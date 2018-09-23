@@ -1,0 +1,44 @@
+ext {
+    android = [
+            compileSdkVersion: 27,
+            buildToolsVersion: "27.0.3",
+            minSdkVersion    : 19,
+            targetSdkVersion : 27,
+            versionCode      : 12,
+            versionName      : "3.0.0"
+    ]
+
+    version = [
+            androidSupportSdkVersion: "27.1.0",
+            retrofitSdkVersion      : "2.4.0",
+            dagger2SdkVersion       : "2.15",
+            glideSdkVersion         : "4.6.1",
+            butterknifeSdkVersion   : "8.8.1",
+            rxlifecycleSdkVersion   : "1.0",
+            rxlifecycle2SdkVersion  : "2.2.1",
+            dagger2SdkVersion       : "2.17",
+            espressoSdkVersion      : "3.0.1",
+            butterknifeSdkVersion   : "8.8.1",
+            canarySdkVersion        : "1.5.4"
+    ]
+
+    dependencies = [
+            //support
+            "appcompat-v7"                  : "com.android.support:appcompat-v7:${version["androidSupportSdkVersion"]}",
+            "design"                        : "com.android.support:design:${version["androidSupportSdkVersion"]}",
+            "support-v4"                    : "com.android.support:support-v4:${version["androidSupportSdkVersion"]}",
+            "cardview-v7"                   : "com.android.support:cardview-v7:${version["androidSupportSdkVersion"]}",
+            "annotations"                   : "com.android.support:support-annotations:${version["androidSupportSdkVersion"]}",
+            "recyclerview-v7"               : "com.android.support:recyclerview-v7:${version["androidSupportSdkVersion"]}",
+            "constraint-layout"             : "com.android.support.constraint:constraint-layout:1.1.2",
+            "dagger2"                       : "com.google.dagger:dagger:${version["dagger2SdkVersion"]}",
+            "dagger2-compiler"              : "com.google.dagger:dagger-compiler:${version["dagger2SdkVersion"]}",
+            "dagger2-android"               : "com.google.dagger:dagger-android:${version["dagger2SdkVersion"]}",
+            "dagger2-android-support"       : "com.google.dagger:dagger-android-support:${version["dagger2SdkVersion"]}",
+            "dagger2-android-processor"     : "com.google.dagger:dagger-android-processor:${version["dagger2SdkVersion"]}",
+            "butterknife"              : "com.jakewharton:butterknife:${version["butterknifeSdkVersion"]}",
+            "butterknife-compiler"     : "com.jakewharton:butterknife-compiler:${version["butterknifeSdkVersion"]}",
+    ]
+
+
+}
