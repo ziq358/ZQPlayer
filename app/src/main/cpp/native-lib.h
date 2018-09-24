@@ -8,7 +8,23 @@
 #define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,TAG, __VA_ARGS__) // 定义LOGD类型
 
 extern "C"{
+    //在c++代码中链接c语言的库，没有添加extern "C"； 会 undefined reference to 'av_frame_alloc'
+    //编码
+    #include "libavcodec/avcodec.h"
+    //封装格式处理
+    #include "libavformat/avformat.h"
+    //像素处理
+    #include "libswscale/swscale.h"
+    #include "libavutil/imgutils.h"
+    #include <android/native_window.h>
+    #include <android/native_window_jni.h>
+
+    #include <libavfilter/avfiltergraph.h>
+    #include <libavfilter/buffersrc.h>
+    #include <libavfilter/buffersink.h>
+    #include "libswresample/swresample.h"
 
     JNIEXPORT jstring JNICALL Java_com_zq_zqplayer_MainActivity_stringFromJNI(JNIEnv *env, jobject);
+    JNIEXPORT void JNICALL Java_com_zq_zqplayer_MainActivity_play(JNIEnv *env, jobject, jobject,jobject, jstring, jint);
 }
 
