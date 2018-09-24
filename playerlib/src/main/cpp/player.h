@@ -24,7 +24,6 @@ extern "C"{
     #include <libavfilter/buffersink.h>
     #include "libswresample/swresample.h"
 
-    JNIEXPORT jstring JNICALL Java_com_zq_zqplayer_MainActivity_stringFromJNI(JNIEnv *env, jobject);
-    JNIEXPORT void JNICALL Java_com_zq_zqplayer_MainActivity_play(JNIEnv *env, jobject, jobject,jobject, jstring, jint);
+    JNIEXPORT void JNICALL Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject, jobject,jobject, jstring, jint);
 }
 

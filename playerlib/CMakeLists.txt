@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-add_library(native-lib
+add_library(player-lib
              SHARED
-             src/main/cpp/native-lib.cpp )
+             src/main/cpp/player.cpp )
 
 include_directories(libs/include)
 
@@ -46,7 +46,7 @@ set_target_properties(avformat-57
 
 find_library( log-lib
               log )
-target_link_libraries( native-lib
+target_link_libraries( player-lib
                        avcodec-57
                        avformat-57
                        avutil-55

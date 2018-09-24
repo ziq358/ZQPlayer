@@ -1,4 +1,4 @@
-#include "native-lib.h"
+#include "player.h"
 
 extern "C"{
 
@@ -6,12 +6,7 @@ extern "C"{
 
     char* jstringToChar(JNIEnv* env, jstring jstr);//定义
 
-    jstring Java_com_zq_zqplayer_MainActivity_stringFromJNI(JNIEnv* env, jobject cls) {
-        std::string hello = "Hello from c++----";
-        return env->NewStringUTF(hello.c_str());
-    }
-
-    void Java_com_zq_zqplayer_MainActivity_play(JNIEnv* env, jobject cls, jobject surface,jobject surfaceFilter, jstring path, jint type) {
+    void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv* env, jobject cls, jobject surface,jobject surfaceFilter, jstring path, jint type) {
     //        char* file_name = jstringToChar(env, path);
         jboolean isCopy = JNI_TRUE;
         const char* file_name = (env)->GetStringUTFChars(path, &isCopy);
