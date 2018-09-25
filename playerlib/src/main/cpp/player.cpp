@@ -11,7 +11,7 @@ extern "C"{
         jboolean isCopy = JNI_TRUE;
         const char* file_name = (env)->GetStringUTFChars(path, &isCopy);
 
-        LOGD("点击 = %s\n", file_name);
+        LOGD("播放 = %s\n", file_name);
         av_register_all();
         avfilter_register_all();//注册 filter
 
@@ -220,7 +220,7 @@ extern "C"{
 
                     // lock native window buffer
                     if(ANativeWindow_lock(nativeWindow, &windowBuffer, 0)){
-                        LOGD("出错 退出");
+                        LOGD("出错 退出 native window");
                         return;
                     };
                     // 格式转换
@@ -252,7 +252,7 @@ extern "C"{
                     //AVfilter end
                     // lock native window buffer
                     if(ANativeWindow_lock(nativeWindowFilter, &windowBufferFilter, 0)){
-                        LOGD("出错 退出");
+                        LOGD("出错 退出 filter native window");
                         return;
                     };
                     // 格式转换
