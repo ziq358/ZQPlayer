@@ -3,6 +3,7 @@ package com.zq.playerlib
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
+import android.util.Log
 import android.view.Surface
 
 class ZQPlayer {
@@ -12,6 +13,15 @@ class ZQPlayer {
     }
 
     external fun play(surface: Surface, surfaceFilter: Surface, path: String, type: Int): Int
+
+
+    fun onLoading(): Unit {
+        Log.e("ziq", "ZQPlayer onLoading")
+    }
+
+
+
+
 
     private var audioTrack: AudioTrack? = null
     //    这个方法  是C进行调用  通道数

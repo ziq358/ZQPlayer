@@ -119,7 +119,7 @@ class MainActivity : BaseActivity<IBasePresenter>() {
         } else if (isSurfaceReady()) {
             isPlaying = true
             Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, 0) }).start()
-            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, 1) }).start()
+//            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, 1) }).start()
         }
     }
 

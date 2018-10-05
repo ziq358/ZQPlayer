@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 add_library(player-lib
+
              SHARED
-             src/main/cpp/player.cpp )
+
+             src/main/cpp/player.cpp
+             src/main/cpp/PlayerCallJava.cpp
+             src/main/cpp/AndroidLog.cpp
+             )
 
 include_directories(libs/include)
 
