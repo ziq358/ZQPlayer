@@ -31,6 +31,7 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
     const char *file_name = (env)->GetStringUTFChars(path, &isCopy);
     logd("播放 = %s, %d\n", file_name, isLogEnable());
 
+
     PlayerCallJava* playerCallJava = new PlayerCallJava(javaVM, &cls);
     playerCallJava->onLoading();
     playerCallJava->onLoading();
@@ -216,10 +217,10 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
     //反射得到Class类型
     jclass david_player = env->GetObjectClass(cls);
     // 反射得到createAudio方法
-    jmethodID createAudio = env->GetMethodID(david_player, "createTrack", "(II)V");
+    jmethodID createAudio = env->GetMethodID(david_player, "initAudioTrack", "(II)V");
     //    反射调用createAudio
     env->CallVoidMethod(cls, createAudio, 44100, out_channer_nb);// 注意第一个参数
-    jmethodID audio_write = env->GetMethodID(david_player, "playTrack", "([BI)V");
+    jmethodID audio_write = env->GetMethodID(david_player, "sendDataToAudioTrack", "([BI)V");
     logd(" 结束　音频初始化");
 
     int frameFinished;

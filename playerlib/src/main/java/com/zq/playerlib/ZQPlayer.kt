@@ -19,13 +19,9 @@ class ZQPlayer {
         Log.e("ziq", "ZQPlayer onLoading")
     }
 
-
-
-
-
+    // AudioTrack 播放 声音
     private var audioTrack: AudioTrack? = null
-    //    这个方法  是C进行调用  通道数
-    fun createTrack(sampleRateInHz: Int, nb_channals: Int) {
+    fun initAudioTrack(sampleRateInHz: Int, nb_channals: Int) {
         val channaleConfig: Int//通道数
         if (nb_channals == 1) {
             channaleConfig = AudioFormat.CHANNEL_OUT_MONO
@@ -39,10 +35,11 @@ class ZQPlayer {
         audioTrack!!.play()
     }
 
-    //C传入音频数据
-    fun playTrack(buffer: ByteArray, lenth: Int) {
+    fun sendDataToAudioTrack(buffer: ByteArray, lenth: Int) {
         if (audioTrack != null && audioTrack!!.playState == AudioTrack.PLAYSTATE_PLAYING) {
             audioTrack!!.write(buffer, 0, lenth)
         }
     }
+
+
 }

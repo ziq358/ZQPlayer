@@ -118,7 +118,7 @@ class MainActivity : BaseActivity<IBasePresenter>() {
             Toast.makeText(this@MainActivity, "已播放", Toast.LENGTH_SHORT).show()
         } else if (isSurfaceReady()) {
             isPlaying = true
-            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, 0) }).start()
+            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, -1) }).start()
 //            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, 1) }).start()
         }
     }

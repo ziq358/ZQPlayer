@@ -12,11 +12,15 @@ class PlayerCallJava {
 public:
     JavaVM *javaVM;
     jobject jobj;
-    jmethodID jmid_onloading;
+    jmethodID jmid_onLoading;
+    jmethodID jmid_initAudioTrack;
+    jmethodID jmid_sendDataToAudioTrack;
 public:
     PlayerCallJava(JavaVM *javaVM, jobject *jobj);
-    void callJavaByMethodID(jmethodID id);
     void onLoading();
+    void initAudioTrack(int sampleRateInHz, int nb_channals);
+    void sendDataToAudioTrack(jbyteArray byteArray, int size);
+
 };
 
 #endif //ZQPLAYER_JAVACALL_H
