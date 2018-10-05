@@ -4,6 +4,7 @@
 extern "C" {
 
 JavaVM *javaVM;
+PlayerCallJava* playerCallJava;
 int ret;
 
 
@@ -32,8 +33,7 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
     logd("播放 = %s, %d\n", file_name, isLogEnable());
 
 
-    PlayerCallJava* playerCallJava = new PlayerCallJava(javaVM, &cls);
-    playerCallJava->onLoading();
+    playerCallJava = new PlayerCallJava(javaVM, &cls);
     playerCallJava->onLoading();
 
     av_register_all();
@@ -214,13 +214,7 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
     swr_init(swrContext);
     int out_channer_nb = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);//    获取通道数  2
 
-    //反射得到Class类型
-    jclass david_player = env->GetObjectClass(cls);
-    // 反射得到createAudio方法
-    jmethodID createAudio = env->GetMethodID(david_player, "initAudioTrack", "(II)V");
-    //    反射调用createAudio
-    env->CallVoidMethod(cls, createAudio, 44100, out_channer_nb);// 注意第一个参数
-    jmethodID audio_write = env->GetMethodID(david_player, "sendDataToAudioTrack", "([BI)V");
+    playerCallJava->initAudioTrack(44100, out_channer_nb);
     logd(" 结束　音频初始化");
 
     int frameFinished;
@@ -318,7 +312,8 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
                 jbyteArray audio_sample_array = env->NewByteArray(size);
                 env->SetByteArrayRegion(audio_sample_array, 0, size,
                                         (const jbyte *) out_buffer);//该函数将本地的数组数据拷贝到了 Java 端的数组中
-                env->CallVoidMethod(cls, audio_write, audio_sample_array, size);//写数据到audioTrack
+                playerCallJava->sendDataToAudioTrack(audio_sample_array, size);
+
                 env->DeleteLocalRef(audio_sample_array);//删除 obj 所指向的局部引用。
             }
         }
