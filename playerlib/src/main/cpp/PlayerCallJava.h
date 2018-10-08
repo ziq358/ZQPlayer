@@ -13,11 +13,13 @@ public:
     JavaVM *javaVM;
     jobject jobj;
     jmethodID jmid_onLoading;
+    jmethodID jmid_onError;
     jmethodID jmid_initAudioTrack;
     jmethodID jmid_sendDataToAudioTrack;
 public:
     PlayerCallJava(JavaVM *javaVM, jobject *jobj);
     void onLoading();
+    void onError(const char *msg);
     void initAudioTrack(int sampleRateInHz, int nb_channals);
     void sendDataToAudioTrack(jbyteArray byteArray, int size);
 

@@ -22,19 +22,20 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
+PlayerCallJava* getPlayerCallJava(JavaVM *jVM, jobject *jobject){
+    if(playerCallJava == NULL){
+        playerCallJava = new PlayerCallJava(javaVM, jobject);
+    }
+    return playerCallJava;
+}
+
 void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surface,
                                          jobject surfaceFilter, jstring path, jint type) {
-    //        char* file_name = jstringToChar(env, path);
-
-
-
     jboolean isCopy = JNI_TRUE;
     const char *file_name = (env)->GetStringUTFChars(path, &isCopy);
     logd("播放 = %s, %d\n", file_name, isLogEnable());
 
-
-    playerCallJava = new PlayerCallJava(javaVM, &cls);
-    playerCallJava->onLoading();
+    getPlayerCallJava(javaVM, &cls)->onLoading();
 
     av_register_all();
     avfilter_register_all();//注册 filter
@@ -214,7 +215,7 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
     swr_init(swrContext);
     int out_channer_nb = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);//    获取通道数  2
 
-    playerCallJava->initAudioTrack(44100, out_channer_nb);
+    getPlayerCallJava(javaVM, &cls)->initAudioTrack(44100, out_channer_nb);
     logd(" 结束　音频初始化");
 
     int frameFinished;
@@ -312,7 +313,7 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
                 jbyteArray audio_sample_array = env->NewByteArray(size);
                 env->SetByteArrayRegion(audio_sample_array, 0, size,
                                         (const jbyte *) out_buffer);//该函数将本地的数组数据拷贝到了 Java 端的数组中
-                playerCallJava->sendDataToAudioTrack(audio_sample_array, size);
+                getPlayerCallJava(javaVM, &cls)->sendDataToAudioTrack(audio_sample_array, size);
 
                 env->DeleteLocalRef(audio_sample_array);//删除 obj 所指向的局部引用。
             }

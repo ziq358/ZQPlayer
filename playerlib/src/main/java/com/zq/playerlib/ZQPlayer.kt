@@ -19,8 +19,13 @@ class ZQPlayer {
         Log.e("ziq", "ZQPlayer onLoading")
     }
 
+    fun onError(msg: String): Unit {
+        Log.e("ziq", "ZQPlayer onError " + msg)
+    }
+
     // AudioTrack 播放 声音
     private var audioTrack: AudioTrack? = null
+
     fun initAudioTrack(sampleRateInHz: Int, nb_channals: Int) {
         val channaleConfig: Int//通道数
         if (nb_channals == 1) {
