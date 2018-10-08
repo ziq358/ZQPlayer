@@ -1,15 +1,15 @@
 #include "player.h"
 
-
 extern "C" {
 
 JavaVM *javaVM;
-PlayerCallJava* playerCallJava;
+PlayerCallJava *playerCallJava;
+AVFormatContext *pFormatCtx;
+Audio *audio;
+Video *video;
 int ret;
 
-
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
-
     jint result = -1;
     javaVM = vm;
     JNIEnv *env;
@@ -22,11 +22,63 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-PlayerCallJava* getPlayerCallJava(JavaVM *jVM, jobject *jobject){
-    if(playerCallJava == NULL){
+PlayerCallJava *getPlayerCallJava(JavaVM *jVM, jobject *jobject) {
+    if (playerCallJava == NULL) {
         playerCallJava = new PlayerCallJava(javaVM, jobject);
     }
     return playerCallJava;
+}
+
+jint Java_com_zq_playerlib_ZQPlayer_prepare(JNIEnv *env, jobject cls, jstring path) {
+    getPlayerCallJava(javaVM, &cls)->onLoading();
+    jboolean isCopy = JNI_TRUE;
+    const char *url = (env)->GetStringUTFChars(path, &isCopy);
+    logd("播放url = %s", url);
+    av_register_all();
+    pFormatCtx = avformat_alloc_context();
+    // 打开文件
+    if (avformat_open_input(&pFormatCtx, url, NULL, NULL) != 0) {
+        logd("无法打开url = %s", url);
+        return JNI_ERR;
+    }
+    // 读 流信息
+    if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
+        logd("没有找到流信息");
+        return JNI_ERR;
+    }
+
+    audio = new Audio(javaVM, getPlayerCallJava(javaVM, &cls));
+    video = new Video();
+    for (int i = 0; i < pFormatCtx->nb_streams; i++) {
+        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            audio->streamList.push_back(i);
+        }
+        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            video->streamList.push_back(i);
+        }
+    }
+
+    if(!audio->streamList.empty()){
+        int audioStreamIndex = audio->streamList.front();
+        audio->currentStreamIndex = audioStreamIndex;
+        audio->init(pFormatCtx->streams[audioStreamIndex]->codecpar);
+    }
+
+    if(!video->streamList.empty()){
+        int videoStreamIndex = video->streamList.front();
+        loge("===video stream index = %d", videoStreamIndex);
+    }
+
+    AVPacket packet;
+    logd("开始读 数据");
+    while (av_read_frame(pFormatCtx, &packet) >= 0) {
+        if (packet.stream_index == audio->currentStreamIndex ) {
+            audio->sendData(&packet);
+        }
+        av_packet_unref(&packet);
+    }
+
+    return JNI_OK;
 }
 
 void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surface,
@@ -245,7 +297,8 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
                     gettimeofday(&currentTv, NULL);
                 }
                 logd("Frame++ %d %d",
-                     int((currentTv.tv_sec * 1000 * 1000 + currentTv.tv_usec ) - (startTv.tv_sec * 1000 * 1000 + startTv.tv_usec )),
+                     int((currentTv.tv_sec * 1000 * 1000 + currentTv.tv_usec) -
+                         (startTv.tv_sec * 1000 * 1000 + startTv.tv_usec)),
                      targetTime);
 
                 // lock native window buffer

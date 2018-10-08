@@ -3,7 +3,12 @@
 #include <string>
 #include <iostream>
 #include "AndroidLog.h"
+
 #include "PlayerCallJava.h"
+
+#include "Audio.h"
+#include "Video.h"
+
 extern "C" {
 //在c++代码中链接c语言的库，没有添加extern "C"； 会 undefined reference to 'av_frame_alloc'
 //编码
@@ -15,7 +20,7 @@ extern "C" {
 #include "libavutil/imgutils.h"
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
-
+//filter
 #include <libavfilter/avfiltergraph.h>
 #include <libavfilter/buffersrc.h>
 #include <libavfilter/buffersink.h>
@@ -24,5 +29,9 @@ extern "C" {
 
 JNIEXPORT void JNICALL
 Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject, jobject, jobject, jstring, jint);
+
+JNIEXPORT jint JNICALL
+Java_com_zq_playerlib_ZQPlayer_prepare(JNIEnv *env, jobject, jstring);
+
 }
 

@@ -5,8 +5,10 @@ add_library(player-lib
              SHARED
 
              src/main/cpp/player.cpp
-             src/main/cpp/PlayerCallJava.cpp
              src/main/cpp/AndroidLog.cpp
+             src/main/cpp/PlayerCallJava.cpp
+             src/main/cpp/Audio.cpp
+             src/main/cpp/Video.cpp
              )
 
 include_directories(libs/include)

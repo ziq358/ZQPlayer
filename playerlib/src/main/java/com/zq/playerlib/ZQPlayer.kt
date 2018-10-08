@@ -12,9 +12,11 @@ class ZQPlayer {
         System.loadLibrary("player-lib")
     }
 
-    external fun play(surface: Surface, surfaceFilter: Surface, path: String, type: Int): Int
+    //native
+    external fun prepare(path: String): Int
+    external fun play(surface: Surface, surfaceFilter: Surface, path: String, type: Int): Unit
 
-
+    //jni  回调
     fun onLoading(): Unit {
         Log.e("ziq", "ZQPlayer onLoading")
     }
