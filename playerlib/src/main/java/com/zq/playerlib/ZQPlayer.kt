@@ -3,6 +3,7 @@ package com.zq.playerlib
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
+import android.os.AsyncTask
 import android.util.Log
 import android.view.Surface
 
@@ -12,17 +13,46 @@ class ZQPlayer {
         System.loadLibrary("player-lib")
     }
 
+
+    interface StatusListener{
+        fun onLoading(): Unit {
+
+        }
+
+        fun onError(msg: String): Unit {
+
+        }
+
+        fun onPrepareFinished(): Unit {
+
+        }
+    }
+
+
+
+    private var listener: StatusListener? = null
+
+    fun setStatusListener(listener: StatusListener?): Unit {
+        this.listener = listener;
+    }
+
+
     //native
     external fun prepare(path: String): Int
+    external fun start(): Unit
     external fun play(surface: Surface, surfaceFilter: Surface, path: String, type: Int): Unit
 
     //jni  回调
     fun onLoading(): Unit {
-        Log.e("ziq", "ZQPlayer onLoading")
+        listener?.onLoading();
     }
 
     fun onError(msg: String): Unit {
-        Log.e("ziq", "ZQPlayer onError " + msg)
+        listener?.onError(msg);
+    }
+
+    fun onPrepareFinished(): Unit {
+        listener?.onPrepareFinished();
     }
 
     // AudioTrack 播放 声音

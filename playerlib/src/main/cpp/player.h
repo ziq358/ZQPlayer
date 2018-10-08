@@ -27,11 +27,32 @@ extern "C" {
 #include "libswresample/swresample.h"
 
 
+class Player {
+public:
+    JavaVM *javaVM;
+    PlayerCallJava *playerCallJava;
+    const char *url;
+    AVFormatContext *pFormatCtx;
+    Audio *audio;
+    Video *video;
+    pthread_t prepareThread;
+    pthread_t startThread;
+public:
+    Player(JavaVM *javaVM, PlayerCallJava *playerCallJava, const char *url);
+    void prepare();
+    void start();
+};
+
+
 JNIEXPORT void JNICALL
 Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject, jobject, jobject, jstring, jint);
 
-JNIEXPORT jint JNICALL
+JNIEXPORT void JNICALL
 Java_com_zq_playerlib_ZQPlayer_prepare(JNIEnv *env, jobject, jstring);
+
+JNIEXPORT void JNICALL
+Java_com_zq_playerlib_ZQPlayer_start(JNIEnv *env, jobject);
+
 
 }
 

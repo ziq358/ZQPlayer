@@ -28,6 +28,7 @@ PlayerCallJava::PlayerCallJava(JavaVM *jVM, jobject *jobject) {
     //反射得到onLoading方法
     jmid_onLoading = env->GetMethodID(player, "onLoading", "()V");
     jmid_onError = env->GetMethodID(player, "onError", "(Ljava/lang/String;)V");
+    jmid_onPrepareFinished = env->GetMethodID(player, "onPrepareFinished", "()V");
     jmid_initAudioTrack = env->GetMethodID(player, "initAudioTrack", "(II)V");
     jmid_sendDataToAudioTrack = env->GetMethodID(player, "sendDataToAudioTrack", "([BI)V");
 
@@ -72,6 +73,26 @@ void PlayerCallJava::onError(const char *msg){
     jstring jmsg = env->NewStringUTF(msg);
     env->CallVoidMethod(jobj, jmid_onError, jmsg);
     env->DeleteLocalRef(jmsg);
+
+    if (isAttached) {
+        javaVM->DetachCurrentThread();
+    }
+}
+
+void PlayerCallJava::onPrepareFinished() {
+    JNIEnv *env;
+    bool isAttached = false;
+    jint status = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (status < 0) {
+        status = javaVM->AttachCurrentThread(&env, NULL);//将当前线程注册到虚拟机中．为了获取JNIEnv， 子线程 需要
+        if(status != JNI_OK){
+            loge("获取JNIEnv 失败");
+            return;
+        }
+        isAttached = true;
+    }
+
+    env->CallVoidMethod(jobj, jmid_onPrepareFinished);
 
     if (isAttached) {
         javaVM->DetachCurrentThread();

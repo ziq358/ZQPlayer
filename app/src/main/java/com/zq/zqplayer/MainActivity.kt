@@ -44,24 +44,34 @@ class MainActivity : BaseActivity<IBasePresenter>() {
     override fun initData(savedInstanceState: Bundle?) {
         initData()
         player = ZQPlayer()
+        player?.setStatusListener(object : ZQPlayer.StatusListener {
+            override fun onLoading() {
+                runOnUiThread {
+                    mBtnPlay.text = "初始化中。。。"
+                    mBtnPlay.isEnabled = false
+                }
+            }
+
+            override fun onPrepareFinished() {
+                runOnUiThread {
+                    mBtnPlay.text = "播放"
+                    mBtnPlay.isEnabled = true
+                }
+            }
+        })
+        player?.prepare(videoPath)
         mTvPath.text = videoPath
-        mBtnPlay.text = "初始化中。。。"
-        mBtnPlay.isEnabled = false
+
+
+
         mSurfaceview.holder.addCallback(object : SurfaceHolder.Callback {
 
             override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
                 mSurfaceHolder = surfaceHolder
-                if (isSurfaceReady()) {
-                    mBtnPlay.text = "准备完成, 点击播放"
-                    mBtnPlay.isEnabled = true
-                    Toast.makeText(this@MainActivity, "准备完成", Toast.LENGTH_SHORT).show()
-                }
             }
 
             override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
                 mSurfaceHolder = surfaceHolder
-                Toast.makeText(this@MainActivity, "surfaceChanged 1", Toast.LENGTH_SHORT).show()
-                play()
             }
 
             override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {
@@ -75,17 +85,10 @@ class MainActivity : BaseActivity<IBasePresenter>() {
 
             override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
                 mSurfaceHolderFilter = surfaceHolder
-                if (isSurfaceReady()) {
-                    mBtnPlay.text = "准备完成, 点击播放"
-                    mBtnPlay.isEnabled = true
-                    Toast.makeText(this@MainActivity, "准备完成", Toast.LENGTH_SHORT).show()
-                }
             }
 
             override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
                 mSurfaceHolderFilter = surfaceHolder
-                Toast.makeText(this@MainActivity, "surfaceChanged 2", Toast.LENGTH_SHORT).show()
-                play()
             }
 
             override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {
@@ -120,8 +123,7 @@ class MainActivity : BaseActivity<IBasePresenter>() {
             isPlaying = true
 //            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, -1) }).start()
 //            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, 1) }).start()
-
-            Thread(Runnable { player?.prepare(videoPath) }).start()
+            player?.start()
         }
     }
 

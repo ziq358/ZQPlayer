@@ -4,16 +4,13 @@ extern "C" {
 
 JavaVM *javaVM;
 PlayerCallJava *playerCallJava;
-AVFormatContext *pFormatCtx;
-Audio *audio;
-Video *video;
+Player *player;
 int ret;
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     jint result = -1;
     javaVM = vm;
     JNIEnv *env;
-
     logd("JNI_OnLoad");
     if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
         loge("GetEnv 失败");
@@ -22,32 +19,32 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-PlayerCallJava *getPlayerCallJava(JavaVM *jVM, jobject *jobject) {
-    if (playerCallJava == NULL) {
-        playerCallJava = new PlayerCallJava(javaVM, jobject);
-    }
-    return playerCallJava;
+
+Player::Player(JavaVM *javaVM, PlayerCallJava *playerCallJava, const char *url) {
+    Player::javaVM = javaVM;
+    Player::playerCallJava = playerCallJava;
+    Player::url = url;
 }
 
-jint Java_com_zq_playerlib_ZQPlayer_prepare(JNIEnv *env, jobject cls, jstring path) {
-    getPlayerCallJava(javaVM, &cls)->onLoading();
-    jboolean isCopy = JNI_TRUE;
-    const char *url = (env)->GetStringUTFChars(path, &isCopy);
+void Player::prepare() {
+    playerCallJava->onLoading();
     logd("播放url = %s", url);
     av_register_all();
     pFormatCtx = avformat_alloc_context();
     // 打开文件
     if (avformat_open_input(&pFormatCtx, url, NULL, NULL) != 0) {
         logd("无法打开url = %s", url);
-        return JNI_ERR;
+        playerCallJava->onError("无法打开url");
+        return ;
     }
     // 读 流信息
     if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
         logd("没有找到流信息");
-        return JNI_ERR;
+        playerCallJava->onError("没有找到流信息");
+        return ;
     }
 
-    audio = new Audio(javaVM, getPlayerCallJava(javaVM, &cls));
+    audio = new Audio(javaVM, playerCallJava);
     video = new Video();
     for (int i = 0; i < pFormatCtx->nb_streams; i++) {
         if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
@@ -69,6 +66,11 @@ jint Java_com_zq_playerlib_ZQPlayer_prepare(JNIEnv *env, jobject cls, jstring pa
         loge("===video stream index = %d", videoStreamIndex);
     }
 
+    playerCallJava->onPrepareFinished();
+
+}
+
+void Player::start() {
     AVPacket packet;
     logd("开始读 数据");
     while (av_read_frame(pFormatCtx, &packet) >= 0) {
@@ -77,9 +79,33 @@ jint Java_com_zq_playerlib_ZQPlayer_prepare(JNIEnv *env, jobject cls, jstring pa
         }
         av_packet_unref(&packet);
     }
-
-    return JNI_OK;
 }
+
+void* prepareRunnable(void *data) {
+    Player* player = (Player*)data;
+    player->prepare();
+    return NULL;
+}
+
+void Java_com_zq_playerlib_ZQPlayer_prepare(JNIEnv *env, jobject cls, jstring path) {
+    jboolean isCopy = JNI_TRUE;
+    const char *url = (env)->GetStringUTFChars(path, &isCopy);
+    playerCallJava = new PlayerCallJava(javaVM, &cls);
+    player = new Player(javaVM, playerCallJava, url);
+    pthread_create(&player->prepareThread, NULL, prepareRunnable, player);
+}
+
+void* startRunnable(void *data) {
+    Player* player = (Player*)data;
+    player->start();
+    return NULL;
+}
+
+void Java_com_zq_playerlib_ZQPlayer_start(JNIEnv *env, jobject cls) {
+    pthread_create(&player->startThread, NULL, startRunnable, player);
+}
+
+
 
 void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surface,
                                          jobject surfaceFilter, jstring path, jint type) {
@@ -87,7 +113,7 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
     const char *file_name = (env)->GetStringUTFChars(path, &isCopy);
     logd("播放 = %s, %d\n", file_name, isLogEnable());
 
-    getPlayerCallJava(javaVM, &cls)->onLoading();
+    playerCallJava->onLoading();
 
     av_register_all();
     avfilter_register_all();//注册 filter
@@ -267,7 +293,7 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
     swr_init(swrContext);
     int out_channer_nb = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);//    获取通道数  2
 
-    getPlayerCallJava(javaVM, &cls)->initAudioTrack(44100, out_channer_nb);
+    playerCallJava->initAudioTrack(44100, out_channer_nb);
     logd(" 结束　音频初始化");
 
     int frameFinished;
@@ -366,7 +392,7 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
                 jbyteArray audio_sample_array = env->NewByteArray(size);
                 env->SetByteArrayRegion(audio_sample_array, 0, size,
                                         (const jbyte *) out_buffer);//该函数将本地的数组数据拷贝到了 Java 端的数组中
-                getPlayerCallJava(javaVM, &cls)->sendDataToAudioTrack(audio_sample_array, size);
+                playerCallJava->sendDataToAudioTrack(audio_sample_array, size);
 
                 env->DeleteLocalRef(audio_sample_array);//删除 obj 所指向的局部引用。
             }
