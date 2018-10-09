@@ -108,7 +108,9 @@ void Audio::sendData(AVPacket* packet) {
         if (isAttached) {
             javaVM->DetachCurrentThread();
         }
-
     }
+    av_packet_free(&packet);
+    av_free(packet);
+    packet = NULL;
 }
 

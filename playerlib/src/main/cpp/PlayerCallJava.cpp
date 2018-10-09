@@ -27,8 +27,11 @@ PlayerCallJava::PlayerCallJava(JavaVM *jVM, jobject *jobject) {
     jclass player = env->GetObjectClass(jobj);
     //反射得到onLoading方法
     jmid_onLoading = env->GetMethodID(player, "onLoading", "()V");
-    jmid_onError = env->GetMethodID(player, "onError", "(Ljava/lang/String;)V");
     jmid_onPrepareFinished = env->GetMethodID(player, "onPrepareFinished", "()V");
+    jmid_onPlaying = env->GetMethodID(player, "onPlaying", "()V");
+    jmid_onPause = env->GetMethodID(player, "onPause", "()V");
+    jmid_onStop = env->GetMethodID(player, "onStop", "()V");
+    jmid_onError = env->GetMethodID(player, "onError", "(Ljava/lang/String;)V");
     jmid_initAudioTrack = env->GetMethodID(player, "initAudioTrack", "(II)V");
     jmid_sendDataToAudioTrack = env->GetMethodID(player, "sendDataToAudioTrack", "([BI)V");
 
@@ -58,6 +61,87 @@ void PlayerCallJava::onLoading() {
     }
 }
 
+void PlayerCallJava::onPrepareFinished() {
+    JNIEnv *env;
+    bool isAttached = false;
+    jint status = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (status < 0) {
+        status = javaVM->AttachCurrentThread(&env, NULL);
+        if(status != JNI_OK){
+            loge("获取JNIEnv 失败");
+            return;
+        }
+        isAttached = true;
+    }
+
+    env->CallVoidMethod(jobj, jmid_onPrepareFinished);
+
+    if (isAttached) {
+        javaVM->DetachCurrentThread();
+    }
+}
+
+void PlayerCallJava::onPlaying() {
+    JNIEnv *env;
+    bool isAttached = false;
+    jint status = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (status < 0) {
+        status = javaVM->AttachCurrentThread(&env, NULL);
+        if(status != JNI_OK){
+            loge("获取JNIEnv 失败");
+            return;
+        }
+        isAttached = true;
+    }
+
+    env->CallVoidMethod(jobj, jmid_onPlaying);
+
+    if (isAttached) {
+        javaVM->DetachCurrentThread();
+    }
+}
+
+void PlayerCallJava::onPause() {
+    JNIEnv *env;
+    bool isAttached = false;
+    jint status = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (status < 0) {
+        status = javaVM->AttachCurrentThread(&env, NULL);
+        if(status != JNI_OK){
+            loge("获取JNIEnv 失败");
+            return;
+        }
+        isAttached = true;
+    }
+
+    env->CallVoidMethod(jobj, jmid_onPause);
+
+    if (isAttached) {
+        javaVM->DetachCurrentThread();
+    }
+}
+
+void PlayerCallJava::onStop() {
+    JNIEnv *env;
+    bool isAttached = false;
+    jint status = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (status < 0) {
+        status = javaVM->AttachCurrentThread(&env, NULL);
+        if(status != JNI_OK){
+            loge("获取JNIEnv 失败");
+            return;
+        }
+        isAttached = true;
+    }
+
+    env->CallVoidMethod(jobj, jmid_onStop);
+
+    if (isAttached) {
+        javaVM->DetachCurrentThread();
+    }
+}
+
+
 void PlayerCallJava::onError(const char *msg){
     JNIEnv *env;
     bool isAttached = false;
@@ -79,25 +163,7 @@ void PlayerCallJava::onError(const char *msg){
     }
 }
 
-void PlayerCallJava::onPrepareFinished() {
-    JNIEnv *env;
-    bool isAttached = false;
-    jint status = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
-    if (status < 0) {
-        status = javaVM->AttachCurrentThread(&env, NULL);//将当前线程注册到虚拟机中．为了获取JNIEnv， 子线程 需要
-        if(status != JNI_OK){
-            loge("获取JNIEnv 失败");
-            return;
-        }
-        isAttached = true;
-    }
 
-    env->CallVoidMethod(jobj, jmid_onPrepareFinished);
-
-    if (isAttached) {
-        javaVM->DetachCurrentThread();
-    }
-}
 
 void PlayerCallJava::initAudioTrack(int sampleRateInHz, int nb_channals) {
     JNIEnv *env;

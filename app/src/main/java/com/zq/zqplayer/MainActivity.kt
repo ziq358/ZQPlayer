@@ -58,6 +58,17 @@ class MainActivity : BaseActivity<IBasePresenter>() {
                     mBtnPlay.isEnabled = true
                 }
             }
+
+            override fun onPlaying() {
+                runOnUiThread {
+                    mBtnPlay.text = "暂停"
+                }
+            }
+            override fun onPause() {
+                runOnUiThread {
+                    mBtnPlay.text = "播放"
+                }
+            }
         })
         player?.prepare(videoPath)
         mTvPath.text = videoPath
@@ -75,7 +86,6 @@ class MainActivity : BaseActivity<IBasePresenter>() {
             }
 
             override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {
-                isPlaying = false
                 mSurfaceHolder = null
                 Toast.makeText(this@MainActivity, "surfaceDestroyed 1", Toast.LENGTH_SHORT).show()
             }
@@ -92,7 +102,6 @@ class MainActivity : BaseActivity<IBasePresenter>() {
             }
 
             override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {
-                isPlaying = false
                 mSurfaceHolderFilter = null
                 Toast.makeText(this@MainActivity, "surfaceDestroyed 2", Toast.LENGTH_SHORT).show()
             }
@@ -117,14 +126,13 @@ class MainActivity : BaseActivity<IBasePresenter>() {
 
     @Synchronized
     private fun play() {
-        if (isPlaying) {
-            Toast.makeText(this@MainActivity, "已播放", Toast.LENGTH_SHORT).show()
-        } else if (isSurfaceReady()) {
-            isPlaying = true
-//            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, -1) }).start()
-//            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, 1) }).start()
+        if (player?.isPlaying()!!) {
+            player?.pause()
+        } else {
             player?.start()
         }
+//            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, -1) }).start()
+//            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, 1) }).start()
     }
 
 

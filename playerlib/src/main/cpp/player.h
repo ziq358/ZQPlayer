@@ -27,6 +27,12 @@ extern "C" {
 #include "libswresample/swresample.h"
 
 
+#define PLAY_STATUS_IDLE    0
+#define PLAY_STATUS_PREPARED    1
+#define PLAY_STATUS_PLAYING    2
+#define PLAY_STATUS_PAUSE    3
+#define PLAY_STATUS_STOP    4
+
 class Player {
 public:
     JavaVM *javaVM;
@@ -37,10 +43,14 @@ public:
     Video *video;
     pthread_t prepareThread;
     pthread_t startThread;
+    int status = PLAY_STATUS_IDLE;
 public:
     Player(JavaVM *javaVM, PlayerCallJava *playerCallJava, const char *url);
     void prepare();
     void start();
+    void pause();
+    void stop();
+    bool isPlaying();
 };
 
 
@@ -53,6 +63,13 @@ Java_com_zq_playerlib_ZQPlayer_prepare(JNIEnv *env, jobject, jstring);
 JNIEXPORT void JNICALL
 Java_com_zq_playerlib_ZQPlayer_start(JNIEnv *env, jobject);
 
+JNIEXPORT void JNICALL
+Java_com_zq_playerlib_ZQPlayer_pause(JNIEnv *env, jobject);
 
+JNIEXPORT void JNICALL
+Java_com_zq_playerlib_ZQPlayer_stop(JNIEnv *env, jobject);
+
+JNIEXPORT jboolean JNICALL
+Java_com_zq_playerlib_ZQPlayer_isPlaying(JNIEnv *env, jobject);
 }
 

@@ -5,7 +5,7 @@ extern "C" {
 JavaVM *javaVM;
 PlayerCallJava *playerCallJava;
 Player *player;
-int ret;
+
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     jint result = -1;
@@ -66,19 +66,48 @@ void Player::prepare() {
         loge("===video stream index = %d", videoStreamIndex);
     }
 
+    status = PLAY_STATUS_PREPARED;
     playerCallJava->onPrepareFinished();
-
 }
 
 void Player::start() {
-    AVPacket packet;
-    logd("开始读 数据");
-    while (av_read_frame(pFormatCtx, &packet) >= 0) {
-        if (packet.stream_index == audio->currentStreamIndex ) {
-            audio->sendData(&packet);
+    if(status == PLAY_STATUS_PAUSE || status == PLAY_STATUS_PREPARED){
+        status = PLAY_STATUS_PLAYING;
+        playerCallJava->onPlaying();
+        while(status == PLAY_STATUS_PLAYING){
+            AVPacket* packet = av_packet_alloc();
+            int ret = av_read_frame(pFormatCtx, packet);
+            if(ret == 0){
+                logd("111读 数据 pts = %lld size = %d ", packet->pts, packet->size);
+                if (packet->stream_index == audio->currentStreamIndex ) {
+                    audio->sendData(packet);
+                    logd("222读 数据 pts = %lld size = %d ", packet->pts, packet->size);
+                }else{
+                    av_packet_free(&packet);
+                    av_free(packet);
+                    packet = NULL;
+                }
+            }else{
+                av_packet_free(&packet);
+                av_free(packet);
+                packet = NULL;
+            }
         }
-        av_packet_unref(&packet);
     }
+}
+
+void Player::pause() {
+    status = PLAY_STATUS_PAUSE;
+    playerCallJava->onPause();
+}
+
+void Player::stop() {
+    status = PLAY_STATUS_STOP;
+    playerCallJava->onStop();
+}
+
+bool Player::isPlaying() {
+    return status == PLAY_STATUS_PLAYING;
 }
 
 void* prepareRunnable(void *data) {
@@ -105,7 +134,17 @@ void Java_com_zq_playerlib_ZQPlayer_start(JNIEnv *env, jobject cls) {
     pthread_create(&player->startThread, NULL, startRunnable, player);
 }
 
+void Java_com_zq_playerlib_ZQPlayer_pause(JNIEnv *env, jobject cls) {
+    player->pause();
+}
 
+void Java_com_zq_playerlib_ZQPlayer_stop(JNIEnv *env, jobject cls) {
+    player->stop();
+}
+
+jboolean Java_com_zq_playerlib_ZQPlayer_isPlaying(JNIEnv *env, jobject cls) {
+    return player->isPlaying();
+}
 
 void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surface,
                                          jobject surfaceFilter, jstring path, jint type) {
@@ -226,6 +265,7 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
              videoCodecCtx->width, videoCodecCtx->height, videoCodecCtx->pix_fmt,
              videoCodecCtx->time_base.num, videoCodecCtx->time_base.den,
              videoCodecCtx->sample_aspect_ratio.num, videoCodecCtx->sample_aspect_ratio.den);
+    int ret;
     ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in", args, NULL, filter_graph);
     if (ret < 0) {
         logd("无法创建 buffer source %d", ret);

@@ -15,44 +15,56 @@ class ZQPlayer {
 
 
     interface StatusListener{
-        fun onLoading(): Unit {
+        fun onLoading(): Unit {}
 
-        }
+        fun onPrepareFinished(): Unit {}
 
-        fun onError(msg: String): Unit {
+        fun onPlaying(): Unit {}
 
-        }
+        fun onPause(): Unit {}
 
-        fun onPrepareFinished(): Unit {
+        fun onStop(): Unit {}
 
-        }
+        fun onError(msg: String): Unit {}
     }
-
-
 
     private var listener: StatusListener? = null
 
     fun setStatusListener(listener: StatusListener?): Unit {
-        this.listener = listener;
+        this.listener = listener
     }
-
 
     //native
     external fun prepare(path: String): Int
     external fun start(): Unit
+    external fun pause(): Unit
+    external fun stop(): Unit
+    external fun isPlaying(): Boolean
     external fun play(surface: Surface, surfaceFilter: Surface, path: String, type: Int): Unit
 
     //jni  回调
     fun onLoading(): Unit {
-        listener?.onLoading();
-    }
-
-    fun onError(msg: String): Unit {
-        listener?.onError(msg);
+        listener?.onLoading()
     }
 
     fun onPrepareFinished(): Unit {
-        listener?.onPrepareFinished();
+        listener?.onPrepareFinished()
+    }
+
+    fun onPlaying(): Unit {
+        listener?.onPlaying()
+    }
+
+    fun onPause(): Unit {
+        listener?.onPause()
+    }
+
+    fun onStop(): Unit {
+        listener?.onStop()
+    }
+
+    fun onError(msg: String): Unit {
+        listener?.onError(msg)
     }
 
     // AudioTrack 播放 声音
