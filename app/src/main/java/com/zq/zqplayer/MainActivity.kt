@@ -43,35 +43,10 @@ class MainActivity : BaseActivity<IBasePresenter>() {
 
     override fun initData(savedInstanceState: Bundle?) {
         initData()
-        player = ZQPlayer()
-        player?.setStatusListener(object : ZQPlayer.StatusListener {
-            override fun onLoading() {
-                runOnUiThread {
-                    mBtnPlay.text = "初始化中。。。"
-                    mBtnPlay.isEnabled = false
-                }
-            }
-
-            override fun onPrepareFinished() {
-                runOnUiThread {
-                    mBtnPlay.text = "播放"
-                    mBtnPlay.isEnabled = true
-                }
-            }
-
-            override fun onPlaying() {
-                runOnUiThread {
-                    mBtnPlay.text = "暂停"
-                }
-            }
-            override fun onPause() {
-                runOnUiThread {
-                    mBtnPlay.text = "播放"
-                }
-            }
-        })
-        player?.prepare(videoPath)
         mTvPath.text = videoPath
+
+
+
 
 
 
@@ -79,6 +54,7 @@ class MainActivity : BaseActivity<IBasePresenter>() {
 
             override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
                 mSurfaceHolder = surfaceHolder
+                initPlayer()
             }
 
             override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
@@ -107,6 +83,38 @@ class MainActivity : BaseActivity<IBasePresenter>() {
             }
         })
 
+    }
+
+    fun initPlayer(): Unit {
+        player = ZQPlayer()
+        player?.setStatusListener(object : ZQPlayer.StatusListener {
+            override fun onLoading() {
+                runOnUiThread {
+                    mBtnPlay.text = "初始化中。。。"
+                    mBtnPlay.isEnabled = false
+                }
+            }
+
+            override fun onPrepareFinished() {
+                runOnUiThread {
+                    mBtnPlay.text = "播放"
+                    mBtnPlay.isEnabled = true
+                }
+            }
+
+            override fun onPlaying() {
+                runOnUiThread {
+                    mBtnPlay.text = "暂停"
+                }
+            }
+            override fun onPause() {
+                runOnUiThread {
+                    mBtnPlay.text = "播放"
+                }
+            }
+        })
+        player?.prepare(videoPath)
+        player?.setSurfsce(mSurfaceHolder?.surface)
     }
 
     @OnClick(R.id.play)

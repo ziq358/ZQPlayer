@@ -34,6 +34,8 @@ PlayerCallJava::PlayerCallJava(JavaVM *jVM, jobject *jobject) {
     jmid_onError = env->GetMethodID(player, "onError", "(Ljava/lang/String;)V");
     jmid_initAudioTrack = env->GetMethodID(player, "initAudioTrack", "(II)V");
     jmid_sendDataToAudioTrack = env->GetMethodID(player, "sendDataToAudioTrack", "([BI)V");
+    jmid_initMediaCodec = env->GetMethodID(player, "initMediaCodec", "(Ljava/lang/String;II[B[B)V");
+    jmid_sendToMediaCodec = env->GetMethodID(player, "sendToMediaCodec", "([BII)V");
 
     if (isAttached) {
         javaVM->DetachCurrentThread();
@@ -185,7 +187,7 @@ void PlayerCallJava::initAudioTrack(int sampleRateInHz, int nb_channals) {
     }
 }
 
-void PlayerCallJava::sendDataToAudioTrack(jbyteArray byteArray, int size){
+void PlayerCallJava::sendDataToAudioTrack(uint8_t *out_buffer, int size){
     JNIEnv *env;
     bool isAttached = false;
     jint status = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
@@ -198,7 +200,61 @@ void PlayerCallJava::sendDataToAudioTrack(jbyteArray byteArray, int size){
         isAttached = true;
     }
 
-    env->CallVoidMethod(jobj, jmid_sendDataToAudioTrack, byteArray, size);
+    jbyteArray audio_sample_array = env->NewByteArray(size);
+    env->SetByteArrayRegion(audio_sample_array, 0, size, (const jbyte *) out_buffer);//该函数将本地的数组数据拷贝到了 Java 端的数组中
+    env->CallVoidMethod(jobj, jmid_sendDataToAudioTrack, audio_sample_array, size);
+    env->DeleteLocalRef(audio_sample_array);//删除 obj 所指向的局部引用。
+
+    if (isAttached) {
+        javaVM->DetachCurrentThread();
+    }
+}
+
+void PlayerCallJava::initMediaCodec(const char *mimetype, int width, int height, int csd_0_size, int csd_1_size, uint8_t *csd_0, uint8_t *csd_1){
+    JNIEnv *env;
+    bool isAttached = false;
+    jint status = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (status < 0) {
+        status = javaVM->AttachCurrentThread(&env, NULL);//将当前线程注册到虚拟机中．为了获取JNIEnv， 子线程 需要
+        if(status != JNI_OK){
+            loge("获取JNIEnv 失败");
+            return;
+        }
+        isAttached = true;
+    }
+    jstring vedioMimetype = env->NewStringUTF(mimetype);
+    jbyteArray csd0 = env->NewByteArray(csd_0_size);
+    env->SetByteArrayRegion(csd0, 0, csd_0_size, (const jbyte *) csd_0);
+    jbyteArray csd1 = env->NewByteArray(csd_1_size);
+    env->SetByteArrayRegion(csd0, 0, csd_1_size, (const jbyte *) csd_1);
+
+    env->CallVoidMethod(jobj, jmid_initMediaCodec, vedioMimetype, width, height, csd0, csd1);
+
+    env->DeleteLocalRef(vedioMimetype);
+    env->DeleteLocalRef(csd0);
+    env->DeleteLocalRef(csd1);
+
+    if (isAttached) {
+        javaVM->DetachCurrentThread();
+    }
+}
+
+void PlayerCallJava::sendToMediaCodec(uint8_t *packet_data, int size, int pts){
+    JNIEnv *env;
+    bool isAttached = false;
+    jint status = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (status < 0) {
+        status = javaVM->AttachCurrentThread(&env, NULL);//将当前线程注册到虚拟机中．为了获取JNIEnv， 子线程 需要
+        if(status != JNI_OK){
+            loge("获取JNIEnv 失败");
+            return;
+        }
+        isAttached = true;
+    }
+    jbyteArray data = env->NewByteArray(size);
+    env->SetByteArrayRegion(data, 0, size, (jbyte*)packet_data);
+    env->CallVoidMethod(jobj, jmid_sendToMediaCodec, data, size, pts);
+    env->DeleteLocalRef(data);
 
     if (isAttached) {
         javaVM->DetachCurrentThread();

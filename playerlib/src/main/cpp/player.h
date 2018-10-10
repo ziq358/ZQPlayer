@@ -25,13 +25,9 @@ extern "C" {
 #include <libavfilter/buffersrc.h>
 #include <libavfilter/buffersink.h>
 #include "libswresample/swresample.h"
-
-
-#define PLAY_STATUS_IDLE    0
-#define PLAY_STATUS_PREPARED    1
-#define PLAY_STATUS_PLAYING    2
-#define PLAY_STATUS_PAUSE    3
-#define PLAY_STATUS_STOP    4
+#include "libavutil/time.h"
+#include "Clock.h"
+#include "common.h"
 
 class Player {
 public:
@@ -39,11 +35,12 @@ public:
     PlayerCallJava *playerCallJava;
     const char *url;
     AVFormatContext *pFormatCtx;
+    Clock *clock;
     Audio *audio;
     Video *video;
     pthread_t prepareThread;
     pthread_t startThread;
-    int status = PLAY_STATUS_IDLE;
+    int status = STATUS_IDLE;
 public:
     Player(JavaVM *javaVM, PlayerCallJava *playerCallJava, const char *url);
     void prepare();

@@ -20,6 +20,8 @@ public:
     jmethodID jmid_onError;
     jmethodID jmid_initAudioTrack;
     jmethodID jmid_sendDataToAudioTrack;
+    jmethodID jmid_initMediaCodec;
+    jmethodID jmid_sendToMediaCodec;
 public:
     PlayerCallJava(JavaVM *javaVM, jobject *jobj);
     void onLoading();
@@ -29,7 +31,9 @@ public:
     void onStop();
     void onError(const char *msg);
     void initAudioTrack(int sampleRateInHz, int nb_channals);
-    void sendDataToAudioTrack(jbyteArray byteArray, int size);
+    void sendDataToAudioTrack(uint8_t *out_buffer, int size);
+    void initMediaCodec(const char *mimetype, int width, int height, int csd_0_size, int csd_1_size, uint8_t *csd_0, uint8_t *csd_1);
+    void sendToMediaCodec(uint8_t *packet_data, int size, int pts);
 
 };
 

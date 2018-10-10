@@ -45,7 +45,7 @@ void Player::prepare() {
     }
 
     audio = new Audio(javaVM, playerCallJava);
-    video = new Video();
+    video = new Video(javaVM, playerCallJava);
     for (int i = 0; i < pFormatCtx->nb_streams; i++) {
         if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             audio->streamList.push_back(i);
@@ -55,59 +55,75 @@ void Player::prepare() {
         }
     }
 
+    clock = new Clock();
     if(!audio->streamList.empty()){
         int audioStreamIndex = audio->streamList.front();
         audio->currentStreamIndex = audioStreamIndex;
-        audio->init(pFormatCtx->streams[audioStreamIndex]->codecpar);
+        audio->init(pFormatCtx->streams[audioStreamIndex]);
+        audio->duration = pFormatCtx->duration / 1000000;
+        audio->clock = clock;
     }
 
     if(!video->streamList.empty()){
         int videoStreamIndex = video->streamList.front();
-        loge("===video stream index = %d", videoStreamIndex);
+        video->currentStreamIndex = videoStreamIndex;
+        video->init(pFormatCtx->streams[videoStreamIndex]);
+        video->duration = pFormatCtx->duration / 1000000;
+        video->clock = clock;
     }
 
-    status = PLAY_STATUS_PREPARED;
+    status = STATUS_PREPARED;
     playerCallJava->onPrepareFinished();
 }
 
 void Player::start() {
-    if(status == PLAY_STATUS_PAUSE || status == PLAY_STATUS_PREPARED){
-        status = PLAY_STATUS_PLAYING;
-        playerCallJava->onPlaying();
-        while(status == PLAY_STATUS_PLAYING){
-            AVPacket* packet = av_packet_alloc();
-            int ret = av_read_frame(pFormatCtx, packet);
-            if(ret == 0){
-                logd("111读 数据 pts = %lld size = %d ", packet->pts, packet->size);
-                if (packet->stream_index == audio->currentStreamIndex ) {
-                    audio->sendData(packet);
-                    logd("222读 数据 pts = %lld size = %d ", packet->pts, packet->size);
-                }else{
-                    av_packet_free(&packet);
-                    av_free(packet);
-                    packet = NULL;
-                }
-            }else{
+    status = STATUS_PLAYING;
+    playerCallJava->onPlaying();
+
+    loge("主 Player 启动");
+    while(status != STATUS_STOP){
+        if(status == STATUS_PAUSE || audio->queuePacket.size() > 50 || video->queuePacket.size() > 50 ){
+//            logd("主 Player 睡眠");
+            av_usleep(1000 * 10);
+            continue;
+        }
+        AVPacket* packet = av_packet_alloc();
+        int ret = av_read_frame(pFormatCtx, packet);
+        if(ret == 0){
+            if (packet->stream_index == audio->currentStreamIndex ) {
+                audio->sendData(packet);
+            }else if (packet->stream_index == video->currentStreamIndex ){
+                video->sendData(packet);
+            } else {
                 av_packet_free(&packet);
                 av_free(packet);
                 packet = NULL;
             }
+        }else{
+            av_packet_free(&packet);
+            av_free(packet);
+            packet = NULL;
         }
     }
+    loge("主 Player 结束 ");
 }
 
 void Player::pause() {
-    status = PLAY_STATUS_PAUSE;
+    status = STATUS_PAUSE;
+    audio->pause();
+    video->pause();
     playerCallJava->onPause();
 }
 
 void Player::stop() {
-    status = PLAY_STATUS_STOP;
+    status = STATUS_STOP;
+    audio->stop();
+    video->stop();
     playerCallJava->onStop();
 }
 
 bool Player::isPlaying() {
-    return status == PLAY_STATUS_PLAYING;
+    return status == STATUS_PLAYING;
 }
 
 void* prepareRunnable(void *data) {
@@ -131,7 +147,16 @@ void* startRunnable(void *data) {
 }
 
 void Java_com_zq_playerlib_ZQPlayer_start(JNIEnv *env, jobject cls) {
-    pthread_create(&player->startThread, NULL, startRunnable, player);
+    if(player->status == STATUS_PAUSE){
+        player->status = STATUS_PLAYING;
+        player->audio->play();
+        player->video->play();
+        playerCallJava->onPlaying();
+    } else{
+        player->audio->play();
+        player->video->play();
+        pthread_create(&player->startThread, NULL, startRunnable, player);
+    }
 }
 
 void Java_com_zq_playerlib_ZQPlayer_pause(JNIEnv *env, jobject cls) {
@@ -146,8 +171,7 @@ jboolean Java_com_zq_playerlib_ZQPlayer_isPlaying(JNIEnv *env, jobject cls) {
     return player->isPlaying();
 }
 
-void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surface,
-                                         jobject surfaceFilter, jstring path, jint type) {
+void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surface, jobject surfaceFilter, jstring path, jint type) {
     jboolean isCopy = JNI_TRUE;
     const char *file_name = (env)->GetStringUTFChars(path, &isCopy);
     logd("播放 = %s, %d\n", file_name, isLogEnable());
@@ -425,16 +449,9 @@ void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surfa
             //  解码  mp3   编码格式frame----pcm   frame
             avcodec_decode_audio4(audioCodecCtx, pFrame, &frameFinished, &packet);
             if (frameFinished) {
-                swr_convert(swrContext, &out_buffer, 44100 * 2, (const uint8_t **) pFrame->data,
-                            pFrame->nb_samples);
-                int size = av_samples_get_buffer_size(NULL, out_channer_nb, pFrame->nb_samples,
-                                                      AV_SAMPLE_FMT_S16, 1);
-                jbyteArray audio_sample_array = env->NewByteArray(size);
-                env->SetByteArrayRegion(audio_sample_array, 0, size,
-                                        (const jbyte *) out_buffer);//该函数将本地的数组数据拷贝到了 Java 端的数组中
-                playerCallJava->sendDataToAudioTrack(audio_sample_array, size);
-
-                env->DeleteLocalRef(audio_sample_array);//删除 obj 所指向的局部引用。
+                swr_convert(swrContext, &out_buffer, 44100 * 2, (const uint8_t **) pFrame->data, pFrame->nb_samples);
+                int size = av_samples_get_buffer_size(NULL, out_channer_nb, pFrame->nb_samples, AV_SAMPLE_FMT_S16, 1);
+                playerCallJava->sendDataToAudioTrack(out_buffer, size);
             }
         }
         av_packet_unref(&packet);

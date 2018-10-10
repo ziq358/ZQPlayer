@@ -1,11 +1,10 @@
 package com.zq.playerlib
 
-import android.media.AudioFormat
-import android.media.AudioManager
-import android.media.AudioTrack
+import android.media.*
 import android.os.AsyncTask
 import android.util.Log
 import android.view.Surface
+import java.nio.ByteBuffer
 
 class ZQPlayer {
 
@@ -90,5 +89,53 @@ class ZQPlayer {
         }
     }
 
+    private var surface: Surface? = null
+    private var mediaCodec:MediaCodec? = null
+    fun setSurfsce(surface: Surface?): Unit {
+        this.surface = surface
+    }
 
+    fun initMediaCodec(mimetype: String, width: Int, height: Int, csd0: ByteArray, csd1: ByteArray) {
+        if (surface != null) {
+            try {
+                Log.e("ziq", "initMediaCodec " + mimetype)
+                var mediaFormat:MediaFormat = MediaFormat.createVideoFormat(mimetype, width, height)
+                mediaFormat.setInteger(MediaFormat.KEY_WIDTH, width)
+                mediaFormat.setInteger(MediaFormat.KEY_HEIGHT, height)
+                mediaFormat.setLong(MediaFormat.KEY_MAX_INPUT_SIZE, (width * height).toLong())
+                mediaFormat.setByteBuffer("csd-0", ByteBuffer.wrap(csd0))
+                mediaFormat.setByteBuffer("csd-1", ByteBuffer.wrap(csd1))
+                mediaCodec = MediaCodec.createDecoderByType(mimetype)
+                if (surface != null) {
+                    mediaCodec?.configure(mediaFormat, surface, null, 0)
+                    mediaCodec?.start()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun sendToMediaCodec(bytes: ByteArray?, size: Int, pts: Int) {
+        if (bytes != null && mediaCodec != null) {
+            try {
+                val videoBufferInfo = MediaCodec.BufferInfo()
+                val inputBufferIndex:Int? = mediaCodec?.dequeueInputBuffer(10)
+                if (inputBufferIndex!! >= 0) {
+                    val byteBuffer = mediaCodec?.getInputBuffers()!![inputBufferIndex]
+                    byteBuffer.clear()
+                    byteBuffer.put(bytes)
+                    mediaCodec?.queueInputBuffer(inputBufferIndex!!, 0, size, pts.toLong(), 0)
+                }
+
+                var index = mediaCodec?.dequeueOutputBuffer(videoBufferInfo, 10)
+                while (index!! >= 0) {
+                    mediaCodec?.releaseOutputBuffer(index, true)
+                    index = mediaCodec?.dequeueOutputBuffer(videoBufferInfo, 10)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 }
