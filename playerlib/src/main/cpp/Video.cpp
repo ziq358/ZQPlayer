@@ -4,6 +4,7 @@
 
 #include "Video.h"
 
+
 Video::Video(JavaVM *javaVM, PlayerCallJava *playerCallJava) {
     Video::javaVM = javaVM;
     Video::playerCallJava = playerCallJava;
@@ -72,12 +73,12 @@ void Video::playAction() {
         countSend++;
         AVPacket *packet = queuePacket.front();
         double time = packet->pts * av_q2d(time_base);
-        loge("--- 视频 取数据  队列 %d 次数 %d 时间  %f ", queuePacket.size(), countSend, time);
+        loge("--- 视频 取数据  队列 %d 次数 %d 时间  %f packet->data = %d packet->size = %d", queuePacket.size(), countSend, time, packet->data, packet->size);
         if(time > clock->time){
-            loge("--- 视频 取数据  sleep  %d", (unsigned int)(1000 * 1000 * (time - clock->time)));
+            logd("--- 视频 取数据  sleep  %d", (unsigned int)(1000 * 1000 * (time - clock->time)));
             av_usleep((unsigned int)(1000 * 1000 * (time - clock->time)));
         }
-//        queuePacket.pop();
+        queuePacket.pop();
 
         //todo  查询 这么写的原因
         uint8_t *data;
@@ -90,24 +91,12 @@ void Video::playAction() {
             av_free(tdata);
         }
 
-        //todo  查询 这么写的原因
-        AVPacket *avPacket = av_packet_alloc();
-        if(av_packet_ref(avPacket, packet) == 0)
-        {
-            queuePacket.pop();
-        }
-        av_packet_free(&packet);
-        av_free(packet);
+        playerCallJava->sendToMediaCodec(packet->data, packet->size, 0);
+
+        av_free(packet->data);
+        av_free(packet->buf);
+        av_free(packet->side_data);
         packet = NULL;
-
-
-
-        playerCallJava->sendToMediaCodec(avPacket->data, avPacket->size, 0);
-
-        av_free(avPacket->data);
-        av_free(avPacket->buf);
-        av_free(avPacket->side_data);
-        avPacket = NULL;
 
     }
     if(mimType != NULL)
