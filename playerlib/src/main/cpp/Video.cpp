@@ -72,13 +72,13 @@ void Video::playAction() {
         }
         countSend++;
         AVPacket *packet = queuePacket.front();
+        queuePacket.pop();
         double time = packet->pts * av_q2d(time_base);
         loge("--- 视频 取数据  队列 %d 次数 %d 时间  %f packet->data = %d packet->size = %d", queuePacket.size(), countSend, time, packet->data, packet->size);
         if(time > clock->time){
             logd("--- 视频 取数据  sleep  %d", (unsigned int)(1000 * 1000 * (time - clock->time)));
             av_usleep((unsigned int)(1000 * 1000 * (time - clock->time)));
         }
-        queuePacket.pop();
 
         //todo  查询 这么写的原因
         uint8_t *data;
