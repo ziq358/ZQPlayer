@@ -80,7 +80,10 @@ void Video::playAction() {
             av_usleep((unsigned int)(1000 * 1000 * (time - clock->time)));
         }
 
-        //todo  查询 这么写的原因
+        //todo  查询 这么写的原因 https://blog.csdn.net/ywl5320/article/details/78965039
+        //添加数据头：
+        //因为AVpacket里面的压缩数据是很纯粹的，这种数据MediaCodec是不能解码或者解码出来也不能播放的，
+        // 因此需要将AVpacket添加相应的数据头，这就要用到FFmpeg的av_bitstream_filter_filter方法
         uint8_t *data;
         av_bitstream_filter_filter(mimType, videoCodecCtx, NULL, &data, &packet->size, packet->data, packet->size, 0);
         uint8_t *tdata = NULL;
@@ -93,6 +96,8 @@ void Video::playAction() {
 
         playerCallJava->sendToMediaCodec(packet->data, packet->size, 0);
 
+        //在解复用时对AVpacket的data进行了操作，如果直接av_packet_free的话，
+        // 会报释放地址错误，所以这里就单独释放AVpacket里面的指针就行了
         av_free(packet->data);
         av_free(packet->buf);
         av_free(packet->side_data);
