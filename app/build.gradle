@@ -53,11 +53,11 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    api 'com.ziq.base:base:3.0.1'
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     kapt(rootProject.ext.dependencies["butterknife-compiler"]) {
         exclude module: 'support-annotations'
     }
     api project(":playerlib")
-
+    api 'com.ziq.base:base:3.0.2'
+    api 'com.zq.customviewlib:customviewlib:2.0.0'
 }
