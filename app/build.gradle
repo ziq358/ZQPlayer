@@ -60,5 +60,5 @@ dependencies {
     api rootProject.ext.dependencies["design"]
     api project(":playerlib")
     api 'com.ziq.base:base:3.0.2'
-    api 'com.zq.customviewlib:customviewlib:2.0.2'
+    api 'com.zq.customviewlib:customviewlib:2.0.3'
 }

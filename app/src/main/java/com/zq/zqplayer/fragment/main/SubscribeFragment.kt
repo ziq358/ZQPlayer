@@ -1,4 +1,4 @@
-package com.zq.zqplayer.fragment
+package com.zq.zqplayer.fragment.main
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -11,10 +11,10 @@ import com.zq.zqplayer.R
  * @author wuyanqiang
  * @date 2018/10/15
  */
-class MineFragment : BaseFragment<IBasePresenter>() {
+class SubscribeFragment : BaseFragment<IBasePresenter>() {
 
     override fun initLayoutResourceId(): Int {
-        return R.layout.fragment_mine
+        return R.layout.fragment_subscribe
     }
 
     override fun initData(view: View, savedInstanceState: Bundle?) {

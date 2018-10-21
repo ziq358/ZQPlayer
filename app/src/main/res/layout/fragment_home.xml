@@ -7,29 +7,12 @@
     android:orientation="vertical"
     >
 
-    <TextView
-        android:id="@+id/path"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
-
-    <Button
-        android:id="@+id/play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="play"/>
-    <SurfaceView
-        android:id="@+id/surfaceview"
+    <com.zq.customviewlib.HorizontalScrollViewTab
+        android:id="@+id/HorizontalScrollViewTab"
         android:layout_width="match_parent"
-        android:layout_height="200dp" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="增加filter 后" />
-    <SurfaceView
-        android:id="@+id/surfaceview_filter"
-        android:layout_marginTop="4dp"
+        android:layout_height="50dp"/>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/ViewPager"
         android:layout_width="match_parent"
-        android:layout_height="200dp" />
+        android:layout_height="match_parent"/>
 </LinearLayout>

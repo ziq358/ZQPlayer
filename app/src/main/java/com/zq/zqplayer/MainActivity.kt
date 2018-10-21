@@ -6,12 +6,13 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import butterknife.BindView
 import com.ziq.base.mvp.BaseActivity
 import com.ziq.base.mvp.IBasePresenter
 import com.zq.customviewlib.NoScrollViewPager
-import com.zq.zqplayer.fragment.*
+import com.zq.zqplayer.fragment.main.*
 
 class MainActivity : BaseActivity<IBasePresenter>() {
 
@@ -27,6 +28,7 @@ class MainActivity : BaseActivity<IBasePresenter>() {
 
     override fun initData(savedInstanceState: Bundle?) {
         var titleList: ArrayList<String> = arrayListOf()
+        var iconList: ArrayList<Int> = arrayListOf()
         var dataList: ArrayList<Fragment> = arrayListOf()
         var home1: HomeFragment = HomeFragment()
         var home2: AmusementFragment = AmusementFragment()
@@ -40,6 +42,12 @@ class MainActivity : BaseActivity<IBasePresenter>() {
         titleList.add("发现")
         titleList.add("我的")
 
+        iconList.add(R.drawable.selector_tab_home)
+        iconList.add(R.drawable.selector_tab_amusement)
+        iconList.add(R.drawable.selector_tab_subscribe)
+        iconList.add(R.drawable.selector_tab_discover)
+        iconList.add(R.drawable.selector_tab_mine)
+
         dataList.add(home1)
         dataList.add(home2)
         dataList.add(home3)
@@ -48,10 +56,12 @@ class MainActivity : BaseActivity<IBasePresenter>() {
 
         var adapter: MainAdapter = MainAdapter(titleList, dataList, supportFragmentManager)
         viewPager.adapter = adapter;
+//        viewPager.offscreenPageLimit = 5
 //        mTabLayout.setupWithViewPager(viewPager)
         for(i in 0..(titleList.size - 1)){
             val tab :TabLayout.Tab = mTabLayout.newTab()
             val tabContent:View = View.inflate(this, R.layout.main_tab_layout, null)
+            tabContent.findViewById<ImageView>(R.id.icon).setBackgroundResource(iconList[i])
             tabContent.findViewById<TextView>(R.id.title).text = titleList[i]
             tab.customView = tabContent
             mTabLayout.addTab(tab)
