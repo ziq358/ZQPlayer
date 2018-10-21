@@ -7,29 +7,21 @@
     android:orientation="vertical"
     >
 
-    <TextView
-        android:id="@+id/path"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+    <com.zq.customviewlib.NoScrollViewPager
+        android:id="@+id/ViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
-    <Button
-        android:id="@+id/play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="play"/>
-    <SurfaceView
-        android:id="@+id/surfaceview"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="200dp" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="增加filter 后" />
-    <SurfaceView
-        android:id="@+id/surfaceview_filter"
-        android:layout_marginTop="4dp"
+        android:layout_height="1dp"
+        android:background="@color/line"
+        />
+    <android.support.design.widget.TabLayout
+        android:id="@+id/TabLayout"
         android:layout_width="match_parent"
-        android:layout_height="200dp" />
+        android:layout_height="wrap_content"
+        app:tabIndicatorColor="@null"
+        />
 </LinearLayout>
