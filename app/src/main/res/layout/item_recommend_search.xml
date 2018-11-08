@@ -1,11 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="wrap_content">
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/ll_search"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="search"
-        />
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:background="@drawable/bg_gray_search"
+        >
 
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="一起看 | S8 | 轩子巨2兔子"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:layout_centerInParent="true"
+            android:textSize="11dp"
+            />
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_toLeftOf="@+id/tv_search"
+            android:layout_centerVertical="true"
+            android:background="@drawable/ic_search"
+            />
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/ic_scan"
+            />
+    </RelativeLayout>
+
+</LinearLayout>

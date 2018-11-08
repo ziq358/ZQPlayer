@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical"
     >
 
     <com.zq.customviewlib.HorizontalScrollViewTab
         android:id="@+id/HorizontalScrollViewTab"
         android:layout_width="match_parent"
-        android:layout_height="50dp"/>
+        android:layout_height="50dp"
+        />
     <android.support.v4.view.ViewPager
         android:id="@+id/ViewPager"
         android:layout_width="match_parent"

@@ -1,9 +1,12 @@
 package com.zq.zqplayer.adapter
 
+import android.view.ViewGroup
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
+import com.zq.customviewlib.AutoRollViewPager
 import com.zq.zqplayer.R
+import com.zq.zqplayer.model.RecommendBannerMultiItem
 
 class RecommendAdapter : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHolder> {
 
@@ -24,6 +27,18 @@ class RecommendAdapter : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHold
 
             }
             RECOMMEND_TYPE_BANNER -> {
+                val recommendBannerMultiItem:RecommendBannerMultiItem = item as RecommendBannerMultiItem;
+                val autoRollViewPager: AutoRollViewPager = helper!!.getView(R.id.autoRollViewPager);
+                autoRollViewPager.adapter = object : AutoRollViewPager.RollViewPagerAdapter<String>(recommendBannerMultiItem.urlList) {
+                    override fun getItemLayoutRes(): Int {
+                        return R.layout.item_in_recommend_banner
+                    }
+
+                    override fun onBindItemView(rootView: ViewGroup?, position: Int, realPosition: Int) {
+                        val imageUrl:String = getItem(realPosition)
+
+                    }
+                }
 
             }
             else ->{
