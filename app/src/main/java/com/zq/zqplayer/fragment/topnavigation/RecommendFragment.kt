@@ -10,6 +10,7 @@ import com.ziq.base.mvp.BaseFragment
 import com.ziq.base.mvp.IBasePresenter
 import com.zq.zqplayer.R
 import com.zq.zqplayer.adapter.RecommendAdapter
+import com.zq.zqplayer.model.RecommendBannerMultiItem
 
 /**
  * @author wuyanqiang
@@ -27,7 +28,12 @@ class RecommendFragment : BaseFragment<IBasePresenter>() {
     override fun initData(view: View, savedInstanceState: Bundle?) {
         val data:ArrayList<MultiItemEntity> = arrayListOf();
         data.add(MultiItemEntity { RecommendAdapter.RECOMMEND_TYPE_SEARCH })
-        data.add(MultiItemEntity { RecommendAdapter.RECOMMEND_TYPE_BANNER })
+        val recommendBannerList:ArrayList<Int> = arrayListOf()
+        recommendBannerList.add(R.drawable.home_recommend_live_app_1523155786)
+        recommendBannerList.add(R.drawable.home_recommend_live_app_1526869950)
+        recommendBannerList.add(R.drawable.home_recommend_live_app_1530243925)
+        recommendBannerList.add(R.drawable.home_recommend_live_app_1540959428)
+        data.add(RecommendBannerMultiItem(recommendBannerList))
         val adapter = RecommendAdapter(data)
         recycleView.layoutManager = LinearLayoutManager(context)
         recycleView.adapter = adapter

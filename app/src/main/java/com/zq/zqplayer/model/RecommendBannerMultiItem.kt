@@ -5,9 +5,9 @@ import com.zq.zqplayer.adapter.RecommendAdapter
 
 class RecommendBannerMultiItem:MultiItemEntity {
 
-    var urlList:List<String>
+    var urlList:List<Int>
 
-    constructor(urlList: List<String>) {
+    constructor(urlList: List<Int>) {
         this.urlList = urlList
     }
 
@@ -15,7 +15,7 @@ class RecommendBannerMultiItem:MultiItemEntity {
         return RecommendAdapter.RECOMMEND_TYPE_BANNER
     }
 
-    fun getBannerUrl(): List<String> {
+    fun getBannerUrl(): List<Int> {
         return urlList;
     }
 
