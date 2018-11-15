@@ -1,5 +1,6 @@
 package com.zq.zqplayer.fragment.topnavigation
 
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
@@ -14,6 +15,7 @@ import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.ziq.base.mvp.BaseFragment
 import com.ziq.base.mvp.IBasePresenter
 import com.zq.zqplayer.R
+import com.zq.zqplayer.activity.LiveActivity
 import com.zq.zqplayer.adapter.RecommendAdapter
 import com.zq.zqplayer.model.RecommendBannerMultiItem
 import com.zq.zqplayer.model.RecommendLiveItemMultiItem
@@ -70,7 +72,8 @@ class RecommendFragment : BaseFragment<IBasePresenter>() {
         recycleView.layoutManager = layoutManager
         adapter.mOnActionListener = object : RecommendAdapter.OnActionListener {
             override fun onLiveItemClick(liveItemMultiItem: RecommendLiveItemMultiItem) {
-                Toast.makeText(context, ""+liveItemMultiItem.title, Toast.LENGTH_SHORT).show()
+                val intent: Intent = Intent(context, LiveActivity::class.java)
+                context?.startActivity(intent)
             }
         }
     }
