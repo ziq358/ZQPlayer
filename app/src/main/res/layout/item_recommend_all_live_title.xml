@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
+    >
+
+    <ImageView
+        android:layout_width="21dp"
+        android:layout_height="21dp"
+        android:background="@drawable/icon_all_live_title"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:textSize="15dp"
+        android:textStyle="bold"
+        android:text="全部直播"
+        />
+    <ImageView
+        android:layout_width="21dp"
+        android:layout_height="21dp"
+        android:background="@drawable/ic_arrow_right_black"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15dp"
+        android:gravity="right"
+        android:text="S8全球总决赛热播中"
+        />
+</LinearLayout>
