@@ -3,6 +3,7 @@ package com.zq.playerlib
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.SurfaceView
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -29,6 +30,9 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
     var mIvFullScreen:ImageView? = null
 
 
+    var mSurfaceView: SurfaceView? = null
+
+
     private fun init() {
         LayoutInflater.from(context).inflate(R.layout.layout_zq_video_view, this)
 
@@ -40,6 +44,8 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
         mIvBarrage = findViewById(R.id.iv_barrage)
         mIvStar = findViewById(R.id.iv_star)
         mIvFullScreen = findViewById(R.id.iv_full_screen)
+
+        mSurfaceView = findViewById(R.id.surfaceView)
 
         mIvBack?.setOnClickListener(this)
         mTvClarity?.setOnClickListener(this)
@@ -64,6 +70,16 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
             else ->{}
         }
     }
+
+    fun setVideoPath(url:String): Unit {
+
+    }
+
+    fun prepare(): Unit {
+
+    }
+
+
 
 
 }
