@@ -39,6 +39,9 @@ class RecommendAdapter : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHold
     override fun convert(helper: BaseViewHolder?, item: MultiItemEntity?) {
         when(item!!.itemType){
             RECOMMEND_TYPE_SEARCH -> {
+                helper?.itemView?.setOnClickListener {
+                    mOnActionListener?.onBannerItemClick()
+                }
             }
             RECOMMEND_TYPE_BANNER -> {
                 val recommendBannerMultiItem:RecommendBannerMultiItem = item as RecommendBannerMultiItem;
@@ -54,6 +57,9 @@ class RecommendAdapter : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHold
                         Glide.with(rootView!!.context).load(imageUrl).into(ivContent)
                     }
                 }
+
+
+
             }
             RECOMMEND_TYPE_ALL_LIVE_TITLE -> { }
             RECOMMEND_TYPE_LIVE_ITEM -> {
@@ -86,6 +92,7 @@ class RecommendAdapter : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHold
 
     interface OnActionListener{
         fun onLiveItemClick(liveItemMultiItem:RecommendLiveItemMultiItem): Unit
+        fun onBannerItemClick(): Unit
     }
 
 }

@@ -1,8 +1,10 @@
 package com.zq.playerlib
 
 import android.content.Context
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.widget.FrameLayout
@@ -30,8 +32,10 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
     var mIvFullScreen:ImageView? = null
 
 
+    internal var mSurfaceHolder: SurfaceHolder? = null
+    var mUrl:String? = null
     var mSurfaceView: SurfaceView? = null
-
+    var player: ZQPlayer? = null
 
     private fun init() {
         LayoutInflater.from(context).inflate(R.layout.layout_zq_video_view, this)
@@ -55,12 +59,31 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
         mIvStar?.setOnClickListener(this)
         mIvFullScreen?.setOnClickListener(this)
 
+
+        mSurfaceView?.holder?.addCallback(object : SurfaceHolder.Callback {
+
+            override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
+                mSurfaceHolder = surfaceHolder
+                initPlayer(mUrl, mSurfaceHolder)
+            }
+
+            override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
+                mSurfaceHolder = surfaceHolder
+                initPlayer(mUrl, mSurfaceHolder)
+            }
+
+            override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {
+                mSurfaceHolder = null
+            }
+        })
+
     }
 
 
     override fun onClick(v: View?) {
         when(v?.id){
-            R.id.iv_back ->{ Toast.makeText(context, "iv_back", Toast.LENGTH_SHORT).show()}
+            R.id.iv_back ->{
+                Toast.makeText(context, "iv_back", Toast.LENGTH_SHORT).show()}
             R.id.tv_clarity ->{Toast.makeText(context, "tv_clarity", Toast.LENGTH_SHORT).show()}
             R.id.iv_setting ->{Toast.makeText(context, "iv_setting", Toast.LENGTH_SHORT).show()}
             R.id.iv_share ->{Toast.makeText(context, "iv_share", Toast.LENGTH_SHORT).show()}
@@ -71,14 +94,58 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
         }
     }
 
-    fun setVideoPath(url:String): Unit {
+    fun setVideoPath(url:String?): Unit {
+        mUrl = url
+        initPlayer(mUrl, mSurfaceHolder)
+    }
+
+    internal fun initPlayer(url:String?, surfaceHolder: SurfaceHolder?): Unit {
+        if(player == null && !TextUtils.isEmpty(url) && surfaceHolder != null){
+            player = ZQPlayer()
+            player?.setStatusListener(object : ZQPlayer.StatusListener {
+                override fun onLoading() {
+//                runOnUiThread {
+//                    mBtnPlay.text = "初始化中。。。"
+//                    mBtnPlay.isEnabled = false
+//                }
+                }
+
+                override fun onPrepareFinished() {
+                    player?.start()
+//                runOnUiThread {
+//                    mBtnPlay.text = "播放"
+//                    mBtnPlay.isEnabled = true
+//                }
+                }
+
+                override fun onPlaying() {
+//                runOnUiThread {
+//                    mBtnPlay.text = "暂停"
+//                }
+                }
+                override fun onPause() {
+//                runOnUiThread {
+//                    mBtnPlay.text = "播放"
+//                }
+                }
+            })
+            player?.prepare(url!!)
+            player?.setSurfsce(surfaceHolder?.surface)
+        }
 
     }
 
-    fun prepare(): Unit {
-
+    fun start(): Unit {
+        player?.start()
     }
 
+    fun pause(): Unit {
+        player?.pause()
+    }
+
+    fun stop(): Unit {
+        player?.stop()
+    }
 
 
 

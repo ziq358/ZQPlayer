@@ -1,5 +1,6 @@
 package com.zq.zqplayer.fragment.topnavigation
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
@@ -16,10 +17,11 @@ import com.ziq.base.mvp.BaseFragment
 import com.ziq.base.mvp.IBasePresenter
 import com.zq.zqplayer.R
 import com.zq.zqplayer.activity.LiveActivity
+import com.zq.zqplayer.activity.TempActivity
 import com.zq.zqplayer.adapter.RecommendAdapter
 import com.zq.zqplayer.model.RecommendBannerMultiItem
 import com.zq.zqplayer.model.RecommendLiveItemMultiItem
-
+import java.io.*
 
 
 /**
@@ -71,9 +73,13 @@ class RecommendFragment : BaseFragment<IBasePresenter>() {
         }
         recycleView.layoutManager = layoutManager
         adapter.mOnActionListener = object : RecommendAdapter.OnActionListener {
-            override fun onLiveItemClick(liveItemMultiItem: RecommendLiveItemMultiItem) {
-                val intent: Intent = Intent(context, LiveActivity::class.java)
+            override fun onBannerItemClick() {
+                val intent: Intent = Intent(context, TempActivity::class.java)
                 context?.startActivity(intent)
+            }
+
+            override fun onLiveItemClick(liveItemMultiItem: RecommendLiveItemMultiItem) {
+                LiveActivity.openVideo(context, getData())
             }
         }
     }
@@ -93,6 +99,38 @@ class RecommendFragment : BaseFragment<IBasePresenter>() {
         data.add(RecommendLiveItemMultiItem("岚切千钰3000米外秒杀！...", "android.resource://" + context!!.packageName + "/" + R.raw.pic_10))
 
         return data
+    }
+
+
+    private fun getData():String {
+        var videoPath: String  = getDataDirPath(context!!, "meidacodec") + File.separator + "gao_bai_qi_qiu.mp4"
+        val `in` = BufferedInputStream(resources.openRawResource(R.raw.gao_bai_qi_qiu))
+        val out: BufferedOutputStream
+        try {
+            val outputStream = FileOutputStream(videoPath)
+            out = BufferedOutputStream(outputStream)
+            val buf = ByteArray(1024)
+            var size = `in`.read(buf)
+            while (size > 0) {
+                out.write(buf, 0, size)
+                size = `in`.read(buf)
+            }
+            `in`.close()
+            out.flush()
+            out.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return videoPath
+    }
+
+    fun getDataDirPath(context: Context, dir: String): String {
+        val path = context.externalCacheDir!!.absolutePath + File.separator + dir
+        val file = File(path)
+        if (!file.exists()) {
+            file.mkdir()
+        }
+        return path
     }
 
 }

@@ -155,7 +155,6 @@ class TempActivity : BaseActivity<IBasePresenter>() {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-
     }
 
     fun getDataDirPath(context: Context, dir: String): String {

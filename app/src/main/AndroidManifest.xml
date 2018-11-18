@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.LiveActivity"/>
+        <activity android:name=".activity.TempActivity"/>
     </application>
 
 </manifest>
