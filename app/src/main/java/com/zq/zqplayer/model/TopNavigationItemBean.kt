@@ -1,6 +1,5 @@
 package com.zq.zqplayer.model
 
-import android.app.Fragment
 import com.zq.customviewlib.HorizontalScrollViewTab
 import com.zq.zqplayer.fragment.EmptyFragment
 

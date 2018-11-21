@@ -9,12 +9,15 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import butterknife.BindView
+import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.mvp.BaseActivity
 import com.ziq.base.mvp.IBasePresenter
 import com.zq.customviewlib.NoScrollViewPager
 import com.zq.zqplayer.fragment.main.*
 
 class MainActivity : BaseActivity<IBasePresenter>() {
+    override fun initForInject(appComponent: AppComponent?) {
+    }
 
     @BindView(R.id.ViewPager)
     lateinit var viewPager: NoScrollViewPager

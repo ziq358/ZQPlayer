@@ -125,7 +125,7 @@ class ZQPlayer {
                     val byteBuffer = mediaCodec?.getInputBuffers()!![inputBufferIndex]
                     byteBuffer.clear()
                     byteBuffer.put(bytes)
-                    mediaCodec?.queueInputBuffer(inputBufferIndex!!, 0, size, pts.toLong(), 0)
+                    mediaCodec?.queueInputBuffer(inputBufferIndex, 0, size, pts.toLong(), 0)
                 }
 
                 var index = mediaCodec?.dequeueOutputBuffer(videoBufferInfo, 10)

@@ -130,7 +130,7 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
                 }
             })
             player?.prepare(url!!)
-            player?.setSurfsce(surfaceHolder?.surface)
+            player?.setSurfsce(surfaceHolder.surface)
         }
 
     }

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import butterknife.BindView
+import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.mvp.BaseActivity
 import com.ziq.base.mvp.IBasePresenter
 import com.zq.playerlib.ZQVideoView
@@ -16,6 +17,8 @@ import java.io.*
  *2018/11/15
  */
 class LiveActivity : BaseActivity<IBasePresenter>(){
+    override fun initForInject(appComponent: AppComponent?) {
+    }
 
     companion object {
         const val VEDIO_URL:String = "vedio_url"

@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import butterknife.BindView
 import butterknife.OnClick
+import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.mvp.BaseFragment
 import com.ziq.base.mvp.IBasePresenter
 import com.zq.customviewlib.HorizontalScrollViewTab
@@ -41,7 +42,8 @@ class HomeFragment : BaseFragment<IBasePresenter>() {
     override fun initLayoutResourceId(): Int {
         return R.layout.fragment_home
     }
-
+    override fun initForInject(appComponent: AppComponent?) {
+    }
     override fun initData(view: View, savedInstanceState: Bundle?) {
         var data: ArrayList<TopNavigationItemBean> = arrayListOf()
         data.add(object : TopNavigationItemBean("推荐") {
