@@ -91,16 +91,15 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
 
         mSmartRefreshLayout.setOnRefreshListener { onRefreshLive() }
         mSmartRefreshLayout.setOnLoadMoreListener { onLoadMoreLive() }
-        showLoading()
     }
 
 
     fun onRefreshLive(): Unit {
-        mPresenter.getData()
+        mPresenter.getVideo()
     }
 
     fun onLoadMoreLive(): Unit {
-
+        mPresenter.getVideo()
     }
 
     override fun hideLoading() {

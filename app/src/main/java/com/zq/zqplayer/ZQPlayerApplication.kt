@@ -5,6 +5,7 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
 import com.ziq.base.mvp.BaseApplication
+import com.ziq.base.utils.RetrofitUtil
 
 /**
  *author: wuyanqiang
@@ -12,8 +13,11 @@ import com.ziq.base.mvp.BaseApplication
  */
 class ZQPlayerApplication : BaseApplication() {
 
+    val BASE_URL = "http://api.m.panda.tv/"
+
     override fun onCreate() {
         super.onCreate()
+        RetrofitUtil.getInstance().init(BASE_URL)
         SmartRefreshLayout.setDefaultRefreshHeaderCreator { context, layout ->
             val header = ClassicsHeader(context)
             header.setTextSizeTitle(14f)
