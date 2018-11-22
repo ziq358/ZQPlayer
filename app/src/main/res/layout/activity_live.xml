@@ -8,7 +8,7 @@
     <com.zq.playerlib.ZQVideoView
         android:id="@+id/zq_video_view"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="203dp"
         />
 
 </LinearLayout>

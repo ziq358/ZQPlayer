@@ -1,12 +1,17 @@
 package com.zq.zqplayer.presenter
 
+import android.os.Bundle
 import android.util.Log
 import com.trello.rxlifecycle2.LifecycleTransformer
 import com.ziq.base.mvp.BasePresenter
 import com.ziq.base.mvp.IBaseView
 import com.ziq.base.utils.RetrofitUtil
 import com.zq.zqplayer.model.PandaTvDataBean
+import com.zq.zqplayer.model.PandaTvListItemBean
+import com.zq.zqplayer.model.PandaTvLiveDataBean
 import com.zq.zqplayer.model.VideoHttpResult
+import com.zq.zqplayer.model.request.BaseRequest
+import com.zq.zqplayer.model.response.BaseObserver
 import com.zq.zqplayer.service.VideoService
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -27,43 +32,68 @@ class RecommendPresenter : BasePresenter {
 
     @Inject lateinit var mView: RecommendPresenter.View
 
+
     @Inject
     constructor() : super()
 
 
-    fun getVideo() {
+     fun getVideo(req: BaseRequest) {
         RetrofitUtil.getInstance().retrofit
                 .create<VideoService>(VideoService::class.java!!)
-                .getVideList("lol", 1, 20, 1, "3.3.1.5978")
+                .getVideList("lol", req.pageNo, req.pageSize, 1, "3.3.1.5978")
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
-                    Log.e("ziq", "doOnSubscribe: " + Thread.currentThread().name)
                     mView.showLoading()
                 }
                 .subscribeOn(AndroidSchedulers.mainThread())//控制doOnSubscribe 所在线程
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally {
-                    Log.e("ziq", "doFinally: " + Thread.currentThread().name)
                     mView.hideLoading()
                 }
                 .compose(this.getLifecycleTransformer() as LifecycleTransformer<VideoHttpResult<PandaTvDataBean>>)
-                .subscribe(object : Observer<VideoHttpResult<PandaTvDataBean>> {
-                    override fun onSubscribe(d: Disposable) {
-
+                .subscribe(object : BaseObserver<VideoHttpResult<PandaTvDataBean>>() {
+                    override fun onSuccessful(t: VideoHttpResult<PandaTvDataBean>?) {
+                        if(t != null && t.data != null && t.data.items != null){
+                            mView.setData(t.data.items)
+                        }
                     }
 
-                    override fun onNext(pandaTvDataBeanVideoHttpResult: VideoHttpResult<PandaTvDataBean>) {
-                        Log.e("ziq", "onNext: " + Thread.currentThread().name)
-                        mView.setData()
+                    override fun onFailed(msg: String?) {
+                        mView.showMessage(msg)
                     }
 
-                    override fun onError(e: Throwable) {
-                        Log.e("ziq", "onError: $e")
+                })
+    }
+
+    fun getVideoUrl(roomId:String ) {
+        RetrofitUtil.getInstance().retrofit
+                .create<VideoService>(VideoService::class.java!!)
+                .getLiveUrl(roomId, "3.3.1.5978", 1, "json", "android")
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe {
+                    mView.showLoading()
+                }
+                .subscribeOn(AndroidSchedulers.mainThread())//控制doOnSubscribe 所在线程
+                .observeOn(AndroidSchedulers.mainThread())
+                .doFinally {
+                    mView.hideLoading()
+                }
+                .compose(this.getLifecycleTransformer() as LifecycleTransformer<VideoHttpResult<PandaTvLiveDataBean>>)
+                .subscribe(object : BaseObserver<VideoHttpResult<PandaTvLiveDataBean>>() {
+                    override fun onSuccessful(t: VideoHttpResult<PandaTvLiveDataBean>?) {
+                        val data:PandaTvLiveDataBean = t!!.data
+                        val pl = data.info.videoinfo.plflag.split("_")
+
+                        if (pl.isNotEmpty()) {
+                            val url = "http://pl" + pl[pl.size - 1] + ".live.panda.tv/live_panda/" + data.info.videoinfo.room_key + "_mid.flv?sign=" + data.info.videoinfo.sign + "&time=" + data.info.videoinfo.ts
+                            mView.onGetVideoUrlSuccessful(url)
+                        }
                     }
 
-                    override fun onComplete() {
-
+                    override fun onFailed(msg: String?) {
+                        mView.showMessage(msg)
                     }
+
                 })
     }
 
@@ -73,7 +103,9 @@ class RecommendPresenter : BasePresenter {
 
 
     interface View : IBaseView {
-        fun setData()
+        fun setData(items:List<PandaTvListItemBean>)
+        fun onGetVideoUrlSuccessful(url:String)
+        fun showMessage(msg:String?)
     }
 }
 

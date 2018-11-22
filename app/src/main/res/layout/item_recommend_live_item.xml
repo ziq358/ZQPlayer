@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="95dp"
         android:scaleType="centerCrop"
-        tools:background="@drawable/ic_picture_default_bg"
+        android:background="@drawable/ic_picture_default_bg"
         />
 
     <TextView

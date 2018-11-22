@@ -1,6 +1,7 @@
 package com.zq.zqplayer.service;
 
 import com.zq.zqplayer.model.PandaTvDataBean;
+import com.zq.zqplayer.model.PandaTvLiveDataBean;
 import com.zq.zqplayer.model.VideoHttpResult;
 
 import io.reactivex.Observable;
@@ -20,4 +21,10 @@ public interface VideoService {
                                                              @Query("room") int room,
                                                              @Query("version") String version);
 
+    @GET("ajax_get_liveroom_baseinfo")
+    Observable<VideoHttpResult<PandaTvLiveDataBean>> getLiveUrl(@Query("roomid") String roomid,
+                                                                @Query("__version") String version,
+                                                                @Query("slaveflag") int slaveflag,
+                                                                @Query("type") String type,
+                                                                @Query("__plat") String __plat);
 }

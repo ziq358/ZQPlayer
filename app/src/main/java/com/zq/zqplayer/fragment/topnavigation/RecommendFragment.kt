@@ -4,9 +4,11 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import butterknife.BindView
 import com.bumptech.glide.Glide
 import com.chad.library.adapter.base.entity.MultiItemEntity
@@ -22,7 +24,9 @@ import com.zq.zqplayer.activity.LiveActivity
 import com.zq.zqplayer.adapter.RecommendAdapter
 import com.zq.zqplayer.dagger.component.DaggerRecommendComponent
 import com.zq.zqplayer.dagger.module.RecommendModule
+import com.zq.zqplayer.model.PandaTvListItemBean
 import com.zq.zqplayer.model.RecommendLiveItemMultiItem
+import com.zq.zqplayer.model.request.BaseRequest
 import com.zq.zqplayer.presenter.RecommendPresenter
 import java.io.*
 
@@ -38,11 +42,16 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
     lateinit var mSmartRefreshLayout: SmartRefreshLayout;
     @BindView(R.id.recycleView)
     lateinit var recycleView: RecyclerView;
-    val data:ArrayList<MultiItemEntity> = arrayListOf()
+
+
+    var data:ArrayList<PandaTvListItemBean> = arrayListOf()
+    var adapter:RecommendAdapter? = null
+    var req: BaseRequest = BaseRequest()
 
     override fun initLayoutResourceId(): Int {
         return R.layout.fragment_recommend
     }
+
     override fun initForInject(appComponent: AppComponent?) {
         val lifecycleTransformer: LifecycleTransformer<Any> = this.bindToLifecycle()
         DaggerRecommendComponent.builder()
@@ -72,7 +81,7 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
             }
         }
 
-        val adapter = RecommendAdapter(data)
+        adapter = RecommendAdapter(data)
         recycleView.adapter = adapter // 要先设置 adapter  SpanSizeLookup才有效
         val layoutManager:GridLayoutManager = GridLayoutManager(context, 2)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -82,24 +91,27 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
 
         }
         recycleView.layoutManager = layoutManager
-        adapter.mOnActionListener = object : RecommendAdapter.OnActionListener {
-            override fun onLiveItemClick(liveItemMultiItem: RecommendLiveItemMultiItem) {
-                LiveActivity.openVideo(context, getData())
+        adapter!!.mOnActionListener = object : RecommendAdapter.OnActionListener {
+            override fun onLiveItemClick(item: PandaTvListItemBean) {
+                mPresenter.getVideoUrl(item.id)
             }
         }
 
 
         mSmartRefreshLayout.setOnRefreshListener { onRefreshLive() }
         mSmartRefreshLayout.setOnLoadMoreListener { onLoadMoreLive() }
+        mSmartRefreshLayout.autoRefresh()
     }
 
 
-    fun onRefreshLive(): Unit {
-        mPresenter.getVideo()
+    private fun onRefreshLive(): Unit {
+        req.setLen(0)
+        mPresenter.getVideo(req)
     }
 
-    fun onLoadMoreLive(): Unit {
-        mPresenter.getVideo()
+    private fun onLoadMoreLive(): Unit {
+        req.setLen(data.size)
+        mPresenter.getVideo(req)
     }
 
     override fun hideLoading() {
@@ -108,8 +120,25 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
         mSmartRefreshLayout.finishLoadMore()
     }
 
-    override fun setData() {
-        hideLoading()
+    override fun setData(items: List<PandaTvListItemBean>) {
+        if (mSmartRefreshLayout.isRefreshing) {
+            adapter!!.data.clear()
+            mSmartRefreshLayout.finishRefresh()
+        } else {
+            mSmartRefreshLayout.finishLoadMore()
+        }
+        mSmartRefreshLayout.isEnableLoadMore = !items.isEmpty()
+        adapter!!.data.addAll(items)
+        adapter!!.notifyDataSetChanged()
+    }
+
+    override fun onGetVideoUrlSuccessful(url: String) {
+        Log.e("ziq", url)
+        LiveActivity.openVideo(context, url)
+    }
+
+    override fun showMessage(msg: String?) {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
     private fun getLiveData(): List<RecommendLiveItemMultiItem> {

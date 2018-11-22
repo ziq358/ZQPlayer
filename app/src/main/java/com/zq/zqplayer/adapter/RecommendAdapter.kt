@@ -6,14 +6,17 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter
+import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.zq.zqplayer.R
+import com.zq.zqplayer.model.PandaTvListItemBean
 import com.zq.zqplayer.model.RecommendLiveItemMultiItem
 import com.zq.zqplayer.wiget.GlideRoundTransform
 
 
-class RecommendAdapter : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHolder> {
+class RecommendAdapter : BaseQuickAdapter<PandaTvListItemBean, BaseViewHolder> {
+
 
 
     companion object {
@@ -22,34 +25,25 @@ class RecommendAdapter : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHold
 
 
 
-    constructor(data: List<MultiItemEntity>?) : super(data){
-        addItemType(RECOMMEND_TYPE_LIVE_ITEM, R.layout.item_recommend_live_item)
+    constructor(data: List<PandaTvListItemBean>?) : super(R.layout.item_recommend_live_item, data){
     }
 
-    override fun convert(helper: BaseViewHolder?, item: MultiItemEntity?) {
-        when(item!!.itemType){
-            RECOMMEND_TYPE_LIVE_ITEM -> {
-                val liveItemMultiItem:RecommendLiveItemMultiItem = item as RecommendLiveItemMultiItem;
-                val tvTitle: TextView = helper!!.getView(R.id.tv_title)
-                tvTitle.text = liveItemMultiItem.title
+    override fun convert(helper: BaseViewHolder?, item: PandaTvListItemBean?) {
+        val tvTitle: TextView = helper!!.getView(R.id.tv_title)
+        tvTitle.text = item!!.name
 
-                val ivCover: ImageView = helper.getView(R.id.iv_cover)
-                val requestOptions: RequestOptions = RequestOptions()
-                        .placeholder(R.drawable.ic_picture_default_bg)
-                        .error(R.drawable.ic_picture_default_bg)
-                        .transform(GlideRoundTransform(5))
-                Log.e("ziq", liveItemMultiItem.coverUrl)
-                Glide.with(ivCover.context)
-                        .load(liveItemMultiItem.coverUrl)
-                        .apply(requestOptions)
-                        .into(ivCover)
+        val ivCover: ImageView = helper.getView(R.id.iv_cover)
+        val requestOptions: RequestOptions = RequestOptions()
+                .placeholder(R.drawable.ic_picture_default_bg)
+                .error(R.drawable.ic_picture_default_bg)
+                .transform(GlideRoundTransform(5))
+        Glide.with(ivCover.context)
+                .load(item.pictures.img)
+                .apply(requestOptions)
+                .into(ivCover)
 
-                helper.itemView.setOnClickListener {
-                    mOnActionListener?.onLiveItemClick(liveItemMultiItem)
-                }
-
-            }
-            else ->{ }
+        helper.itemView.setOnClickListener {
+            mOnActionListener?.onLiveItemClick(item)
         }
     }
 
@@ -57,7 +51,7 @@ class RecommendAdapter : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHold
 
 
     interface OnActionListener{
-        fun onLiveItemClick(liveItemMultiItem:RecommendLiveItemMultiItem): Unit
+        fun onLiveItemClick(item:PandaTvListItemBean): Unit
     }
 
 }
