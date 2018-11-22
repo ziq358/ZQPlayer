@@ -66,4 +66,6 @@ dependencies {
     kapt rootProject.ext.dependencies["dagger2-compiler"]
 
     api 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.5.1'
+    //FlycoTabLayout第三方tab https://github.com/H07000223/FlycoTabLayout/blob/master/README_CN.md
+    api rootProject.ext.dependencies["flycoTabLayout_Lib"]
 }

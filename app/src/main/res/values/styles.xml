@@ -8,4 +8,22 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="SlidingTabStyle">
+        <item name="tl_indicator_color">@color/color_ffa60a</item>
+        <item name="tl_indicator_corner_radius">1.5dp</item>
+        <item name="tl_indicator_height">3dp</item>
+        <item name="tl_indicator_margin_bottom">9dp</item>
+        <item name="tl_indicator_width_equal_title">true</item>
+        <item name="tl_tab_space_equal">true</item>
+        <item name="tl_textSelectColor">@color/color_ffa60a</item>
+        <item name="tl_textUnselectColor">@color/color_333333</item>
+        <item name="tl_textsize">15dp</item>
+    </style>
+
+    <style name="view_line">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/color_line_bg</item>
+    </style>
+
 </resources>

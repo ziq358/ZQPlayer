@@ -34,8 +34,9 @@ ext {
             "dagger2-android"               : "com.google.dagger:dagger-android:${version["dagger2SdkVersion"]}",
             "dagger2-android-support"       : "com.google.dagger:dagger-android-support:${version["dagger2SdkVersion"]}",
             "dagger2-android-processor"     : "com.google.dagger:dagger-android-processor:${version["dagger2SdkVersion"]}",
-            "butterknife"              : "com.jakewharton:butterknife:${version["butterknifeSdkVersion"]}",
-            "butterknife-compiler"     : "com.jakewharton:butterknife-compiler:${version["butterknifeSdkVersion"]}",
+            "butterknife"                   : "com.jakewharton:butterknife:${version["butterknifeSdkVersion"]}",
+            "butterknife-compiler"          : "com.jakewharton:butterknife-compiler:${version["butterknifeSdkVersion"]}",
+            "flycoTabLayout_Lib"            : "com.flyco.tablayout:FlycoTabLayout_Lib:2.1.2@aar",
     ]
 
 
