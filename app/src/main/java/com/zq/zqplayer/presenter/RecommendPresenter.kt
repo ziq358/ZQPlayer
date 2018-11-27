@@ -65,7 +65,7 @@ class RecommendPresenter : BasePresenter {
                 })
     }
 
-    fun getVideoUrl(roomId:String ) {
+    fun getVideoUrl(roomId:String , title:String ) {
         RetrofitUtil.getInstance().retrofit
                 .create<VideoService>(VideoService::class.java!!)
                 .getLiveUrl(roomId, "3.3.1.5978", 1, "json", "android")
@@ -86,7 +86,7 @@ class RecommendPresenter : BasePresenter {
 
                         if (pl.isNotEmpty()) {
                             val url = "http://pl" + pl[pl.size - 1] + ".live.panda.tv/live_panda/" + data.info.videoinfo.room_key + "_mid.flv?sign=" + data.info.videoinfo.sign + "&time=" + data.info.videoinfo.ts
-                            mView.onGetVideoUrlSuccessful(url)
+                            mView.onGetVideoUrlSuccessful(url, title)
                         }
                     }
 
@@ -104,7 +104,7 @@ class RecommendPresenter : BasePresenter {
 
     interface View : IBaseView {
         fun setData(items:List<PandaTvListItemBean>)
-        fun onGetVideoUrlSuccessful(url:String)
+        fun onGetVideoUrlSuccessful(url:String, title:String)
         fun showMessage(msg:String?)
     }
 }

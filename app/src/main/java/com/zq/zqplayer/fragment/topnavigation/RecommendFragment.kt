@@ -93,7 +93,7 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
         recycleView.layoutManager = layoutManager
         adapter!!.mOnActionListener = object : RecommendAdapter.OnActionListener {
             override fun onLiveItemClick(item: PandaTvListItemBean) {
-                mPresenter.getVideoUrl(item.id)
+                mPresenter.getVideoUrl(item.id, item.name)
             }
         }
 
@@ -132,9 +132,9 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
         adapter!!.notifyDataSetChanged()
     }
 
-    override fun onGetVideoUrlSuccessful(url: String) {
+    override fun onGetVideoUrlSuccessful(url: String, title:String) {
         Log.e("ziq", url)
-        LiveActivity.openVideo(context, url)
+        LiveActivity.openVideo(context, url, title)
     }
 
     override fun showMessage(msg: String?) {

@@ -76,8 +76,8 @@
         android:background="@drawable/ic_back_white"
         />
 
-    <LinearLayout
-        android:id="@+id/ll_bottom_bar"
+    <RelativeLayout
+        android:id="@+id/rl_bottom_bar"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:orientation="horizontal"
@@ -89,46 +89,58 @@
         android:background="@drawable/bg_bottom_bar"
         >
         <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="3dp"
-            android:background="@drawable/ic_people"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="2,200"
-            android:singleLine="true"
-            android:textSize="15dp"
-            android:textColor="@color/white"
-            />
-        <ImageView
-            android:id="@+id/iv_barrage"
+            android:id="@+id/iv_play"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="-2dp"
-            android:background="@drawable/ic_barrage_on"
-            />
-        <ImageView
-            android:id="@+id/iv_star"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="-4dp"
-            android:background="@drawable/ic_star"
-            />
-        <ImageView
-            android:id="@+id/iv_full_screen"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/ic_full_screen"
+            android:background="@drawable/ic_play"
             />
 
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentRight="true"
+            >
+            <ImageView
+                android:id="@+id/iv_barrage"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/ic_barrage_on"
+                />
+            <ImageView
+                android:id="@+id/iv_star"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/ic_star"
+                />
+            <ImageView
+                android:id="@+id/iv_full_screen"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/ic_full_screen"
+                />
+        </LinearLayout>
+
+
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        >
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
+    </FrameLayout>
 
 
 
