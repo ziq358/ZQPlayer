@@ -34,6 +34,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -70,28 +75,28 @@ dependencies {
 }
 
 MobSDK {
-    appKey "221d2dea8a628"
-    appSecret "b3ae29c86f24afd3b8a3fcf9e8fab537"
+    appKey "28fdc29fdfb87"
+    appSecret "a4b98f7a64b94d21d4be3a51d3ea987d"
 
     ShareSDK {
         //平台配置信息
         devInfo {
             SinaWeibo {
-                appKey "2727755032"
-                appSecret "2f8f854809773efd753120ccb61a31d4"
+                appKey "2594507670"
+                appSecret "880f6e17566da98f5e301d4e6785d105"
                 shareByAppClient true
             }
-            Wechat {
-                appId "wx746d4aca852fd114"
-                appSecret "0f4399c55ce47151d3840929c94d1cd1"
-                shareByAppClient true
-                bypassApproval false //bypassApproval表示是否绕过审核  https://blog.csdn.net/gf771115/article/details/44858007
-            }
-            QQ {
-                appId "1106565528"
-                appKey "X6CnxgtbqxEDetTg"
-                shareByAppClient true
-            }
+//            Wechat {
+//                appId "wx746d4aca852fd114"
+//                appSecret "0f4399c55ce47151d3840929c94d1cd1"
+//                shareByAppClient true
+//                bypassApproval false //bypassApproval表示是否绕过审核  https://blog.csdn.net/gf771115/article/details/44858007
+//            }
+//            QQ {
+//                appId "1106565528"
+//                appKey "X6CnxgtbqxEDetTg"
+//                shareByAppClient true
+//            }
         }
     }
 

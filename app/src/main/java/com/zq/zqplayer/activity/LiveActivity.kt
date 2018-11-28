@@ -153,7 +153,7 @@ class LiveActivity : BaseActivity<IBasePresenter>(){
     private fun showShare() {
         val oks = OnekeyShare()
         //关闭sso授权
-        oks.disableSSOWhenAuthorize()
+//        oks.disableSSOWhenAuthorize()
 
         // 分享时Notification的图标和文字  2.5.9以后的版本不调用此方法
         //oks.setNotification(R.drawable.ic_launcher, getString(R.string.app_name));
