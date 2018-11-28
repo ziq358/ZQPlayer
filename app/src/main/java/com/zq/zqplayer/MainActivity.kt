@@ -13,8 +13,19 @@ import com.ziq.base.mvp.IBasePresenter
 import com.zq.customviewlib.NoScrollViewPager
 import com.zq.zqplayer.adapter.FragmentViewPagerAdapter
 import com.zq.zqplayer.fragment.main.*
+import java.util.*
 
 class MainActivity : BaseActivity<IBasePresenter>() {
+
+
+    companion object {
+        var isForeground = false
+        const val MESSAGE_RECEIVED_ACTION = "com.epro.g3.yuanyi.doctor.MESSAGE_RECEIVED_ACTION"
+        const val KEY_TITLE = "title"
+        const val KEY_MESSAGE = "message"
+        const val KEY_EXTRAS = "extras"
+    }
+
     override fun initForInject(appComponent: AppComponent?) {
     }
 
