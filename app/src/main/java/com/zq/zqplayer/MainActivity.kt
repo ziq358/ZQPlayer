@@ -13,6 +13,8 @@ import com.ziq.base.mvp.IBasePresenter
 import com.zq.customviewlib.NoScrollViewPager
 import com.zq.zqplayer.adapter.FragmentViewPagerAdapter
 import com.zq.zqplayer.fragment.main.*
+import kotlinx.android.synthetic.main.item_chat.*
+import me.leolin.shortcutbadger.ShortcutBadger
 import java.util.*
 
 class MainActivity : BaseActivity<IBasePresenter>() {
@@ -83,6 +85,10 @@ class MainActivity : BaseActivity<IBasePresenter>() {
             }
 
         })
+
+        ShortcutBadger.applyCount(this, 5)
+
+
     }
 
 

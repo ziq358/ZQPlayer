@@ -20,7 +20,7 @@ import com.zq.zqplayer.fragment.live.VIPListFragment
 import kotlinx.android.synthetic.main.item_chat.*
 import com.mob.wrappers.ShareSDKWrapper.share
 import cn.sharesdk.onekeyshare.OnekeyShare
-
+import me.leolin.shortcutbadger.ShortcutBadger
 
 
 /**
@@ -61,6 +61,7 @@ class LiveActivity : BaseActivity<IBasePresenter>(){
     override fun initData(savedInstanceState: Bundle?) {
         initViewPager()
         initVideoView()
+        ShortcutBadger.removeCount(this)
     }
 
     fun initViewPager(): Unit {
