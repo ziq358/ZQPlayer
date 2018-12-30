@@ -73,13 +73,18 @@ dependencies {
     kapt(rootProject.ext.dependencies["butterknife-compiler"]) {
         exclude module: 'support-annotations'
     }
+//    api "com.android.support:appcompat-v7:27.1.1"
+    api rootProject.ext.dependencies["appcompat-v7"]
+    api rootProject.ext.dependencies["recyclerview-v7"]
     api rootProject.ext.dependencies["design"]
     api project(":playerlib")
 
     api 'com.ziq.base:base:3.1.0'
     api 'com.zq.customviewlib:customviewlib:2.0.3'
 
-    kapt rootProject.ext.dependencies["dagger2-compiler"]
+    kapt (rootProject.ext.dependencies["dagger2-compiler"]){
+        exclude module: 'support-annotations'
+    }
 
     api 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.5.1'
     //FlycoTabLayout第三方tab https://github.com/H07000223/FlycoTabLayout/blob/master/README_CN.md
