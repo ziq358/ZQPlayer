@@ -11,22 +11,20 @@ import android.widget.ImageView
 import android.widget.Toast
 import butterknife.BindView
 import com.bumptech.glide.Glide
-import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.trello.rxlifecycle2.LifecycleTransformer
 import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.dagger.module.RxLifecycleModule
 import com.ziq.base.mvp.BaseFragment
-import com.ziq.base.mvp.IBasePresenter
 import com.zq.customviewlib.AutoRollViewPager
 import com.zq.zqplayer.R
 import com.zq.zqplayer.activity.LiveActivity
 import com.zq.zqplayer.adapter.RecommendAdapter
 import com.zq.zqplayer.dagger.component.DaggerRecommendComponent
 import com.zq.zqplayer.dagger.module.RecommendModule
-import com.zq.zqplayer.model.PandaTvListItemBean
 import com.zq.zqplayer.model.RecommendLiveItemMultiItem
 import com.zq.zqplayer.model.request.BaseRequest
+import com.zq.zqplayer.model.response.ZQPlayerVideoListItemBean
 import com.zq.zqplayer.presenter.RecommendPresenter
 import java.io.*
 
@@ -44,7 +42,7 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
     lateinit var recycleView: RecyclerView;
 
 
-    var data:ArrayList<PandaTvListItemBean> = arrayListOf()
+    var data:ArrayList<ZQPlayerVideoListItemBean> = arrayListOf()
     var adapter:RecommendAdapter? = null
     var req: BaseRequest = BaseRequest()
 
@@ -92,8 +90,8 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
         }
         recycleView.layoutManager = layoutManager
         adapter!!.mOnActionListener = object : RecommendAdapter.OnActionListener {
-            override fun onLiveItemClick(item: PandaTvListItemBean) {
-                mPresenter.getVideoUrl(item.id, item.name)
+            override fun onLiveItemClick(item: ZQPlayerVideoListItemBean) {
+                mPresenter.getZqVideoUrl(item.id, item.name)
             }
         }
 
@@ -106,12 +104,12 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
 
     private fun onRefreshLive(): Unit {
         req.setLen(0)
-        mPresenter.getVideo(req)
+        mPresenter.getZqVideoList(req)
     }
 
     private fun onLoadMoreLive(): Unit {
         req.setLen(data.size)
-        mPresenter.getVideo(req)
+        mPresenter.getZqVideoList(req)
     }
 
     override fun hideLoading() {
@@ -120,7 +118,7 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
         mSmartRefreshLayout.finishLoadMore()
     }
 
-    override fun setData(items: List<PandaTvListItemBean>) {
+    override fun setData(items: List<ZQPlayerVideoListItemBean>) {
         if (mSmartRefreshLayout.isRefreshing) {
             adapter!!.data.clear()
             mSmartRefreshLayout.finishRefresh()

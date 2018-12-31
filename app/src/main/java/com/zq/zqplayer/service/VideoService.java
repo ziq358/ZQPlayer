@@ -1,12 +1,17 @@
 package com.zq.zqplayer.service;
 
-import com.zq.zqplayer.model.PandaTvDataBean;
-import com.zq.zqplayer.model.PandaTvLiveDataBean;
-import com.zq.zqplayer.model.VideoHttpResult;
+import com.zq.zqplayer.model.request.ZQPlayerVideoListRequest;
+import com.zq.zqplayer.model.request.ZQPlayerVideoUrlRequest;
+import com.zq.zqplayer.model.response.BaseResponse;
+import com.zq.zqplayer.model.response.ZQPlayerVideoListItemBean;
+import com.zq.zqplayer.model.response.ZQPlayerVideoUrlBean;
+
+import java.util.List;
 
 import io.reactivex.Observable;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+import retrofit2.http.Body;
+import retrofit2.http.POST;
+import retrofit2.http.Url;
 
 /**
  * author: wuyanqiang
@@ -14,17 +19,11 @@ import retrofit2.http.Query;
  */
 public interface VideoService {
 
-    @GET("ajax_get_live_list_by_cate")
-    Observable<VideoHttpResult<PandaTvDataBean>> getVideList(@Query("cate") String cate,
-                                                             @Query("pageno") int pageno,
-                                                             @Query("pagenum") int pagenum,
-                                                             @Query("room") int room,
-                                                             @Query("version") String version);
+    @POST()
+    Observable<BaseResponse<List<ZQPlayerVideoListItemBean>>> getZQVideoList(@Url String url, @Body ZQPlayerVideoListRequest zqPlayerVideoListRequest);
 
-    @GET("ajax_get_liveroom_baseinfo")
-    Observable<VideoHttpResult<PandaTvLiveDataBean>> getLiveUrl(@Query("roomid") String roomid,
-                                                                @Query("__version") String version,
-                                                                @Query("slaveflag") int slaveflag,
-                                                                @Query("type") String type,
-                                                                @Query("__plat") String __plat);
+    @POST()
+    Observable<BaseResponse<ZQPlayerVideoUrlBean>> getZQVideoListUrl(@Url String url, @Body ZQPlayerVideoUrlRequest request);
+
+
 }

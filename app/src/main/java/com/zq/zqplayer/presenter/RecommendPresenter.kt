@@ -1,27 +1,19 @@
 package com.zq.zqplayer.presenter
 
-import android.os.Bundle
-import android.util.Log
 import com.trello.rxlifecycle2.LifecycleTransformer
 import com.ziq.base.mvp.BasePresenter
 import com.ziq.base.mvp.IBaseView
 import com.ziq.base.utils.RetrofitUtil
-import com.zq.zqplayer.model.PandaTvDataBean
-import com.zq.zqplayer.model.PandaTvListItemBean
-import com.zq.zqplayer.model.PandaTvLiveDataBean
-import com.zq.zqplayer.model.VideoHttpResult
 import com.zq.zqplayer.model.request.BaseRequest
+import com.zq.zqplayer.model.request.ZQPlayerVideoListRequest
+import com.zq.zqplayer.model.request.ZQPlayerVideoUrlRequest
 import com.zq.zqplayer.model.response.BaseObserver
+import com.zq.zqplayer.model.response.BaseResponse
+import com.zq.zqplayer.model.response.ZQPlayerVideoListItemBean
+import com.zq.zqplayer.model.response.ZQPlayerVideoUrlBean
 import com.zq.zqplayer.service.VideoService
-import io.reactivex.Observable
-import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.annotations.NonNull
-import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -37,10 +29,16 @@ class RecommendPresenter : BasePresenter {
     constructor() : super()
 
 
-     fun getVideo(req: BaseRequest) {
+    fun getZqVideoList(req: BaseRequest) {
+        val request:ZQPlayerVideoListRequest = ZQPlayerVideoListRequest();
+        request.pageno = req.pageNo;
+        request.pagenum = req.pageSize
+        request.cate = "lol"
+        request.room = 1
+        request.version = "3.3.1.5978"
         RetrofitUtil.getInstance().retrofit
                 .create<VideoService>(VideoService::class.java!!)
-                .getVideList("lol", req.pageNo, req.pageSize, 1, "3.3.1.5978")
+                .getZQVideoList("http://193.112.65.251:8080/live/list", request)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     mView.showLoading()
@@ -50,11 +48,11 @@ class RecommendPresenter : BasePresenter {
                 .doFinally {
                     mView.hideLoading()
                 }
-                .compose(this.getLifecycleTransformer() as LifecycleTransformer<VideoHttpResult<PandaTvDataBean>>)
-                .subscribe(object : BaseObserver<VideoHttpResult<PandaTvDataBean>>() {
-                    override fun onSuccessful(t: VideoHttpResult<PandaTvDataBean>?) {
-                        if(t != null && t.data != null && t.data.items != null){
-                            mView.setData(t.data.items)
+                .compose(this.getLifecycleTransformer() as LifecycleTransformer<BaseResponse<List<ZQPlayerVideoListItemBean>>>)
+                .subscribe(object : BaseObserver<BaseResponse<List<ZQPlayerVideoListItemBean>>>() {
+                    override fun onSuccessful(t: BaseResponse<List<ZQPlayerVideoListItemBean>>?) {
+                        if(t != null && t.data != null){
+                            mView.setData(t.data)
                         }
                     }
 
@@ -65,10 +63,16 @@ class RecommendPresenter : BasePresenter {
                 })
     }
 
-    fun getVideoUrl(roomId:String , title:String ) {
+    fun getZqVideoUrl(roomId:String , title:String) {
+        val request:ZQPlayerVideoUrlRequest = ZQPlayerVideoUrlRequest();
+        request.__version = "3.3.1.5978"
+        request.roomid = roomId
+        request.slaveflag = 1
+        request.type = "json"
+        request.__plat = "android"
         RetrofitUtil.getInstance().retrofit
                 .create<VideoService>(VideoService::class.java!!)
-                .getLiveUrl(roomId, "3.3.1.5978", 1, "json", "android")
+                .getZQVideoListUrl("http://193.112.65.251:8080/live/list/item", request)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     mView.showLoading()
@@ -78,15 +82,11 @@ class RecommendPresenter : BasePresenter {
                 .doFinally {
                     mView.hideLoading()
                 }
-                .compose(this.getLifecycleTransformer() as LifecycleTransformer<VideoHttpResult<PandaTvLiveDataBean>>)
-                .subscribe(object : BaseObserver<VideoHttpResult<PandaTvLiveDataBean>>() {
-                    override fun onSuccessful(t: VideoHttpResult<PandaTvLiveDataBean>?) {
-                        val data:PandaTvLiveDataBean = t!!.data
-                        val pl = data.info.videoinfo.plflag.split("_")
-
-                        if (pl.isNotEmpty()) {
-                            val url = "http://pl" + pl[pl.size - 1] + ".live.panda.tv/live_panda/" + data.info.videoinfo.room_key + "_mid.flv?sign=" + data.info.videoinfo.sign + "&time=" + data.info.videoinfo.ts
-                            mView.onGetVideoUrlSuccessful(url, title)
+                .compose(this.getLifecycleTransformer() as LifecycleTransformer<BaseResponse<ZQPlayerVideoUrlBean>>)
+                .subscribe(object : BaseObserver<BaseResponse<ZQPlayerVideoUrlBean>>() {
+                    override fun onSuccessful(t: BaseResponse<ZQPlayerVideoUrlBean>?) {
+                        if(t != null && t.data != null){
+                            mView.onGetVideoUrlSuccessful(t.data.videoUrl, title)
                         }
                     }
 
@@ -103,7 +103,7 @@ class RecommendPresenter : BasePresenter {
 
 
     interface View : IBaseView {
-        fun setData(items:List<PandaTvListItemBean>)
+        fun setData(items:List<ZQPlayerVideoListItemBean>)
         fun onGetVideoUrlSuccessful(url:String, title:String)
         fun showMessage(msg:String?)
     }

@@ -1,21 +1,17 @@
 package com.zq.zqplayer.adapter
 
-import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.chad.library.adapter.base.BaseMultiItemQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
-import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.zq.zqplayer.R
-import com.zq.zqplayer.model.PandaTvListItemBean
-import com.zq.zqplayer.model.RecommendLiveItemMultiItem
+import com.zq.zqplayer.model.response.ZQPlayerVideoListItemBean
 import com.zq.zqplayer.wiget.GlideRoundTransform
 
 
-class RecommendAdapter : BaseQuickAdapter<PandaTvListItemBean, BaseViewHolder> {
+class RecommendAdapter : BaseQuickAdapter<ZQPlayerVideoListItemBean, BaseViewHolder> {
 
 
 
@@ -25,10 +21,10 @@ class RecommendAdapter : BaseQuickAdapter<PandaTvListItemBean, BaseViewHolder> {
 
 
 
-    constructor(data: List<PandaTvListItemBean>?) : super(R.layout.item_recommend_live_item, data){
+    constructor(data: List<ZQPlayerVideoListItemBean>?) : super(R.layout.item_recommend_live_item, data){
     }
 
-    override fun convert(helper: BaseViewHolder?, item: PandaTvListItemBean?) {
+    override fun convert(helper: BaseViewHolder?, item: ZQPlayerVideoListItemBean?) {
         val tvTitle: TextView = helper!!.getView(R.id.tv_title)
         tvTitle.text = item!!.name
 
@@ -38,7 +34,7 @@ class RecommendAdapter : BaseQuickAdapter<PandaTvListItemBean, BaseViewHolder> {
                 .error(R.drawable.ic_picture_default_bg)
                 .transform(GlideRoundTransform(5))
         Glide.with(ivCover.context)
-                .load(item.pictures.img)
+                .load(item.imageUrl)
                 .apply(requestOptions)
                 .into(ivCover)
 
@@ -51,7 +47,7 @@ class RecommendAdapter : BaseQuickAdapter<PandaTvListItemBean, BaseViewHolder> {
 
 
     interface OnActionListener{
-        fun onLiveItemClick(item:PandaTvListItemBean): Unit
+        fun onLiveItemClick(item: ZQPlayerVideoListItemBean): Unit
     }
 
 }
