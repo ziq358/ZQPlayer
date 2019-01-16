@@ -49,6 +49,11 @@
         </activity>
         <activity android:name=".activity.LiveActivity"/>
         <activity android:name=".activity.TempActivity"/>
+        <activity android:name=".activity.ZQPlayerServiceTestActivity"/>
+
+
+
+
 
 
 

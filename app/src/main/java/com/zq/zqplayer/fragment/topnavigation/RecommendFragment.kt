@@ -1,6 +1,7 @@
 package com.zq.zqplayer.fragment.topnavigation
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -19,6 +20,7 @@ import com.ziq.base.mvp.BaseFragment
 import com.zq.customviewlib.AutoRollViewPager
 import com.zq.zqplayer.R
 import com.zq.zqplayer.activity.LiveActivity
+import com.zq.zqplayer.activity.ZQPlayerServiceTestActivity
 import com.zq.zqplayer.adapter.RecommendAdapter
 import com.zq.zqplayer.dagger.component.DaggerRecommendComponent
 import com.zq.zqplayer.dagger.module.RecommendModule
@@ -132,7 +134,11 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
 
     override fun onGetVideoUrlSuccessful(url: String, title:String) {
         Log.e("ziq", url)
-        LiveActivity.openVideo(context, url, title)
+//        LiveActivity.openVideo(context, url, title)
+
+        val intent = Intent(context, ZQPlayerServiceTestActivity::class.java)
+        context?.startActivity(intent)
+
     }
 
     override fun showMessage(msg: String?) {

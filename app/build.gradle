@@ -7,7 +7,7 @@ apply plugin: 'com.mob.sdk'
 
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
-    buildToolsVersion '28.0.3'
+    buildToolsVersion rootProject.ext.android.buildToolsVersion
     defaultConfig {
         applicationId "com.zq.zqplayer"
         minSdkVersion rootProject.ext.android.minSdkVersion
@@ -15,7 +15,7 @@ android {
         versionCode rootProject.ext.android["versionCode"]
         versionName rootProject.ext.android["versionName"]
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        multiDexEnabled true
         ndk {
             //选择要添加的对应 cpu 类型的 .so 库。
             abiFilters 'armeabi','armeabi-v7a'
@@ -79,7 +79,7 @@ dependencies {
     api rootProject.ext.dependencies["design"]
     api project(":playerlib")
 
-    api 'com.ziq.base:base:3.1.0'
+    api 'com.ziq.base:base:3.1.1'
     api 'com.zq.customviewlib:customviewlib:2.0.3'
 
     kapt (rootProject.ext.dependencies["dagger2-compiler"]){
