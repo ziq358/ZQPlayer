@@ -4,6 +4,8 @@ import android.app.Service
 import android.content.*
 import android.os.IBinder
 import android.util.Log
+import android.view.Surface
+import com.zq.playerlib.ZQPlayer
 import java.lang.ref.WeakReference
 
 /**
@@ -18,10 +20,21 @@ class ZQPlayerService: Service() {
             context.startService(intent)
         }
 
+        fun stopZQPlayerService(context: Context) {
+            val intent = Intent(context, ZQPlayerService::class.java)
+            context.stopService(intent)
+        }
+
         fun bindZQPlayerService(context: Context, serviceConnection: ServiceConnection) {
-            //need to start service first
+            //需要先启动服务 start service first，不然直接绑定不会立即回调onServiceConnected， 待 服务start后，统一回调所有之前 进行的绑定动作
             val intent = Intent(context, ZQPlayerService::class.java)
             context.bindService(intent, serviceConnection, 0)
+        }
+
+        fun unbindZQPlayerService(context: Context, serviceConnection: ServiceConnection) {
+            //activity 绑定的时候  把ServiceConnection 给了 服务，serviceConnection 强引用了activity, 退出activity时 不解绑会 内存泄漏
+            //不会调用  ServiceConnection.onServiceDisconnected  只有服务crash 或被kill 才调用
+            context.unbindService(serviceConnection)
         }
 
         val TAG = "ZQPlayerService"
@@ -47,6 +60,7 @@ class ZQPlayerService: Service() {
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
         unregisterReceiver(mBroadcastReceiver)
+        zqPlayer?.stop()
         super.onDestroy()
     }
 
@@ -70,12 +84,8 @@ class ZQPlayerService: Service() {
             mService = WeakReference(service)
         }
 
-        override fun play() {
-            mService?.get()?.play()
-        }
-
-        override fun setPlayItemInfo(info: PlayerItemInfo?) {
-            mService?.get()?.setPlayItemInfo(info)
+        override fun initPlayer(info: PlayerItemInfo?, surface: Surface?) {
+            mService?.get()?.initPlayer(info, surface)
         }
 
     }
@@ -93,13 +103,34 @@ class ZQPlayerService: Service() {
     }
 
 
-    fun play(): Unit {
-        Log.d(TAG, "play")
+    var zqPlayer:ZQPlayer? = null
+    var playerItemInfo: PlayerItemInfo? = null
+
+    fun initPlayer(info: PlayerItemInfo?, surface: Surface?): Unit {
+        Log.d(TAG, info?.url)
+        playerItemInfo = info
+        zqPlayer = ZQPlayer()
+        zqPlayer?.setStatusListener(object : ZQPlayer.StatusListener {
+            override fun onLoading() {
+                Log.d(TAG, "onLoading")
+            }
+
+            override fun onPrepareFinished() {
+                Log.d(TAG, "onPrepareFinished")
+                zqPlayer?.start()
+            }
+
+            override fun onPlaying() {
+                Log.d(TAG, "onPlaying")
+            }
+            override fun onPause() {
+                Log.d(TAG, "onPause")
+            }
+        })
+        zqPlayer?.prepare(playerItemInfo?.url!!)
+        zqPlayer?.setSurfsce(surface)
     }
 
-    fun setPlayItemInfo(info: PlayerItemInfo?): Unit {
-        Log.d(TAG, info?.url)
-    }
 
 
 

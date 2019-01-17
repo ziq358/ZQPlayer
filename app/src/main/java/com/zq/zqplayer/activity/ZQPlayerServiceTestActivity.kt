@@ -1,11 +1,18 @@
 package com.zq.zqplayer.activity
 
 import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.View
+import android.widget.Button
+import android.widget.Toast
+import butterknife.BindView
 import butterknife.OnClick
 import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.mvp.BaseActivity
@@ -21,6 +28,31 @@ import com.zq.zqplayer.R
  */
 class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
 
+    var serviceBinder: ZQPlayerServiceBinder? = null
+    private var videoPath: String = ""
+    var playeriteminfo = PlayerItemInfo()
+
+    @BindView(R.id.btn_play)
+    lateinit var btn_play: Button
+    @BindView(R.id.surfaceView)
+    lateinit var mSurfaceView:SurfaceView
+    var mSurfaceHolder: SurfaceHolder? = null
+
+    @BindView(R.id.btn_play2)
+    lateinit var btn_play2: Button
+    @BindView(R.id.surfaceView2)
+    lateinit var mSurfaceView2:SurfaceView
+    var mSurfaceHolder2: SurfaceHolder? = null
+
+    companion object {
+        const val VIDEO_URL:String = "video_url"
+        const val VIDEO_TITLE:String = "video_title"
+        fun start(context: Context?, url:String): Unit {
+            val intent = Intent(context, ZQPlayerServiceTestActivity::class.java)
+            intent.putExtra(VIDEO_URL, url)
+            context?.startActivity(intent)
+        }
+    }
 
 
     override fun initLayoutResourceId(): Int {
@@ -31,10 +63,48 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
     }
 
     override fun initData(savedInstanceState: Bundle?) {
+        videoPath = intent.getStringExtra(LiveActivity.VIDEO_URL)
+        playeriteminfo.url = videoPath
+
+
+        mSurfaceView.holder.addCallback(object : SurfaceHolder.Callback {
+
+            override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
+                mSurfaceHolder = surfaceHolder
+                btn_play.isEnabled = true
+            }
+
+            override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
+                mSurfaceHolder = surfaceHolder
+                btn_play.isEnabled = true
+            }
+
+            override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {
+                mSurfaceHolder = null
+            }
+        })
+
+        mSurfaceView2.holder.addCallback(object : SurfaceHolder.Callback {
+
+            override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
+                mSurfaceHolder2 = surfaceHolder
+                btn_play2.isEnabled = true
+            }
+
+            override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
+                mSurfaceHolder2 = surfaceHolder
+                btn_play2.isEnabled = true
+            }
+
+            override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {
+                mSurfaceHolder2 = null
+            }
+        })
+
     }
 
 
-    @OnClick(R.id.btn_start, R.id.btn_stop, R.id.btn_bind, R.id.btn_unbind)
+    @OnClick(R.id.btn_start, R.id.btn_stop, R.id.btn_bind, R.id.btn_unbind,R.id.btn_play,R.id.btn_play2)
     fun onClick(view: View): Unit {
         when(view.id){
             R.id.btn_start -> {
@@ -43,26 +113,39 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
             }
             R.id.btn_stop -> {
                 Log.d("ziq", "btn_stop")
+                ZQPlayerService.stopZQPlayerService(this)
             }
             R.id.btn_bind -> {
                 Log.d("ziq", "btn_bind")
-                ZQPlayerService.bindZQPlayerService(this, object : ServiceConnection {
-                    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                        val serviceBinder = ZQPlayerServiceBinder.Stub.asInterface(service)
-                        var playeriteminfo = PlayerItemInfo()
-                        playeriteminfo.url = "PlayerItemInfo url"
-                        serviceBinder.setPlayItemInfo(playeriteminfo)
-                        serviceBinder.play()
-                    }
-
-                    override fun onServiceDisconnected(name: ComponentName?) {
-                    }
-                })
+                ZQPlayerService.bindZQPlayerService(this, serviceConnection)
             }
             R.id.btn_unbind -> {
                 Log.d("ziq", "btn_unbind")
+                ZQPlayerService.unbindZQPlayerService(this, serviceConnection)
+            }
+            R.id.btn_play -> {
+                serviceBinder?.initPlayer(playeriteminfo, mSurfaceHolder?.surface)
+            }
+            R.id.btn_play2 -> {
+
+                serviceBinder?.initPlayer(playeriteminfo, mSurfaceHolder2?.surface)
             }
             else -> {}
+        }
+    }
+
+    override fun onDestroy() {
+        ZQPlayerService.unbindZQPlayerService(this, serviceConnection)
+        super.onDestroy()
+    }
+
+    var serviceConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            serviceBinder = ZQPlayerServiceBinder.Stub.asInterface(service)
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            serviceBinder = null
         }
     }
 

@@ -136,8 +136,7 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
         Log.e("ziq", url)
 //        LiveActivity.openVideo(context, url, title)
 
-        val intent = Intent(context, ZQPlayerServiceTestActivity::class.java)
-        context?.startActivity(intent)
+        ZQPlayerServiceTestActivity.start(context, url)
 
     }
 
