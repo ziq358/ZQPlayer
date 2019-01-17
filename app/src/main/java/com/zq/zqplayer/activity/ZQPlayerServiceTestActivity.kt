@@ -38,12 +38,6 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
     lateinit var mSurfaceView:SurfaceView
     var mSurfaceHolder: SurfaceHolder? = null
 
-    @BindView(R.id.btn_play2)
-    lateinit var btn_play2: Button
-    @BindView(R.id.surfaceView2)
-    lateinit var mSurfaceView2:SurfaceView
-    var mSurfaceHolder2: SurfaceHolder? = null
-
     companion object {
         const val VIDEO_URL:String = "video_url"
         const val VIDEO_TITLE:String = "video_title"
@@ -66,7 +60,6 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
         videoPath = intent.getStringExtra(LiveActivity.VIDEO_URL)
         playeriteminfo.url = videoPath
 
-
         mSurfaceView.holder.addCallback(object : SurfaceHolder.Callback {
 
             override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
@@ -84,23 +77,6 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
             }
         })
 
-        mSurfaceView2.holder.addCallback(object : SurfaceHolder.Callback {
-
-            override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
-                mSurfaceHolder2 = surfaceHolder
-                btn_play2.isEnabled = true
-            }
-
-            override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
-                mSurfaceHolder2 = surfaceHolder
-                btn_play2.isEnabled = true
-            }
-
-            override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {
-                mSurfaceHolder2 = null
-            }
-        })
-
     }
 
 
@@ -109,6 +85,8 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
         when(view.id){
             R.id.btn_start -> {
                 Log.d("ziq", "btn_start")
+                mSurfaceView.visibility = View.GONE  // surface 会 重新 建立
+                mSurfaceView.visibility = View.VISIBLE
                 ZQPlayerService.startZQPlayerService(this)
             }
             R.id.btn_stop -> {
@@ -125,10 +103,6 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
             }
             R.id.btn_play -> {
                 serviceBinder?.initPlayer(playeriteminfo, mSurfaceHolder?.surface)
-            }
-            R.id.btn_play2 -> {
-
-                serviceBinder?.initPlayer(playeriteminfo, mSurfaceHolder2?.surface)
             }
             else -> {}
         }

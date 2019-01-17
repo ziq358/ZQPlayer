@@ -53,19 +53,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="203dp"
                 />
-            <Button
-                android:id="@+id/btn_play2"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="btn_play2"
-                android:enabled="false"
-                />
-
-            <SurfaceView
-                android:id="@+id/surfaceView2"
-                android:layout_width="match_parent"
-                android:layout_height="203dp"
-                />
 
         </LinearLayout>
 
