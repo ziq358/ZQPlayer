@@ -80,7 +80,7 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
     }
 
 
-    @OnClick(R.id.btn_start, R.id.btn_stop, R.id.btn_bind, R.id.btn_unbind,R.id.btn_play,R.id.btn_play2)
+    @OnClick(R.id.btn_start, R.id.btn_stop, R.id.btn_bind, R.id.btn_unbind,R.id.btn_play)
     fun onClick(view: View): Unit {
         when(view.id){
             R.id.btn_start -> {

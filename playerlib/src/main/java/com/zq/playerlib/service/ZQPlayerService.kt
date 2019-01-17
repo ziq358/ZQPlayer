@@ -2,9 +2,13 @@ package com.zq.playerlib.service
 
 import android.app.Service
 import android.content.*
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import android.view.Surface
+import android.view.*
+import android.view.WindowManager.LayoutParams.*
+import android.widget.TextView
+import com.zq.playerlib.R
 import com.zq.playerlib.ZQPlayer
 import java.lang.ref.WeakReference
 
@@ -85,7 +89,7 @@ class ZQPlayerService: Service() {
         }
 
         override fun initPlayer(info: PlayerItemInfo?, surface: Surface?) {
-            mService?.get()?.initPlayer(info, surface)
+            mService?.get()?.showFloatingWindow(info)
         }
 
     }
@@ -131,7 +135,89 @@ class ZQPlayerService: Service() {
         zqPlayer?.setSurfsce(surface)
     }
 
+    internal var floatingWindow: View? = null
+    internal var windowManager: WindowManager? = null
+    internal var wmParams: WindowManager.LayoutParams? = null
+    internal var displayHeight: Int = 0
+    internal var displayWidth: Int = 0
+    internal var statusBarHeight: Int = 0
+    internal var floatingWindowHeight: Int = 0
+    internal var floatingWindowWidth: Int = 0
 
+
+    internal var surfaceView: SurfaceView? = null
+
+
+
+    private fun showFloatingWindow(info: PlayerItemInfo?) {
+        if (floatingWindow == null) {
+
+            displayHeight = DeviceInfoUtil.getDisplayHeight(applicationContext)
+            displayWidth = DeviceInfoUtil.getDisplayWidth(applicationContext)
+            statusBarHeight = DeviceInfoUtil.getStatusBarHeight(applicationContext)
+
+            windowManager = application.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            wmParams = WindowManager.LayoutParams()
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1 && Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+                wmParams!!.type = WindowManager.LayoutParams.TYPE_TOAST
+            } else {
+                wmParams!!.type = WindowManager.LayoutParams.TYPE_PHONE
+            }
+            wmParams!!.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
+            wmParams!!.flags = FLAG_NOT_TOUCH_MODAL or FLAG_NOT_FOCUSABLE or FLAG_LAYOUT_NO_LIMITS
+
+            wmParams!!.gravity = Gravity.LEFT or Gravity.TOP
+
+            wmParams!!.width = displayWidth /2
+            wmParams!!.height = wmParams!!.width /16 * 9
+
+            val inflater = LayoutInflater.from(application)
+            floatingWindow = inflater.inflate(R.layout.layout_service_video, null)
+            surfaceView = floatingWindow!!.findViewById(R.id.surfaceView)
+            floatingWindow!!.setOnTouchListener(View.OnTouchListener { v, event ->
+                // getRawX是触摸位置相对于屏幕的坐标，getX是相对于按钮的坐标
+
+                if (floatingWindowHeight == 0) {
+                    floatingWindowWidth = floatingWindow!!.getMeasuredWidth()
+                    floatingWindowHeight = floatingWindow!!.getMeasuredHeight()
+                }
+
+                var targetX = event.rawX.toInt() - floatingWindowWidth / 2
+                var targetY = event.rawY.toInt() - floatingWindowHeight / 2 - statusBarHeight
+
+                if (targetX <= 0) {
+                    targetX = 0
+                } else if (targetX + floatingWindowWidth >= displayWidth) {
+                    targetX = displayWidth - floatingWindowWidth
+                }
+                if (targetY <= 0) {
+                    targetY = 0
+                } else if (targetY + floatingWindowHeight >= displayHeight) {
+                    targetY = displayHeight - floatingWindowHeight - statusBarHeight
+                }
+
+                wmParams!!.x = targetX
+                wmParams!!.y = targetY
+                windowManager!!.updateViewLayout(floatingWindow, wmParams)// 刷新
+                return@OnTouchListener false// 此处必须返回false，否则OnClickListener获取不到监听
+            })
+            windowManager!!.addView(floatingWindow, wmParams)
+
+            surfaceView!!.holder.addCallback(object : SurfaceHolder.Callback {
+                override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+                    initPlayer(info, holder?.surface)
+                }
+
+                override fun surfaceDestroyed(holder: SurfaceHolder?) {
+                    initPlayer(info, holder?.surface)
+                }
+
+                override fun surfaceCreated(holder: SurfaceHolder?) {
+
+                }
+            })
+        }
+    }
 
 
 }
