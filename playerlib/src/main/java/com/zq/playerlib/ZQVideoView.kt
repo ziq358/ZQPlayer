@@ -116,7 +116,7 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
     internal fun initPlayer(url:String?, surfaceHolder: SurfaceHolder?): Unit {
         if(player == null && !TextUtils.isEmpty(url) && surfaceHolder != null){
             player = ZQPlayer()
-            player?.setStatusListener(object : ZQPlayer.StatusListener {
+            player?.setStatusListener(object : StatusListener {
                 //回调 在 子线程
                 override fun onLoading() {
                     zqHandler?.sendEmptyMessage(STATUS_LOADING)

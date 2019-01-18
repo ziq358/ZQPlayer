@@ -6,4 +6,6 @@ import com.zq.playerlib.service.PlayerItemInfo;
 
 interface ZQPlayerServiceBinder {
     void initPlayer(in PlayerItemInfo info, in Surface surface);
+    void showFloatingWindow(in PlayerItemInfo info);
+
 }

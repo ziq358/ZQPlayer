@@ -7,8 +7,10 @@ import android.os.IBinder
 import android.util.Log
 import android.view.*
 import android.view.WindowManager.LayoutParams.*
+import android.widget.ImageView
 import android.widget.TextView
 import com.zq.playerlib.R
+import com.zq.playerlib.StatusListener
 import com.zq.playerlib.ZQPlayer
 import java.lang.ref.WeakReference
 
@@ -43,7 +45,7 @@ class ZQPlayerService: Service() {
 
         val TAG = "ZQPlayerService"
 
-        val PLAY_CMD = "com.zq.playerlib.service.zqplayerservice.play"
+        val STOP_CMD = "com.zq.playerlib.service.zqplayerservice.stop"
 
     }
 
@@ -51,7 +53,7 @@ class ZQPlayerService: Service() {
         super.onCreate()
         Log.d(TAG, "onCreate")
         val intentFilter: IntentFilter = IntentFilter()
-        intentFilter.addAction(PLAY_CMD)
+        intentFilter.addAction(STOP_CMD)
         registerReceiver(mBroadcastReceiver, intentFilter)
     }
 
@@ -64,7 +66,7 @@ class ZQPlayerService: Service() {
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
         unregisterReceiver(mBroadcastReceiver)
-        zqPlayer?.stop()
+        stop()
         super.onDestroy()
     }
 
@@ -81,15 +83,18 @@ class ZQPlayerService: Service() {
     }
 
     class ZQPlayerBind() : ZQPlayerServiceBinder.Stub() {
+        override fun showFloatingWindow(info: PlayerItemInfo?) {
+            mService?.get()?.showFloatingWindow(info)
+        }
+
+        override fun initPlayer(info: PlayerItemInfo?, surface: Surface?) {
+            mService?.get()?.initPlayer(info, surface)
+        }
 
         private var mService: WeakReference<ZQPlayerService>? = null
 
         constructor(service: ZQPlayerService) :this(){
             mService = WeakReference(service)
-        }
-
-        override fun initPlayer(info: PlayerItemInfo?, surface: Surface?) {
-            mService?.get()?.showFloatingWindow(info)
         }
 
     }
@@ -98,23 +103,31 @@ class ZQPlayerService: Service() {
     fun handleIntent(intent: Intent?): Unit {
         val action = intent?.action
         when(action){
-//            PLAY_CMD -> play()
-//            REMOVE_NOTIFICATION_CMD ->{
-//                mMediaPlayer.stop()
-//                mMusicNotification?.removeNotification()
-//            }
+            STOP_CMD -> stop()
+            else ->{
+            }
         }
     }
 
+    fun stop(): Unit {
+        zqPlayer?.stop()
+        if(floatingWindow != null){
+            windowManager?.removeView(floatingWindow)
+            floatingWindow = null
+        }
+    }
 
     var zqPlayer:ZQPlayer? = null
     var playerItemInfo: PlayerItemInfo? = null
 
     fun initPlayer(info: PlayerItemInfo?, surface: Surface?): Unit {
+        if(zqPlayer != null){
+            zqPlayer?.stop()
+        }
         Log.d(TAG, info?.url)
         playerItemInfo = info
         zqPlayer = ZQPlayer()
-        zqPlayer?.setStatusListener(object : ZQPlayer.StatusListener {
+        zqPlayer?.setStatusListener(object : StatusListener {
             override fun onLoading() {
                 Log.d(TAG, "onLoading")
             }
@@ -143,15 +156,9 @@ class ZQPlayerService: Service() {
     internal var statusBarHeight: Int = 0
     internal var floatingWindowHeight: Int = 0
     internal var floatingWindowWidth: Int = 0
-
-
     internal var surfaceView: SurfaceView? = null
-
-
-
-    private fun showFloatingWindow(info: PlayerItemInfo?) {
-        if (floatingWindow == null) {
-
+    fun showFloatingWindow(info: PlayerItemInfo?) {
+        if(windowManager == null){
             displayHeight = DeviceInfoUtil.getDisplayHeight(applicationContext)
             displayWidth = DeviceInfoUtil.getDisplayWidth(applicationContext)
             statusBarHeight = DeviceInfoUtil.getStatusBarHeight(applicationContext)
@@ -159,22 +166,27 @@ class ZQPlayerService: Service() {
             windowManager = application.getSystemService(Context.WINDOW_SERVICE) as WindowManager
             wmParams = WindowManager.LayoutParams()
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1 && Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-                wmParams!!.type = WindowManager.LayoutParams.TYPE_TOAST
+                wmParams?.type = WindowManager.LayoutParams.TYPE_TOAST
             } else {
-                wmParams!!.type = WindowManager.LayoutParams.TYPE_PHONE
+                wmParams?.type = WindowManager.LayoutParams.TYPE_PHONE
             }
-            wmParams!!.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
-            wmParams!!.flags = FLAG_NOT_TOUCH_MODAL or FLAG_NOT_FOCUSABLE or FLAG_LAYOUT_NO_LIMITS
+            wmParams?.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
+            wmParams?.flags = FLAG_NOT_TOUCH_MODAL or FLAG_NOT_FOCUSABLE or FLAG_LAYOUT_NO_LIMITS
 
-            wmParams!!.gravity = Gravity.LEFT or Gravity.TOP
+            wmParams?.gravity = Gravity.LEFT or Gravity.TOP
+            wmParams?.width = displayWidth / 20 * 12
+            wmParams?.height = wmParams!!.width /16 * 9
+        }
 
-            wmParams!!.width = displayWidth /2
-            wmParams!!.height = wmParams!!.width /16 * 9
-
+        if(floatingWindow != null){
+            surfaceView?.visibility = View.INVISIBLE
+            surfaceView?.visibility = View.VISIBLE
+        }else {
             val inflater = LayoutInflater.from(application)
             floatingWindow = inflater.inflate(R.layout.layout_service_video, null)
-            surfaceView = floatingWindow!!.findViewById(R.id.surfaceView)
-            floatingWindow!!.setOnTouchListener(View.OnTouchListener { v, event ->
+            surfaceView = floatingWindow?.findViewById(R.id.surfaceView)
+            val ivClose: View? = floatingWindow?.findViewById(R.id.iv_close)
+            floatingWindow?.setOnTouchListener(View.OnTouchListener { v, event ->
                 // getRawX是触摸位置相对于屏幕的坐标，getX是相对于按钮的坐标
 
                 if (floatingWindowHeight == 0) {
@@ -196,23 +208,26 @@ class ZQPlayerService: Service() {
                     targetY = displayHeight - floatingWindowHeight - statusBarHeight
                 }
 
-                wmParams!!.x = targetX
-                wmParams!!.y = targetY
-                windowManager!!.updateViewLayout(floatingWindow, wmParams)// 刷新
+                wmParams?.x = targetX
+                wmParams?.y = targetY
+                windowManager?.updateViewLayout(floatingWindow, wmParams)// 刷新
                 return@OnTouchListener false// 此处必须返回false，否则OnClickListener获取不到监听
             })
-            windowManager!!.addView(floatingWindow, wmParams)
+            ivClose?.setOnClickListener { stop() }
 
-            surfaceView!!.holder.addCallback(object : SurfaceHolder.Callback {
-                override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+
+            windowManager?.addView(floatingWindow, wmParams)
+            surfaceView?.holder?.addCallback(object : SurfaceHolder.Callback {
+
+                override fun surfaceCreated(holder: SurfaceHolder?) {
                     initPlayer(info, holder?.surface)
+                }
+
+                override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+//                    initPlayer(info, holder?.surface)
                 }
 
                 override fun surfaceDestroyed(holder: SurfaceHolder?) {
-                    initPlayer(info, holder?.surface)
-                }
-
-                override fun surfaceCreated(holder: SurfaceHolder?) {
 
                 }
             })

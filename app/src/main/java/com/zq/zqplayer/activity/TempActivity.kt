@@ -13,6 +13,7 @@ import butterknife.OnClick
 import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.mvp.BaseActivity
 import com.ziq.base.mvp.IBasePresenter
+import com.zq.playerlib.StatusListener
 import com.zq.playerlib.ZQPlayer
 import com.zq.zqplayer.R
 import java.io.*
@@ -82,7 +83,7 @@ class TempActivity : BaseActivity<IBasePresenter>() {
 
     fun initPlayer(): Unit {
         player = ZQPlayer()
-        player?.setStatusListener(object : ZQPlayer.StatusListener {
+        player?.setStatusListener(object : StatusListener {
             override fun onLoading() {
                 runOnUiThread {
                     mBtnPlay.text = "初始化中。。。"

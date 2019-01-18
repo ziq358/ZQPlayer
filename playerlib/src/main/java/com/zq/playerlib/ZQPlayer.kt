@@ -13,19 +13,7 @@ class ZQPlayer {
     }
 
 
-    interface StatusListener{
-        fun onLoading(): Unit {}
 
-        fun onPrepareFinished(): Unit {}
-
-        fun onPlaying(): Unit {}
-
-        fun onPause(): Unit {}
-
-        fun onStop(): Unit {}
-
-        fun onError(msg: String): Unit {}
-    }
 
     private var listener: StatusListener? = null
 
@@ -93,6 +81,7 @@ class ZQPlayer {
     private var mediaCodec:MediaCodec? = null
     fun setSurfsce(surface: Surface?): Unit {
         this.surface = surface
+        mediaCodec
     }
 
     fun initMediaCodec(mimetype: String, width: Int, height: Int, csd0: ByteArray, csd1: ByteArray) {

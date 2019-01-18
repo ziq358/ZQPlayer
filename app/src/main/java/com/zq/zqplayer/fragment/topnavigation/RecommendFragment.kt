@@ -18,6 +18,7 @@ import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.dagger.module.RxLifecycleModule
 import com.ziq.base.mvp.BaseFragment
 import com.zq.customviewlib.AutoRollViewPager
+import com.zq.playerlib.service.ZQPlayerService
 import com.zq.zqplayer.R
 import com.zq.zqplayer.activity.LiveActivity
 import com.zq.zqplayer.activity.ZQPlayerServiceTestActivity
@@ -134,9 +135,11 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
 
     override fun onGetVideoUrlSuccessful(url: String, title:String) {
         Log.e("ziq", url)
-//        LiveActivity.openVideo(context, url, title)
+        val intent = Intent(ZQPlayerService.STOP_CMD)
+        activity?.sendBroadcast(intent)
+        LiveActivity.openVideo(context, url, title)
 
-        ZQPlayerServiceTestActivity.start(context, url)
+//        ZQPlayerServiceTestActivity.start(context, url)
 
     }
 

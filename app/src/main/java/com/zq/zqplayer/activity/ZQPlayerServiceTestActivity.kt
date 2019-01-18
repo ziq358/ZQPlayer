@@ -32,6 +32,9 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
     private var videoPath: String = ""
     var playeriteminfo = PlayerItemInfo()
 
+    @BindView(R.id.btn_play_window)
+    lateinit var btn_play_window: Button
+
     @BindView(R.id.btn_play)
     lateinit var btn_play: Button
     @BindView(R.id.surfaceView)
@@ -59,17 +62,18 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
     override fun initData(savedInstanceState: Bundle?) {
         videoPath = intent.getStringExtra(LiveActivity.VIDEO_URL)
         playeriteminfo.url = videoPath
-
         mSurfaceView.holder.addCallback(object : SurfaceHolder.Callback {
 
             override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
                 mSurfaceHolder = surfaceHolder
                 btn_play.isEnabled = true
+                btn_play_window.isEnabled = true
             }
 
             override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
                 mSurfaceHolder = surfaceHolder
                 btn_play.isEnabled = true
+                btn_play_window.isEnabled = true
             }
 
             override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {
@@ -80,7 +84,7 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
     }
 
 
-    @OnClick(R.id.btn_start, R.id.btn_stop, R.id.btn_bind, R.id.btn_unbind,R.id.btn_play)
+    @OnClick(R.id.btn_start, R.id.btn_stop, R.id.btn_bind, R.id.btn_unbind,R.id.btn_play, R.id.btn_play_window)
     fun onClick(view: View): Unit {
         when(view.id){
             R.id.btn_start -> {
@@ -103,6 +107,9 @@ class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
             }
             R.id.btn_play -> {
                 serviceBinder?.initPlayer(playeriteminfo, mSurfaceHolder?.surface)
+            }
+            R.id.btn_play_window -> {
+                serviceBinder?.showFloatingWindow(playeriteminfo)
             }
             else -> {}
         }

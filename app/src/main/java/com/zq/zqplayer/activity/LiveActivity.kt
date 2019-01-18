@@ -1,8 +1,11 @@
 package com.zq.zqplayer.activity
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.support.v4.view.ViewPager
 import android.widget.Toast
 import butterknife.BindView
@@ -20,6 +23,9 @@ import com.zq.zqplayer.fragment.live.VIPListFragment
 import kotlinx.android.synthetic.main.item_chat.*
 import com.mob.wrappers.ShareSDKWrapper.share
 import cn.sharesdk.onekeyshare.OnekeyShare
+import com.zq.playerlib.service.PlayerItemInfo
+import com.zq.playerlib.service.ZQPlayerService
+import com.zq.playerlib.service.ZQPlayerServiceBinder
 import me.leolin.shortcutbadger.ShortcutBadger
 
 
@@ -59,6 +65,8 @@ class LiveActivity : BaseActivity<IBasePresenter>(){
     }
 
     override fun initData(savedInstanceState: Bundle?) {
+        ZQPlayerService.startZQPlayerService(this)
+        ZQPlayerService.bindZQPlayerService(this, serviceConnection)
         initViewPager()
         initVideoView()
         ShortcutBadger.removeCount(this)
@@ -91,6 +99,7 @@ class LiveActivity : BaseActivity<IBasePresenter>(){
             }
 
             override fun onPrepareFinished() {
+                mZQVideoView.start()
             }
 
             override fun onClick() {
@@ -146,8 +155,22 @@ class LiveActivity : BaseActivity<IBasePresenter>(){
     }
 
     override fun onDestroy() {
+        var playeriteminfo = PlayerItemInfo()
+        playeriteminfo.url = videoPath
+        serviceBinder?.showFloatingWindow(playeriteminfo)
         mZQVideoView.stop()
         super.onDestroy()
+    }
+
+    var serviceBinder: ZQPlayerServiceBinder? = null
+    var serviceConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            serviceBinder = ZQPlayerServiceBinder.Stub.asInterface(service)
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            serviceBinder = null
+        }
     }
 
 
