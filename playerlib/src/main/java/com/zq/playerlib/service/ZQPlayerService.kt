@@ -167,10 +167,12 @@ class ZQPlayerService: Service() {
             wmParams = WindowManager.LayoutParams()
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1 && Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
                 wmParams?.type = WindowManager.LayoutParams.TYPE_TOAST
-            } else {
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1){
+                wmParams?.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
+            }else{
                 wmParams?.type = WindowManager.LayoutParams.TYPE_PHONE
             }
-            wmParams?.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
+
             wmParams?.flags = FLAG_NOT_TOUCH_MODAL or FLAG_NOT_FOCUSABLE or FLAG_LAYOUT_NO_LIMITS
 
             wmParams?.gravity = Gravity.LEFT or Gravity.TOP

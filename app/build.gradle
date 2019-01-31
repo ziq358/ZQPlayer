@@ -79,8 +79,8 @@ dependencies {
     api rootProject.ext.dependencies["design"]
     api project(":playerlib")
 
-    api 'com.ziq.base:base:3.1.1'
-    api 'com.zq.customviewlib:customviewlib:2.0.3'
+    api 'com.ziq.base:base:3.1.2'
+    api 'com.zq.customviewlib:customviewlib:2.0.4'
 
     kapt (rootProject.ext.dependencies["dagger2-compiler"]){
         exclude module: 'support-annotations'
