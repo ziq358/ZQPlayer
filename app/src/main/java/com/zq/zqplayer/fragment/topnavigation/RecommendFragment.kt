@@ -3,25 +3,24 @@ package com.zq.zqplayer.fragment.topnavigation
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import com.bumptech.glide.Glide
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.trello.rxlifecycle2.LifecycleTransformer
-import com.ziq.base.dagger.component.AppComponent
-import com.ziq.base.dagger.module.RxLifecycleModule
 import com.ziq.base.mvp.BaseFragment
+import com.ziq.base.mvp.dagger.component.AppComponent
+import com.ziq.base.mvp.dagger.module.LifecycleProviderModule
 import com.zq.customviewlib.AutoRollViewPager
 import com.zq.playerlib.service.ZQPlayerService
 import com.zq.zqplayer.R
 import com.zq.zqplayer.activity.LiveActivity
-import com.zq.zqplayer.activity.ZQPlayerServiceTestActivity
 import com.zq.zqplayer.adapter.RecommendAdapter
 import com.zq.zqplayer.dagger.component.DaggerRecommendComponent
 import com.zq.zqplayer.dagger.module.RecommendModule
@@ -54,10 +53,9 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
     }
 
     override fun initForInject(appComponent: AppComponent?) {
-        val lifecycleTransformer: LifecycleTransformer<Any> = this.bindToLifecycle()
         DaggerRecommendComponent.builder()
                 .appComponent(appComponent)
-                .rxLifecycleModule(RxLifecycleModule(lifecycleTransformer))
+                .lifecycleProviderModule(LifecycleProviderModule(this))
                 .recommendModule(RecommendModule(this))
                 .build().inject(this)
     }
@@ -84,7 +82,7 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendPresenter
 
         adapter = RecommendAdapter(data)
         recycleView.adapter = adapter // 要先设置 adapter  SpanSizeLookup才有效
-        val layoutManager:GridLayoutManager = GridLayoutManager(context, 2)
+        val layoutManager: GridLayoutManager = GridLayoutManager(context, 2)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return 1

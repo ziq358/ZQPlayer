@@ -1,19 +1,17 @@
 package com.zq.zqplayer
 
 import android.os.Bundle
-import android.support.design.widget.TabLayout
-import android.support.v4.app.Fragment
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import butterknife.BindView
-import com.ziq.base.dagger.component.AppComponent
+import com.google.android.material.tabs.TabLayout
 import com.ziq.base.mvp.BaseActivity
 import com.ziq.base.mvp.IBasePresenter
+import com.ziq.base.mvp.dagger.component.AppComponent
 import com.zq.customviewlib.NoScrollViewPager
 import com.zq.zqplayer.adapter.FragmentViewPagerAdapter
 import com.zq.zqplayer.fragment.main.*
-import kotlinx.android.synthetic.main.item_chat.*
 import me.leolin.shortcutbadger.ShortcutBadger
 import java.util.*
 
@@ -66,7 +64,7 @@ class MainActivity : BaseActivity<IBasePresenter>() {
 //        viewPager.offscreenPageLimit = 5
 //        mTabLayout.setupWithViewPager(viewPager)
         for(i in 0..(dataList.size - 1)){
-            val tab :TabLayout.Tab = mTabLayout.newTab()
+            val tab : TabLayout.Tab = mTabLayout.newTab()
             val tabContent:View = View.inflate(this, R.layout.main_tab_layout, null)
             tabContent.findViewById<ImageView>(R.id.icon).setBackgroundResource(iconList[i])
             tabContent.findViewById<TextView>(R.id.title).text = dataList[i].title

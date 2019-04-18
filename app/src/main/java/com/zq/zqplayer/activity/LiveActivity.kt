@@ -6,26 +6,24 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.support.v4.view.ViewPager
 import android.widget.Toast
+import androidx.viewpager.widget.ViewPager
 import butterknife.BindView
+import cn.sharesdk.onekeyshare.OnekeyShare
 import com.flyco.tablayout.SlidingTabLayout
-import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.mvp.BaseActivity
 import com.ziq.base.mvp.IBasePresenter
+import com.ziq.base.mvp.dagger.component.AppComponent
 import com.zq.playerlib.ZQVideoView
+import com.zq.playerlib.service.PlayerItemInfo
+import com.zq.playerlib.service.ZQPlayerService
+import com.zq.playerlib.service.ZQPlayerServiceBinder
 import com.zq.zqplayer.R
 import com.zq.zqplayer.adapter.FragmentViewPagerAdapter
 import com.zq.zqplayer.fragment.live.ChatFragment
 import com.zq.zqplayer.fragment.live.RankingFragment
 import com.zq.zqplayer.fragment.live.TheHostFragment
 import com.zq.zqplayer.fragment.live.VIPListFragment
-import kotlinx.android.synthetic.main.item_chat.*
-import com.mob.wrappers.ShareSDKWrapper.share
-import cn.sharesdk.onekeyshare.OnekeyShare
-import com.zq.playerlib.service.PlayerItemInfo
-import com.zq.playerlib.service.ZQPlayerService
-import com.zq.playerlib.service.ZQPlayerServiceBinder
 import me.leolin.shortcutbadger.ShortcutBadger
 
 

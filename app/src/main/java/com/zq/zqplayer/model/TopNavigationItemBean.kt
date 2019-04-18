@@ -1,5 +1,6 @@
 package com.zq.zqplayer.model
 
+import androidx.fragment.app.Fragment
 import com.zq.customviewlib.HorizontalScrollViewTab
 import com.zq.zqplayer.fragment.EmptyFragment
 
@@ -11,12 +12,12 @@ abstract class TopNavigationItemBean(title:String) :HorizontalScrollViewTab.Cont
         return mTitle
     }
 
-    abstract fun getFragment(): android.support.v4.app.Fragment
+    abstract fun getFragment(): Fragment
 
     companion object {
         fun getEmptyInstance(title:String): TopNavigationItemBean {
             return object : TopNavigationItemBean(title) {
-                override fun getFragment(): android.support.v4.app.Fragment {
+                override fun getFragment(): Fragment {
                     return EmptyFragment()
                 }
             }

@@ -1,7 +1,5 @@
 package com.zq.zqplayer.model.request;
 
-import retrofit2.http.Query;
-
 public class ZQPlayerVideoUrlRequest {
     private String roomid;
     private int slaveflag;

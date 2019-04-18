@@ -1,31 +1,21 @@
 package com.zq.zqplayer.fragment.main
 
-import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentStatePagerAdapter
-import android.support.v4.view.ViewPager
 import android.util.Log
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.viewpager.widget.ViewPager
 import butterknife.BindView
-import butterknife.OnClick
-import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.mvp.BaseFragment
 import com.ziq.base.mvp.IBasePresenter
+import com.ziq.base.mvp.dagger.component.AppComponent
 import com.zq.customviewlib.HorizontalScrollViewTab
-import com.zq.playerlib.ZQPlayer
 import com.zq.zqplayer.R
-import com.zq.zqplayer.fragment.EmptyFragment
 import com.zq.zqplayer.fragment.topnavigation.RecommendFragment
 import com.zq.zqplayer.model.TopNavigationItemBean
-import java.io.*
-import java.util.ArrayList
+import java.util.*
 
 /**
  * @author wuyanqiang

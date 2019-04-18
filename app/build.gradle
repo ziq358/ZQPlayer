@@ -14,7 +14,7 @@ android {
         targetSdkVersion rootProject.ext.android.targetSdkVersion
         versionCode rootProject.ext.android["versionCode"]
         versionName rootProject.ext.android["versionName"]
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk {
             //选择要添加的对应 cpu 类型的 .so 库。
@@ -58,6 +58,10 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
 
 }
@@ -65,8 +69,8 @@ android {
 dependencies {
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -79,7 +83,7 @@ dependencies {
     api rootProject.ext.dependencies["design"]
     api project(":playerlib")
 
-    api 'com.ziq.base:base:3.1.2'
+    api 'com.ziq.base:base:3.1.5'
     api 'com.zq.customviewlib:customviewlib:2.0.4'
 
     kapt (rootProject.ext.dependencies["dagger2-compiler"]){

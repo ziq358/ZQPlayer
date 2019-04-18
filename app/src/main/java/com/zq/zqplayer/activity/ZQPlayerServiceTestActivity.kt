@@ -11,12 +11,11 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import butterknife.BindView
 import butterknife.OnClick
-import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.mvp.BaseActivity
 import com.ziq.base.mvp.IBasePresenter
+import com.ziq.base.mvp.dagger.component.AppComponent
 import com.zq.playerlib.service.PlayerItemInfo
 import com.zq.playerlib.service.ZQPlayerService
 import com.zq.playerlib.service.ZQPlayerServiceBinder

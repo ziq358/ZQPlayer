@@ -1,16 +1,16 @@
 package com.zq.zqplayer.fragment.live
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import butterknife.BindView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
-import com.ziq.base.dagger.component.AppComponent
 import com.ziq.base.mvp.BaseFragment
 import com.ziq.base.mvp.IBasePresenter
+import com.ziq.base.mvp.dagger.component.AppComponent
 import com.zq.zqplayer.R
 
 /**

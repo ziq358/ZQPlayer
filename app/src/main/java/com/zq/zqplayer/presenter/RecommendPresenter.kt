@@ -38,7 +38,7 @@ class RecommendPresenter : BasePresenter {
         request.version = "3.3.1.5978"
         RetrofitUtil.getInstance().retrofit
                 .create<VideoService>(VideoService::class.java!!)
-                .getZQVideoList("http://193.112.65.251:8080/live/list", request)
+                .getZQVideoList("http://193.112.65.251:1234/live/list", request)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     mView.showLoading()
@@ -48,7 +48,7 @@ class RecommendPresenter : BasePresenter {
                 .doFinally {
                     mView.hideLoading()
                 }
-                .compose(this.getLifecycleTransformer() as LifecycleTransformer<BaseResponse<List<ZQPlayerVideoListItemBean>>>)
+                .compose(this.getDestroyLifecycleTransformer())
                 .subscribe(object : BaseObserver<BaseResponse<List<ZQPlayerVideoListItemBean>>>() {
                     override fun onSuccessful(t: BaseResponse<List<ZQPlayerVideoListItemBean>>?) {
                         if(t != null && t.data != null){
@@ -72,7 +72,7 @@ class RecommendPresenter : BasePresenter {
         request.__plat = "android"
         RetrofitUtil.getInstance().retrofit
                 .create<VideoService>(VideoService::class.java!!)
-                .getZQVideoListUrl("http://193.112.65.251:8080/live/list/item", request)
+                .getZQVideoListUrl("http://193.112.65.251:1234/live/list/item", request)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     mView.showLoading()
@@ -82,7 +82,7 @@ class RecommendPresenter : BasePresenter {
                 .doFinally {
                     mView.hideLoading()
                 }
-                .compose(this.getLifecycleTransformer() as LifecycleTransformer<BaseResponse<ZQPlayerVideoUrlBean>>)
+                .compose(this.getDestroyLifecycleTransformer())
                 .subscribe(object : BaseObserver<BaseResponse<ZQPlayerVideoUrlBean>>() {
                     override fun onSuccessful(t: BaseResponse<ZQPlayerVideoUrlBean>?) {
                         if(t != null && t.data != null){
