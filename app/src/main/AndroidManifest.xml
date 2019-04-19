@@ -45,9 +45,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.LiveActivity"/>
-        <activity android:name=".activity.TempActivity"/>
-        <activity android:name=".activity.ZQPlayerServiceTestActivity"/>
+        <activity android:name=".mvp.live.ui.LiveActivity"/>
+        <activity android:name=".test.TempActivity"/>
+        <activity android:name=".test.ZQPlayerServiceTestActivity"/>
 
 
 

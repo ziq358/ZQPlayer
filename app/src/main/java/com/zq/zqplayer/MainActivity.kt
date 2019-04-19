@@ -10,8 +10,8 @@ import com.ziq.base.mvp.BaseActivity
 import com.ziq.base.mvp.IBasePresenter
 import com.ziq.base.mvp.dagger.component.AppComponent
 import com.zq.customviewlib.NoScrollViewPager
-import com.zq.zqplayer.adapter.FragmentViewPagerAdapter
-import com.zq.zqplayer.fragment.main.*
+import com.zq.zqplayer.mvp.adapter.FragmentViewPagerAdapter
+import com.zq.zqplayer.mvp.main.ui.*
 import me.leolin.shortcutbadger.ShortcutBadger
 import java.util.*
 
@@ -47,17 +47,12 @@ class MainActivity : BaseActivity<IBasePresenter>() {
         iconList.add(R.drawable.selector_tab_discover)
         iconList.add(R.drawable.selector_tab_mine)
 
-        var home1: HomeFragment = HomeFragment()
-        var home2: AmusementFragment = AmusementFragment()
-        var home3: SubscribeFragment = SubscribeFragment()
-        var home4: DiscoveryFragment = DiscoveryFragment()
-        var home5: MineFragment = MineFragment()
         var dataList: ArrayList<FragmentViewPagerAdapter.Data> = arrayListOf()
-        dataList.add(FragmentViewPagerAdapter.Data("首页", home1))
-        dataList.add(FragmentViewPagerAdapter.Data("娱乐", home2))
-        dataList.add(FragmentViewPagerAdapter.Data("订阅", home3))
-        dataList.add(FragmentViewPagerAdapter.Data("发现", home4))
-        dataList.add(FragmentViewPagerAdapter.Data("我的", home5))
+        dataList.add(FragmentViewPagerAdapter.Data("首页", HomeFragment()))
+        dataList.add(FragmentViewPagerAdapter.Data("娱乐", AmusementFragment()))
+        dataList.add(FragmentViewPagerAdapter.Data("订阅", SubscribeFragment()))
+        dataList.add(FragmentViewPagerAdapter.Data("发现", DiscoveryFragment()))
+        dataList.add(FragmentViewPagerAdapter.Data("我的", MineFragment()))
 
         var adapter: FragmentViewPagerAdapter = FragmentViewPagerAdapter(dataList, supportFragmentManager)
         viewPager.adapter = adapter;
