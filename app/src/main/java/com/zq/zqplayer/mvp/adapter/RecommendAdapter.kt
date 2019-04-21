@@ -7,11 +7,11 @@ import com.bumptech.glide.request.RequestOptions
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.zq.zqplayer.R
-import com.zq.zqplayer.bean.ZQPlayerVideoListItemBean
+import com.zq.zqplayer.bean.LiveListItemBean
 import com.zq.zqplayer.wiget.GlideRoundTransform
 
 
-class RecommendAdapter : BaseQuickAdapter<ZQPlayerVideoListItemBean, BaseViewHolder> {
+class RecommendAdapter : BaseQuickAdapter<LiveListItemBean, BaseViewHolder> {
 
 
 
@@ -21,12 +21,12 @@ class RecommendAdapter : BaseQuickAdapter<ZQPlayerVideoListItemBean, BaseViewHol
 
 
 
-    constructor(data: List<ZQPlayerVideoListItemBean>?) : super(R.layout.item_recommend_live_item, data){
+    constructor(data: List<LiveListItemBean>?) : super(R.layout.item_recommend_live_item, data){
     }
 
-    override fun convert(helper: BaseViewHolder?, item: ZQPlayerVideoListItemBean?) {
+    override fun convert(helper: BaseViewHolder?, item: LiveListItemBean?) {
         val tvTitle: TextView = helper!!.getView(R.id.tv_title)
-        tvTitle.text = item!!.name
+        tvTitle.text = item!!.live_title
 
         val ivCover: ImageView = helper.getView(R.id.iv_cover)
         val requestOptions: RequestOptions = RequestOptions()
@@ -34,7 +34,7 @@ class RecommendAdapter : BaseQuickAdapter<ZQPlayerVideoListItemBean, BaseViewHol
                 .error(R.drawable.ic_picture_default_bg)
                 .transform(GlideRoundTransform(5))
         Glide.with(ivCover.context)
-                .load(item.imageUrl)
+                .load(item.live_img)
                 .apply(requestOptions)
                 .into(ivCover)
 
@@ -47,7 +47,7 @@ class RecommendAdapter : BaseQuickAdapter<ZQPlayerVideoListItemBean, BaseViewHol
 
 
     interface OnActionListener{
-        fun onLiveItemClick(item: ZQPlayerVideoListItemBean): Unit
+        fun onLiveItemClick(item: LiveListItemBean): Unit
     }
 
 }

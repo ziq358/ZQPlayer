@@ -19,12 +19,13 @@ import com.ziq.base.mvp.dagger.module.LifecycleProviderModule
 import com.zq.customviewlib.AutoRollViewPager
 import com.zq.playerlib.service.ZQPlayerService
 import com.zq.zqplayer.R
+import com.zq.zqplayer.bean.LiveItemDetailBean
 import com.zq.zqplayer.mvp.live.ui.LiveActivity
 import com.zq.zqplayer.mvp.adapter.RecommendAdapter
 import com.zq.zqplayer.mvp.main.dagger.component.DaggerRecommendComponent
 import com.zq.zqplayer.mvp.main.dagger.module.RecommendModule
 import com.zq.zqplayer.bean.RecommendLiveItemMultiItem
-import com.zq.zqplayer.bean.ZQPlayerVideoListItemBean
+import com.zq.zqplayer.bean.LiveListItemBean
 import com.zq.zqplayer.mvp.main.contract.RecommendContract
 import com.zq.zqplayer.mvp.main.presenter.RecommendPresenter
 import java.io.*
@@ -43,7 +44,7 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendContract.
     lateinit var recycleView: RecyclerView;
 
 
-    var data:ArrayList<ZQPlayerVideoListItemBean> = arrayListOf()
+    var data:ArrayList<LiveListItemBean> = arrayListOf()
     var adapter:RecommendAdapter? = null
 
     override fun initLayoutResourceId(): Int {
@@ -89,8 +90,8 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendContract.
         }
         recycleView.layoutManager = layoutManager
         adapter!!.mOnActionListener = object : RecommendAdapter.OnActionListener {
-            override fun onLiveItemClick(item: ZQPlayerVideoListItemBean) {
-                mPresenter.getZqVideoUrl(item.id, item.name)
+            override fun onLiveItemClick(item: LiveListItemBean) {
+                mPresenter.getZqVideoUrl(item.live_id, item.live_type, item.game_type)
             }
         }
 
@@ -115,7 +116,7 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendContract.
         mSmartRefreshLayout.finishLoadMore()
     }
 
-    override fun setData(items: List<ZQPlayerVideoListItemBean>) {
+    override fun setData(items: List<LiveListItemBean>) {
         if (mSmartRefreshLayout.isRefreshing) {
             adapter!!.data.clear()
             mSmartRefreshLayout.finishRefresh()
@@ -127,14 +128,15 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendContract.
         adapter!!.notifyDataSetChanged()
     }
 
-    override fun onGetVideoUrlSuccessful(url: String, title:String) {
-        Log.e("ziq", url)
-        val intent = Intent(ZQPlayerService.STOP_CMD)
-        activity?.sendBroadcast(intent)
-        LiveActivity.openVideo(context, url, title)
-
-//        ZQPlayerServiceTestActivity.start(context, url)
-
+    override fun onGetVideoUrlSuccessful(detailBean: LiveItemDetailBean) {
+        if(detailBean.stream_list != null && !detailBean.stream_list.isEmpty()){
+            var stream = detailBean.stream_list[0]
+            val intent = Intent(ZQPlayerService.STOP_CMD)
+            activity?.sendBroadcast(intent)
+            LiveActivity.openVideo(context, stream.url, detailBean.live_title)
+        }else{
+            Toast.makeText(activity, "暂无直播源", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun showMessage(msg: String?) {

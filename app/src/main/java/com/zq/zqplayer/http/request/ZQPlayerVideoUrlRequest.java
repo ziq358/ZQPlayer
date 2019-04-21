@@ -1,50 +1,32 @@
 package com.zq.zqplayer.http.request;
 
 public class ZQPlayerVideoUrlRequest {
-    private String roomid;
-    private int slaveflag;
-    private String type;
-    private String __plat;
-    private String __version;
+    private String live_type;//=yy&
+    private String live_id ;//=17956424&
+    private String game_type;//=ow
 
 
-    public String getRoomid() {
-        return roomid;
+    public String getLive_type() {
+        return live_type;
     }
 
-    public void setRoomid(String roomid) {
-        this.roomid = roomid;
+    public void setLive_type(String live_type) {
+        this.live_type = live_type;
     }
 
-    public int getSlaveflag() {
-        return slaveflag;
+    public String getLive_id() {
+        return live_id;
     }
 
-    public void setSlaveflag(int slaveflag) {
-        this.slaveflag = slaveflag;
+    public void setLive_id(String live_id) {
+        this.live_id = live_id;
     }
 
-    public String getType() {
-        return type;
+    public String getGame_type() {
+        return game_type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String get__plat() {
-        return __plat;
-    }
-
-    public void set__plat(String __plat) {
-        this.__plat = __plat;
-    }
-
-    public String get__version() {
-        return __version;
-    }
-
-    public void set__version(String __version) {
-        this.__version = __version;
+    public void setGame_type(String game_type) {
+        this.game_type = game_type;
     }
 }

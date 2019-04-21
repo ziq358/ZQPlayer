@@ -1,49 +1,40 @@
 package com.zq.zqplayer.http.request;
 
 public class ZQPlayerVideoListRequest {
-    private String cate;
-    private int pageno;
-    private int pagenum;
-    private int room;
-    private String version;
+    private String offset;//
+    private String limit;//
+    private String live_type;//平台类型
+    private String game_type;//
 
-    public String getCate() {
-        return cate;
+    public String getOffset() {
+        return offset;
     }
 
-    public void setCate(String cate) {
-        this.cate = cate;
+    public void setOffset(String offset) {
+        this.offset = offset;
     }
 
-    public int getPageno() {
-        return pageno;
+    public String getLimit() {
+        return limit;
     }
 
-    public void setPageno(int pageno) {
-        this.pageno = pageno;
+    public void setLimit(String limit) {
+        this.limit = limit;
     }
 
-    public int getPagenum() {
-        return pagenum;
+    public String getLive_type() {
+        return live_type;
     }
 
-    public void setPagenum(int pagenum) {
-        this.pagenum = pagenum;
+    public void setLive_type(String live_type) {
+        this.live_type = live_type;
     }
 
-    public int getRoom() {
-        return room;
+    public String getGame_type() {
+        return game_type;
     }
 
-    public void setRoom(int room) {
-        this.room = room;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
+    public void setGame_type(String game_type) {
+        this.game_type = game_type;
     }
 }
