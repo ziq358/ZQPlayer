@@ -11,9 +11,9 @@ import androidx.viewpager.widget.ViewPager
 import butterknife.BindView
 import cn.sharesdk.onekeyshare.OnekeyShare
 import com.flyco.tablayout.SlidingTabLayout
-import com.ziq.base.mvp.BaseActivity
+import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvp.IBasePresenter
-import com.ziq.base.mvp.dagger.component.AppComponent
+import com.ziq.base.mvp.MvpBaseActivity
 import com.zq.playerlib.ZQVideoView
 import com.zq.playerlib.service.PlayerItemInfo
 import com.zq.playerlib.service.ZQPlayerService
@@ -27,7 +27,7 @@ import me.leolin.shortcutbadger.ShortcutBadger
  *author: wuyanqiang
  *2018/11/15
  */
-class LiveActivity : BaseActivity<IBasePresenter>(){
+class LiveActivity : MvpBaseActivity<IBasePresenter>(){
 
 
     companion object {

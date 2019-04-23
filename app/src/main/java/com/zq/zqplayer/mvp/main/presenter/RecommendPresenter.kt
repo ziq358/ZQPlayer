@@ -1,5 +1,6 @@
 package com.zq.zqplayer.mvp.main.presenter
 
+import com.ziq.base.baserx.dagger.bean.IRepositoryManager
 import com.ziq.base.mvp.BasePresenter
 import com.ziq.base.utils.RetrofitUtil
 import com.zq.zqplayer.http.request.ZQPlayerVideoListRequest
@@ -21,6 +22,8 @@ import javax.inject.Inject
 class RecommendPresenter : BasePresenter {
 
     @Inject lateinit var mView: RecommendContract.View
+    @Inject lateinit var mRepositoryManager: IRepositoryManager
+
 
 
     @Inject
@@ -37,8 +40,7 @@ class RecommendPresenter : BasePresenter {
         request.offset = "${currentPage * 20}"
         request.limit = "20"
         request.game_type = "ow"
-        RetrofitUtil.getInstance().retrofit
-                .create<VideoService>(VideoService::class.java!!)
+        mRepositoryManager.createService(VideoService::class.java!!)
                 .getZQVideoList(request)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
@@ -70,8 +72,7 @@ class RecommendPresenter : BasePresenter {
         request.live_id = roomId
         request.live_type = live_type
         request.game_type = game_type
-        RetrofitUtil.getInstance().retrofit
-                .create<VideoService>(VideoService::class.java!!)
+        mRepositoryManager.createService(VideoService::class.java!!)
                 .getZQVideoListUrl(request)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {

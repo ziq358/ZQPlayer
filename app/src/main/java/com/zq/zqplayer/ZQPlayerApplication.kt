@@ -5,7 +5,7 @@ import cn.jpush.android.api.JPushInterface
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
-import com.ziq.base.mvp.BaseApplication
+import com.ziq.base.baserx.BaseApplication
 import com.ziq.base.utils.RetrofitUtil
 import com.zq.zqplayer.common.Constants
 
@@ -21,7 +21,6 @@ class ZQPlayerApplication : BaseApplication() {
         JPushInterface.setDebugMode(true);
         JPushInterface.init(this);
 
-        RetrofitUtil.getInstance().init(Constants.baseUrl)
         SmartRefreshLayout.setDefaultRefreshHeaderCreator { context, layout ->
             val header = ClassicsHeader(context)
             header.setTextSizeTitle(14f)

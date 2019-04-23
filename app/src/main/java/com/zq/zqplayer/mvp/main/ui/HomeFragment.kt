@@ -8,9 +8,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import butterknife.BindView
-import com.ziq.base.mvp.BaseFragment
+import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvp.IBasePresenter
-import com.ziq.base.mvp.dagger.component.AppComponent
+import com.ziq.base.mvp.MvpBaseFragment
 import com.zq.customviewlib.HorizontalScrollViewTab
 import com.zq.zqplayer.R
 import com.zq.zqplayer.bean.TopNavigationItemBean
@@ -20,7 +20,7 @@ import java.util.*
  * @author wuyanqiang
  * @date 2018/10/15
  */
-class HomeFragment : BaseFragment<IBasePresenter>() {
+class HomeFragment : MvpBaseFragment<IBasePresenter>() {
 
     @BindView(R.id.HorizontalScrollViewTab)
     lateinit var mHorizontalScrollViewTab: HorizontalScrollViewTab

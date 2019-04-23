@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.mob.sdk'
-
+apply plugin: 'com.zq.sdk'
 
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
@@ -63,32 +63,35 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    dataBinding {
+        enabled = true
+    }
 
 }
 
 dependencies {
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
-
+    androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    api project(":playerlib")
+    //ZQSDK 会添加以下依赖
+//    api 'com.ziq.base:base:3.1.5'
+//    api 'com.zq.customviewlib:customviewlib:2.0.4'
+
     kapt(rootProject.ext.dependencies["butterknife-compiler"]) {
         exclude module: 'support-annotations'
     }
-//    api "com.android.support:appcompat-v7:27.1.1"
-    api rootProject.ext.dependencies["appcompat-v7"]
-    api rootProject.ext.dependencies["recyclerview-v7"]
-    api rootProject.ext.dependencies["design"]
-    api project(":playerlib")
-
-    api 'com.ziq.base:base:3.1.5'
-    api 'com.zq.customviewlib:customviewlib:2.0.4'
-
     kapt (rootProject.ext.dependencies["dagger2-compiler"]){
         exclude module: 'support-annotations'
     }
+
+    api rootProject.ext.dependencies["appcompat"]
+    api rootProject.ext.dependencies["recyclerview"]
+    api rootProject.ext.dependencies["design"]
 
     api 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.5.1'
     //FlycoTabLayout第三方tab https://github.com/H07000223/FlycoTabLayout/blob/master/README_CN.md
@@ -100,7 +103,26 @@ dependencies {
     api 'com.orhanobut:logger:2.2.0'
     api 'me.leolin:ShortcutBadger:1.1.22@aar'
 
+    // Architecture Components
+    implementation rootProject.ext.dependencies["lifecycle-extensions"]
+    annotationProcessor rootProject.ext.dependencies["lifecycle-compiler"]
+
 }
+
+ZQSDK {
+    //依赖 库
+    //添加了基础库依赖，默认是添加最新版 “+”
+    BaseLib{
+//            versionName '3.1.2'
+    }
+    CustomViewLib{}
+
+    //会移除 基础库依赖
+//    configurations.all {
+//        exclude group: 'com.ziq.base', module: 'base'
+//    }
+}
+
 
 MobSDK {
     appKey "28fdc29fdfb87"

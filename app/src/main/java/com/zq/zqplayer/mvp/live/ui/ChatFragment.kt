@@ -1,22 +1,22 @@
 package com.zq.zqplayer.mvp.live.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.view.View
 import butterknife.BindView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
-import com.ziq.base.mvp.BaseFragment
+import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvp.IBasePresenter
-import com.ziq.base.mvp.dagger.component.AppComponent
+import com.ziq.base.mvp.MvpBaseFragment
 import com.zq.zqplayer.R
 
 /**
  * @author wuyanqiang
  * @date 2018/10/15
  */
-class ChatFragment : BaseFragment<IBasePresenter>() {
+class ChatFragment : MvpBaseFragment<IBasePresenter>() {
 
     @BindView(R.id.recycleView)
     lateinit var recycleView: RecyclerView

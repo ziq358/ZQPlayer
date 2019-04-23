@@ -13,9 +13,9 @@ import android.view.View
 import android.widget.Button
 import butterknife.BindView
 import butterknife.OnClick
-import com.ziq.base.mvp.BaseActivity
+import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvp.IBasePresenter
-import com.ziq.base.mvp.dagger.component.AppComponent
+import com.ziq.base.mvp.MvpBaseActivity
 import com.zq.playerlib.service.PlayerItemInfo
 import com.zq.playerlib.service.ZQPlayerService
 import com.zq.playerlib.service.ZQPlayerServiceBinder
@@ -26,7 +26,7 @@ import com.zq.zqplayer.mvp.live.ui.LiveActivity
  *@author wuyanqiang
  *@date 2019/1/16
  */
-class ZQPlayerServiceTestActivity : BaseActivity<IBasePresenter>() {
+class ZQPlayerServiceTestActivity : MvpBaseActivity<IBasePresenter>() {
 
     var serviceBinder: ZQPlayerServiceBinder? = null
     private var videoPath: String = ""

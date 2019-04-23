@@ -10,15 +10,15 @@ import android.widget.TextView
 import android.widget.Toast
 import butterknife.BindView
 import butterknife.OnClick
-import com.ziq.base.mvp.BaseActivity
+import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvp.IBasePresenter
-import com.ziq.base.mvp.dagger.component.AppComponent
+import com.ziq.base.mvp.MvpBaseActivity
 import com.zq.playerlib.StatusListener
 import com.zq.playerlib.ZQPlayer
 import com.zq.zqplayer.R
 import java.io.*
 
-class TempActivity : BaseActivity<IBasePresenter>() {
+class TempActivity : MvpBaseActivity<IBasePresenter>() {
     override fun initForInject(appComponent: AppComponent?) {
     }
 

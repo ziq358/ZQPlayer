@@ -6,16 +6,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import butterknife.BindView
 import com.google.android.material.tabs.TabLayout
-import com.ziq.base.mvp.BaseActivity
+import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvp.IBasePresenter
-import com.ziq.base.mvp.dagger.component.AppComponent
+import com.ziq.base.mvp.MvpBaseActivity
 import com.zq.customviewlib.NoScrollViewPager
 import com.zq.zqplayer.mvp.adapter.FragmentViewPagerAdapter
 import com.zq.zqplayer.mvp.main.ui.*
 import me.leolin.shortcutbadger.ShortcutBadger
 import java.util.*
 
-class MainActivity : BaseActivity<IBasePresenter>() {
+class MainActivity : MvpBaseActivity<IBasePresenter>() {
 
 
     companion object {

@@ -3,7 +3,6 @@ package com.zq.zqplayer.mvp.main.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -13,21 +12,22 @@ import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import com.bumptech.glide.Glide
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
-import com.ziq.base.mvp.BaseFragment
-import com.ziq.base.mvp.dagger.component.AppComponent
-import com.ziq.base.mvp.dagger.module.LifecycleProviderModule
+import com.ziq.base.baserx.dagger.component.AppComponent
+import com.ziq.base.baserx.dagger.module.LifecycleProviderModule
+import com.ziq.base.mvp.MvpBaseFragment
 import com.zq.customviewlib.AutoRollViewPager
 import com.zq.playerlib.service.ZQPlayerService
 import com.zq.zqplayer.R
 import com.zq.zqplayer.bean.LiveItemDetailBean
-import com.zq.zqplayer.mvp.live.ui.LiveActivity
+import com.zq.zqplayer.bean.LiveListItemBean
+import com.zq.zqplayer.bean.RecommendLiveItemMultiItem
 import com.zq.zqplayer.mvp.adapter.RecommendAdapter
+import com.zq.zqplayer.mvp.live.ui.LiveActivity
+import com.zq.zqplayer.mvp.main.contract.RecommendContract
 import com.zq.zqplayer.mvp.main.dagger.component.DaggerRecommendComponent
 import com.zq.zqplayer.mvp.main.dagger.module.RecommendModule
-import com.zq.zqplayer.bean.RecommendLiveItemMultiItem
-import com.zq.zqplayer.bean.LiveListItemBean
-import com.zq.zqplayer.mvp.main.contract.RecommendContract
 import com.zq.zqplayer.mvp.main.presenter.RecommendPresenter
+import com.zq.zqplayer.mvvm.login.LoginActivity
 import java.io.*
 
 
@@ -35,7 +35,7 @@ import java.io.*
  * @author wuyanqiang
  * @date 2018/10/15
  */
-class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendContract.View {
+class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContract.View {
 
 
     @BindView(R.id.smartRefreshLayout)
@@ -91,7 +91,8 @@ class RecommendFragment : BaseFragment<RecommendPresenter>(), RecommendContract.
         recycleView.layoutManager = layoutManager
         adapter!!.mOnActionListener = object : RecommendAdapter.OnActionListener {
             override fun onLiveItemClick(item: LiveListItemBean) {
-                mPresenter.getZqVideoUrl(item.live_id, item.live_type, item.game_type)
+//                mPresenter.getZqVideoUrl(item.live_id, item.live_type, item.game_type)
+                startActivity(Intent(activity, LoginActivity::class.java))
             }
         }
 
