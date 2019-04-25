@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.zq.zqplayer">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -35,28 +36,27 @@
         android:allowBackup="true"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
 
         <meta-data
             android:name="com.zq.zqplayer.GlobalConfiguration"
             android:value="ConfigModule" />
 
 
-
-        <activity android:name=".MainActivity">
+        <activity android:name=".mvvm.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".MainActivity">
         </activity>
         <activity android:name=".mvp.live.ui.LiveActivity"/>
         <activity android:name=".test.TempActivity"/>
         <activity android:name=".test.ZQPlayerServiceTestActivity"/>
 
-        <activity android:name=".mvvm.login.LoginActivity"/>
 
 
         <!-- 极光推送   -->
