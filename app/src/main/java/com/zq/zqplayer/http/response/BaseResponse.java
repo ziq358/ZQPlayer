@@ -1,9 +1,10 @@
 package com.zq.zqplayer.http.response;
 
 public class BaseResponse<T> {
-
     private String code;
     private String msg;
+    private String url;
+    private String timestamp;
     private T data;
 
     public String getCode() {
@@ -29,4 +30,25 @@ public class BaseResponse<T> {
     public void setData(T data) {
         this.data = data;
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public boolean isSuccess(){
+        return "1".equalsIgnoreCase(code);
+    }
+
 }

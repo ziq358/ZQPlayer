@@ -51,6 +51,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".mvvm.register.RegisterActivity"/>
         <activity android:name=".MainActivity">
         </activity>
         <activity android:name=".mvp.live.ui.LiveActivity"/>

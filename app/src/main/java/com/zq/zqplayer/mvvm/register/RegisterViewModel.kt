@@ -1,7 +1,6 @@
-package com.zq.zqplayer.mvvm.login
+package com.zq.zqplayer.mvvm.register
 
 import android.app.Application
-import android.content.Intent
 import android.text.Editable
 import android.text.TextUtils
 import android.util.Log
@@ -20,18 +19,15 @@ import com.zq.zqplayer.http.request.LoginRequest
 import com.zq.zqplayer.http.response.BaseResponse
 import com.zq.zqplayer.http.service.UserService
 import com.zq.zqplayer.http.service.VideoService
-import com.zq.zqplayer.mvvm.register.RegisterActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class LoginViewModel : AndroidViewModel, ILoginViewModel{
-
+class RegisterViewModel : AndroidViewModel, IRegisterViewModel{
 
     @Inject lateinit var lifecycleProvider: LifecycleProvider<*>
     @Inject lateinit var iRepositoryManager:IRepositoryManager
 
-    override val isGotoRegisterActivity = MutableLiveData<Boolean>()
     override val isLoading = MutableLiveData<Boolean>()
     override val toastMsg = MutableLiveData<String>()
     override val userInfo = MutableLiveData<UserInfoBean>()
@@ -52,10 +48,10 @@ class LoginViewModel : AndroidViewModel, ILoginViewModel{
     }
 
 
-    override fun login(view: View) {
+    override fun register(view: View) {
         val loginRequest = LoginRequest(userName.value!!, userPassword.value!!)
         iRepositoryManager.createService(UserService::class.java)
-                .login(loginRequest)
+                .register(loginRequest)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     isLoading.value = true
@@ -82,16 +78,10 @@ class LoginViewModel : AndroidViewModel, ILoginViewModel{
                 })
     }
 
-    override fun gotoRegisterPage(view: View) {
-        isGotoRegisterActivity.value = true
-    }
 
 
     @Inject
     constructor(application : Application) : super(application){
-        userName.value = "ziq358"
-        userPassword.value = "123456"
-
     }
 
 

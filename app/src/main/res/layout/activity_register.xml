@@ -6,7 +6,7 @@
         <import type="android.view.View"/>
         <variable
             name="viewmodel"
-            type="com.zq.zqplayer.mvvm.login.ILoginViewModel" />
+            type="com.zq.zqplayer.mvvm.register.IRegisterViewModel" />
 
     </data>
 
@@ -94,46 +94,8 @@
                     android:background="@drawable/bj_selector_login"
                     android:textColor="@color/white"
                     android:enabled="@{viewmodel.isValid}"
-                    android:onClick="@{(view)->viewmodel.login(view)}"
-                    android:text="登录" />
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingVertical="23dp">
-
-                    <TextView
-                        android:id="@+id/tv_register"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="立即注册"
-                        android:onClick="@{(view)->viewmodel.gotoRegisterPage(view)}"
-                        android:textColor="@color/color_333333"
-                        android:textSize="14sp" />
-
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="18dp"
-                        android:layout_marginLeft="22dp"
-                        android:layout_marginRight="22dp"
-                        android:background="#979797" />
-
-                    <TextView
-                        android:id="@+id/tv_forget_password"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_gravity="right"
-                        android:text="忘记密码"
-                        android:textColor="@color/color_333333"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
+                    android:onClick="@{(view)->viewmodel.register(view)}"
+                    android:text="注册" />
 
             </LinearLayout>
 
