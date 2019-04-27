@@ -6,5 +6,6 @@ class UserInfoBean {
      val userId: String? = null
      val userName: String? = null
      val password: String? = null
+     val token: String? = null
 
 }

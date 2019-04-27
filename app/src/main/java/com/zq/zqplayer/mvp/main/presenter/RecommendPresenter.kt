@@ -11,6 +11,7 @@ import com.zq.zqplayer.bean.LiveListItemBean
 import com.zq.zqplayer.bean.LiveItemDetailBean
 import com.zq.zqplayer.mvp.main.contract.RecommendContract
 import com.zq.zqplayer.http.service.VideoService
+import com.zq.zqplayer.util.UserInfoUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -24,10 +25,17 @@ class RecommendPresenter : BasePresenter {
     @Inject lateinit var mView: RecommendContract.View
     @Inject lateinit var mRepositoryManager: IRepositoryManager
 
-
+    lateinit var headers:HashMap<String, String>
 
     @Inject
-    constructor() : super()
+    constructor() : super(){
+        headers = HashMap()
+        var token  = ""
+        if(UserInfoUtil.getUserInfo()?.token != null){
+            token = UserInfoUtil.getUserInfo()?.token!!
+        }
+        headers["token"] = token
+    }
 
     var currentPage:Int = 0;
     fun getZqVideoList(isRefresh:Boolean) {
@@ -40,8 +48,9 @@ class RecommendPresenter : BasePresenter {
         request.offset = "${currentPage * 20}"
         request.limit = "20"
         request.game_type = "ow"
+
         mRepositoryManager.createService(VideoService::class.java!!)
-                .getZQVideoList(request)
+                .getZQVideoList(headers, request)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     mView.showLoading()
@@ -54,7 +63,7 @@ class RecommendPresenter : BasePresenter {
                 .compose(this.getDestroyLifecycleTransformer())
                 .subscribe(object : BaseObserver<BaseResponse<List<LiveListItemBean>>>() {
                     override fun onSuccessful(t: BaseResponse<List<LiveListItemBean>>?) {
-                        if(t != null && t.data != null){
+                        if(t?.data != null){
                             currentPage++
                             mView.setData(t.data)
                         }
@@ -73,7 +82,7 @@ class RecommendPresenter : BasePresenter {
         request.live_type = live_type
         request.game_type = game_type
         mRepositoryManager.createService(VideoService::class.java!!)
-                .getZQVideoListUrl(request)
+                .getZQVideoListUrl(headers, request)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     mView.showLoading()
@@ -86,7 +95,7 @@ class RecommendPresenter : BasePresenter {
                 .compose(this.getDestroyLifecycleTransformer())
                 .subscribe(object : BaseObserver<BaseResponse<LiveItemDetailBean>>() {
                     override fun onSuccessful(t: BaseResponse<LiveItemDetailBean>?) {
-                        if(t != null && t.data != null){
+                        if(t?.data != null){
                             mView.onGetVideoUrlSuccessful(t.data)
                         }
                     }

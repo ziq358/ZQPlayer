@@ -15,8 +15,14 @@ import com.zq.zqplayer.common.Constants
  */
 class ZQPlayerApplication : BaseApplication() {
 
+    companion object {
+        var sApplication:BaseApplication? = null
+    }
+
     override fun onCreate() {
         super.onCreate()
+
+        sApplication = this
 
         JPushInterface.setDebugMode(true);
         JPushInterface.init(this);

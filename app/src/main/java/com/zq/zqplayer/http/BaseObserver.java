@@ -1,5 +1,7 @@
 package com.zq.zqplayer.http;
 
+import com.zq.zqplayer.http.response.BaseResponse;
+
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -14,7 +16,13 @@ public abstract class BaseObserver<T> implements Observer<T> {
         public void onNext(T t) {
             if (t == null) {
                 onFailed("网络异常");
-            } else {
+            } else if(t instanceof BaseResponse){
+                if(((BaseResponse) t).isSuccess()){
+                    onSuccessful(t);
+                }else{
+                    onFailed(((BaseResponse) t).getMsg());
+                }
+            }else{
                 onSuccessful(t);
             }
             onComplete();

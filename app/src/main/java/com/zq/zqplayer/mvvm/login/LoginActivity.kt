@@ -57,7 +57,7 @@ class LoginActivity : MvvmBaseActivity() {
 
         loginViewModel.userInfo.observe(this, object : Observer<UserInfoBean> {
             override fun onChanged(t: UserInfoBean?) {
-                UserInfoUtil.saveToSP(this@LoginActivity, t!!)
+                UserInfoUtil.saveToSP(t!!)
                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                 finish()
             }
@@ -72,7 +72,7 @@ class LoginActivity : MvvmBaseActivity() {
 
         })
 
-        if(UserInfoUtil.getUserInfo(this) != null){
+        if(UserInfoUtil.getUserInfo() != null){
             startActivity(Intent(this@LoginActivity, MainActivity::class.java))
             finish()
         }

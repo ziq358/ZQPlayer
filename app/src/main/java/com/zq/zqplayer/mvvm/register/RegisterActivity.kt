@@ -57,13 +57,13 @@ class RegisterActivity : MvvmBaseActivity() {
 
         registerViewModel.userInfo.observe(this, object : Observer<UserInfoBean> {
             override fun onChanged(t: UserInfoBean?) {
-                UserInfoUtil.saveToSP(this@RegisterActivity, t!!)
+                UserInfoUtil.saveToSP(t!!)
                 startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
                 finish()
             }
         })
 
-        if(UserInfoUtil.getUserInfo(this) != null){
+        if(UserInfoUtil.getUserInfo() != null){
             startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
             finish()
         }
