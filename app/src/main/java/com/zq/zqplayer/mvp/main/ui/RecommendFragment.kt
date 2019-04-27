@@ -91,8 +91,7 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
         recycleView.layoutManager = layoutManager
         adapter!!.mOnActionListener = object : RecommendAdapter.OnActionListener {
             override fun onLiveItemClick(item: LiveListItemBean) {
-//                mPresenter.getZqVideoUrl(item.live_id, item.live_type, item.game_type)
-                startActivity(Intent(activity, LoginActivity::class.java))
+                mPresenter.getZqVideoUrl(item.live_id, item.live_type, item.game_type)
             }
         }
 

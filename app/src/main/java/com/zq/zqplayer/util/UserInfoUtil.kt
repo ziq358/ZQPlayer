@@ -35,6 +35,11 @@ class UserInfoUtil {
                 null
             } else Gson().fromJson(value, UserInfoBean::class.java)
         }
+
+        fun cleanSP() {
+            sUserInfoBean = null
+            SharePreferenceUtil.remove(ZQPlayerApplication.sApplication, Constants.SP_KEY_USER_INFO)
+        }
     }
 
 

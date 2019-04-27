@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
     <TextView
+        android:id="@+id/tv_logout"
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="mine"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:background="@color/color_main_theme"
+        android:textColor="@color/white"
+        android:text="退出登录"
         />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
