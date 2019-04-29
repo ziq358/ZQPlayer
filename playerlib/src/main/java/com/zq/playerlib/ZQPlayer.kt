@@ -12,22 +12,13 @@ class ZQPlayer {
         System.loadLibrary("player-lib")
     }
 
-
-
-
-    private var listener: StatusListener? = null
-
-    fun setStatusListener(listener: StatusListener?): Unit {
-        this.listener = listener
-    }
-
+    external fun playdemo(surface: Surface, surfaceFilter: Surface, path: String, type: Int): Unit
     //native
-    external fun prepare(path: String): Int
-    external fun start(): Unit
+    external fun init(path: String): Int
+    external fun play(): Unit
     external fun pause(): Unit
     external fun stop(): Unit
     external fun isPlaying(): Boolean
-    external fun play(surface: Surface, surfaceFilter: Surface, path: String, type: Int): Unit
 
     //jni  回调
     fun onLoading(): Unit {
@@ -53,6 +44,15 @@ class ZQPlayer {
     fun onError(msg: String): Unit {
         listener?.onError(msg)
     }
+
+    private var listener: StatusListener? = null
+    fun setStatusListener(listener: StatusListener?): Unit {
+        this.listener = listener
+    }
+
+
+
+
 
     // AudioTrack 播放 声音
     private var audioTrack: AudioTrack? = null
@@ -81,7 +81,6 @@ class ZQPlayer {
     private var mediaCodec:MediaCodec? = null
     fun setSurfsce(surface: Surface?): Unit {
         this.surface = surface
-        mediaCodec
     }
 
     fun initMediaCodec(mimetype: String, width: Int, height: Int, csd0: ByteArray, csd1: ByteArray) {

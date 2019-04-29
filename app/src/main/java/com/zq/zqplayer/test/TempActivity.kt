@@ -109,7 +109,7 @@ class TempActivity : MvpBaseActivity<IBasePresenter>() {
                 }
             }
         })
-        player?.prepare(videoPath)
+        player?.init(videoPath)
         player?.setSurfsce(mSurfaceHolder?.surface)
     }
 
@@ -133,7 +133,7 @@ class TempActivity : MvpBaseActivity<IBasePresenter>() {
         if (player?.isPlaying()!!) {
             player?.pause()
         } else {
-            player?.start()
+            player?.play()
         }
 //            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, -1) }).start()
 //            Thread(Runnable { player?.play(mSurfaceHolder!!.surface, mSurfaceHolderFilter!!.surface, videoPath, 1) }).start()

@@ -93,7 +93,7 @@ class LiveActivity : MvpBaseActivity<IBasePresenter>(){
             }
 
             override fun onPrepareFinished() {
-                mZQVideoView.start()
+                mZQVideoView.play()
             }
 
             override fun onClick() {
@@ -108,7 +108,7 @@ class LiveActivity : MvpBaseActivity<IBasePresenter>(){
                 if(mZQVideoView.isPlaying()){
                     mZQVideoView.pause()
                 }else{
-                    mZQVideoView.start()
+                    mZQVideoView.play()
                 }
             }
 
@@ -151,7 +151,7 @@ class LiveActivity : MvpBaseActivity<IBasePresenter>(){
     override fun onDestroy() {
         var playeriteminfo = PlayerItemInfo()
         playeriteminfo.url = videoPath
-        serviceBinder?.showFloatingWindow(playeriteminfo)
+//        serviceBinder?.showFloatingWindow(playeriteminfo)
         mZQVideoView.stop()
         super.onDestroy()
     }

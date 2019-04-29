@@ -5,7 +5,9 @@ extern "C" {
 JavaVM *javaVM;
 PlayerCallJava *playerCallJava;
 Player *player;
-
+void* initRunnable(void *data);
+void* playRunnable(void *data);
+void* playAudioRunnable(void *data);
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     jint result = -1;
@@ -19,144 +21,17 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-
-Player::Player(JavaVM *javaVM, PlayerCallJava *playerCallJava, const char *url) {
-    Player::javaVM = javaVM;
-    Player::playerCallJava = playerCallJava;
-    Player::url = url;
-}
-
-void Player::prepare() {
-    playerCallJava->onLoading();
-    logd("播放url = %s", url);
-    av_register_all();
-    pFormatCtx = avformat_alloc_context();
-    // 打开文件
-    if (avformat_open_input(&pFormatCtx, url, NULL, NULL) != 0) {
-        logd("无法打开url = %s", url);
-        playerCallJava->onError("无法打开url");
-        return ;
-    }
-    // 读 流信息
-    if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
-        logd("没有找到流信息");
-        playerCallJava->onError("没有找到流信息");
-        return ;
-    }
-
-    audio = new Audio(javaVM, playerCallJava);
-    video = new Video(javaVM, playerCallJava);
-    for (int i = 0; i < pFormatCtx->nb_streams; i++) {
-        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            audio->streamList.push_back(i);
-        }
-        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            video->streamList.push_back(i);
-        }
-    }
-
-    clock = new Clock();
-    if(!audio->streamList.empty()){
-        int audioStreamIndex = audio->streamList.front();
-        audio->currentStreamIndex = audioStreamIndex;
-        audio->init(pFormatCtx->streams[audioStreamIndex]);
-        audio->duration = pFormatCtx->duration / 1000000;
-        audio->clock = clock;
-    }
-
-    if(!video->streamList.empty()){
-        int videoStreamIndex = video->streamList.front();
-        video->currentStreamIndex = videoStreamIndex;
-        video->init(pFormatCtx->streams[videoStreamIndex]);
-        video->duration = pFormatCtx->duration / 1000000;
-        video->clock = clock;
-    }
-
-    status = STATUS_PREPARED;
-    playerCallJava->onPrepareFinished();
-}
-
-void Player::start() {
-    status = STATUS_PLAYING;
-    playerCallJava->onPlaying();
-
-    loge("主 Player 启动");
-    while(status != STATUS_STOP){
-        if(status == STATUS_PAUSE || audio->queuePacket.size() > 50 || video->queuePacket.size() > 50 ){
-//            logd("主 Player 睡眠");
-            av_usleep(1000 * 10);
-            continue;
-        }
-        AVPacket* packet = av_packet_alloc();
-        int ret = av_read_frame(pFormatCtx, packet);
-        if(ret == 0){
-            if (packet->stream_index == audio->currentStreamIndex ) {
-                audio->sendData(packet);
-            }else if (packet->stream_index == video->currentStreamIndex ){
-                video->sendData(packet);
-            } else {
-                av_packet_free(&packet);
-                av_free(packet);
-                packet = NULL;
-            }
-        }else{
-            av_packet_free(&packet);
-            av_free(packet);
-            packet = NULL;
-        }
-    }
-    loge("主 Player 结束 ");
-}
-
-void Player::pause() {
-    status = STATUS_PAUSE;
-    audio->pause();
-    video->pause();
-    playerCallJava->onPause();
-}
-
-void Player::stop() {
-    status = STATUS_STOP;
-    audio->stop();
-    video->stop();
-    playerCallJava->onStop();
-}
-
-bool Player::isPlaying() {
-    return status == STATUS_PLAYING;
-}
-
-void* prepareRunnable(void *data) {
-    Player* player = (Player*)data;
-    player->prepare();
-    return NULL;
-}
-
-void Java_com_zq_playerlib_ZQPlayer_prepare(JNIEnv *env, jobject cls, jstring path) {
+void Java_com_zq_playerlib_ZQPlayer_init(JNIEnv *env, jobject cls, jstring path) {
     jboolean isCopy = JNI_TRUE;
     const char *url = (env)->GetStringUTFChars(path, &isCopy);
     playerCallJava = new PlayerCallJava(javaVM, &cls);
-    player = new Player(javaVM, playerCallJava, url);
-    pthread_create(&player->prepareThread, NULL, prepareRunnable, player);
+
+    player = new Player(javaVM, playerCallJava);
+    player->init(url);
 }
 
-void* startRunnable(void *data) {
-    Player* player = (Player*)data;
-    player->start();
-    return NULL;
-}
-
-void Java_com_zq_playerlib_ZQPlayer_start(JNIEnv *env, jobject cls) {
-    if(player->status == STATUS_PAUSE){
-        player->status = STATUS_PLAYING;
-        player->audio->play();
-        player->video->play();
-        playerCallJava->onPlaying();
-    } else{
-        player->audio->play();
-        player->video->play();
-        pthread_create(&player->startThread, NULL, startRunnable, player);
-    }
+void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls) {
+    player->play();
 }
 
 void Java_com_zq_playerlib_ZQPlayer_pause(JNIEnv *env, jobject cls) {
@@ -168,10 +43,121 @@ void Java_com_zq_playerlib_ZQPlayer_stop(JNIEnv *env, jobject cls) {
 }
 
 jboolean Java_com_zq_playerlib_ZQPlayer_isPlaying(JNIEnv *env, jobject cls) {
-    return player->isPlaying();
+    return static_cast<jboolean>(player->isPlaying());
 }
 
-void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls, jobject surface, jobject surfaceFilter, jstring path, jint type) {
+
+//实现--------------
+
+Player::Player(JavaVM *javaVM, PlayerCallJava *playerCallJava) {
+    Player::javaVM = javaVM;
+    Player::playerCallJava = playerCallJava;
+}
+
+void Player::init(const char *url) {
+    Player::url = url;
+    playerCallJava->onLoading();
+    pthread_create(&player->initThread, NULL, initRunnable, player);
+}
+
+void* initRunnable(void *data) {
+    auto * player = (Player*)data;
+    player->decoder = new Decoder(player->playerCallJava);
+    if(player->decoder->open(player->url)){
+        player->status = STATUS_PREPARED;
+        playerCallJava->onPrepareFinished();
+    }else{
+        playerCallJava->onError("打开地址失败");
+    }
+    return NULL;
+}
+
+void Player::play() {
+    if(status == STATUS_PREPARED || status == STATUS_PAUSE){
+        status = STATUS_PLAYING;
+        pthread_create(&player->playFrameThread, NULL, playRunnable, player);
+        pthread_create(&player->playAudioFrameThread, NULL, playAudioRunnable, player);
+    }else{
+        playerCallJava->onError("play()时状态错误");
+    }
+}
+
+void* playRunnable(void *data) {
+    auto * player = (Player*)data;
+    while (player->isPlaying() && !player->decoder->mIsEOF){
+        std::list<PlayerFrame*> frames = player->decoder->readFrames();
+        if(!frames.empty()){
+            std::list<PlayerFrame*>::iterator iter;
+            for(iter = frames.begin(); iter != frames.end() ;iter++)
+            {
+                if((*iter)->type == PlayerFrameTypeVideo){
+                    player->videoframes.push_back(*iter);
+                }else if((*iter)->type == PlayerFrameTypeAudio){
+                    player->audioframes.push_back(*iter);
+                }
+//                if((*iter)->data != NULL){
+//                    av_free((*iter)->data->data[0]);
+//                    av_frame_free(&(*iter)->data);
+//                }
+            }
+            frames.clear();
+        }
+        loge("---frame size: video = %d , audio = %d", player->videoframes.size(), player->audioframes.size());
+        std::list<PlayerFrame*>::iterator iter;
+        for(iter = player->videoframes.begin(); iter != player->videoframes.end() ;iter++)
+        {
+            if((*iter)->data != NULL){
+                av_free((*iter)->data->data[0]);
+                av_frame_free(&(*iter)->data);
+            }
+        }
+        player->videoframes.clear();
+
+    }
+
+    return NULL;
+}
+
+void* playAudioRunnable(void *data) {
+    auto * player = (Player*)data;
+    while (player->isPlaying() && !player->decoder->mIsEOF){
+        if(!player->audioframes.empty()){
+            loge("---渲染音频 %d", player->audioframes.size());
+            PlayerFrame* audioFrame = (PlayerFrame*)player->audioframes.front();
+            player->audioframes.pop_front();
+            playerCallJava->sendDataToAudioTrack(audioFrame->data->data[0], audioFrame->size);
+            if(audioFrame->data != NULL){
+                av_free(audioFrame->data->data[0]);
+                av_frame_free(&audioFrame->data);
+            }
+        }else{
+            av_usleep(1000 * 10);
+        }
+    }
+
+    return NULL;
+}
+
+
+void Player::pause() {
+    status = STATUS_PAUSE;
+    playerCallJava->onPause();
+}
+
+void Player::stop() {
+    status = STATUS_STOP;
+    playerCallJava->onStop();
+}
+
+bool Player::isPlaying() {
+    return status == STATUS_PLAYING;
+}
+
+
+
+
+
+void Java_com_zq_playerlib_ZQPlayer_playdemo(JNIEnv *env, jobject cls, jobject surface, jobject surfaceFilter, jstring path, jint type) {
     jboolean isCopy = JNI_TRUE;
     const char *file_name = (env)->GetStringUTFChars(path, &isCopy);
     logd("播放 = %s, %d\n", file_name, isLogEnable());

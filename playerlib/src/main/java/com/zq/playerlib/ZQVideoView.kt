@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Message
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -128,8 +129,13 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
                 }
                 override fun onPause() {
                 }
+
+                override fun onError(msg: String) {
+                    Log.e("ziq", msg)
+                }
+
             })
-            player?.prepare(url!!)
+            player?.init(url!!)
             player?.setSurfsce(surfaceHolder.surface)
         }
 
@@ -221,9 +227,9 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
         return false
     }
 
-    fun start(): Unit {
+    fun play(): Unit {
         mIvPlay?.setBackgroundResource(R.drawable.ic_pause)
-        player?.start()
+        player?.play()
     }
 
     fun pause(): Unit {

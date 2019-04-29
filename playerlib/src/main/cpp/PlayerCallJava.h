@@ -2,11 +2,12 @@
 // Created by johnwu on 2018/10/5.
 //
 
-#include <jni.h>
-#include "AndroidLog.h"
+
 
 #ifndef ZQPLAYER_JAVACALL_H
 #define ZQPLAYER_JAVACALL_H
+#import <jni.h>
+#import "AndroidLog.h"
 
 class PlayerCallJava {
 public:

@@ -1,50 +1,51 @@
-#include <jni.h>
-#include <unistd.h> // sleep 的头文件
-#include <string>
-#include <iostream>
-#include "AndroidLog.h"
+#import <jni.h>
+#import <unistd.h> // sleep 的头文件
+#import <string>
+#import <iostream>
+#import "AndroidLog.h"
 
-#include "PlayerCallJava.h"
+#import "PlayerCallJava.h"
 
-#include "Audio.h"
-#include "Video.h"
+#import "Audio.h"
+#import "Video.h"
+#import "Decoder.h"
 
 extern "C" {
 //在c++代码中链接c语言的库，没有添加extern "C"； 会 undefined reference to 'av_frame_alloc'
 //编码
-#include "libavcodec/avcodec.h"
+#import "libavcodec/avcodec.h"
 //封装格式处理
-#include "libavformat/avformat.h"
+#import "libavformat/avformat.h"
 //像素处理
-#include "libswscale/swscale.h"
-#include "libavutil/imgutils.h"
-#include <android/native_window.h>
-#include <android/native_window_jni.h>
+#import "libswscale/swscale.h"
+#import "libavutil/imgutils.h"
+#import <android/native_window.h>
+#import <android/native_window_jni.h>
 //filter
-#include <libavfilter/avfiltergraph.h>
-#include <libavfilter/buffersrc.h>
-#include <libavfilter/buffersink.h>
-#include "libswresample/swresample.h"
-#include "libavutil/time.h"
-#include "Clock.h"
-#include "common.h"
+#import <libavfilter/avfiltergraph.h>
+#import <libavfilter/buffersrc.h>
+#import <libavfilter/buffersink.h>
+#import "libswresample/swresample.h"
+#import "libavutil/time.h"
+#import "Clock.h"
+#import "common.h"
 
 class Player {
 public:
     JavaVM *javaVM;
     PlayerCallJava *playerCallJava;
     const char *url;
-    AVFormatContext *pFormatCtx;
-    Clock *clock;
-    Audio *audio;
-    Video *video;
-    pthread_t prepareThread;
-    pthread_t startThread;
+    Decoder *decoder;
+    pthread_t initThread;
+    pthread_t playFrameThread;
+    pthread_t playAudioFrameThread;
+    std::list<PlayerFrame*> videoframes;
+    std::list<PlayerFrame*> audioframes;
     int status = STATUS_IDLE;
 public:
-    Player(JavaVM *javaVM, PlayerCallJava *playerCallJava, const char *url);
-    void prepare();
-    void start();
+    Player(JavaVM *javaVM, PlayerCallJava *playerCallJava);
+    void init(const char *url);
+    void play();
     void pause();
     void stop();
     bool isPlaying();
@@ -52,13 +53,13 @@ public:
 
 
 JNIEXPORT void JNICALL
-Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject, jobject, jobject, jstring, jint);
+Java_com_zq_playerlib_ZQPlayer_playdemo(JNIEnv *env, jobject, jobject, jobject, jstring, jint);
 
 JNIEXPORT void JNICALL
-Java_com_zq_playerlib_ZQPlayer_prepare(JNIEnv *env, jobject, jstring);
+Java_com_zq_playerlib_ZQPlayer_init(JNIEnv *env, jobject, jstring);
 
 JNIEXPORT void JNICALL
-Java_com_zq_playerlib_ZQPlayer_start(JNIEnv *env, jobject);
+Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject);
 
 JNIEXPORT void JNICALL
 Java_com_zq_playerlib_ZQPlayer_pause(JNIEnv *env, jobject);

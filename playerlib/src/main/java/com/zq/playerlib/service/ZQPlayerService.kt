@@ -134,7 +134,7 @@ class ZQPlayerService: Service() {
 
             override fun onPrepareFinished() {
                 Log.d(TAG, "onPrepareFinished")
-                zqPlayer?.start()
+                zqPlayer?.play()
             }
 
             override fun onPlaying() {
@@ -144,7 +144,7 @@ class ZQPlayerService: Service() {
                 Log.d(TAG, "onPause")
             }
         })
-        zqPlayer?.prepare(playerItemInfo?.url!!)
+        zqPlayer?.init(playerItemInfo?.url!!)
         zqPlayer?.setSurfsce(surface)
     }
 

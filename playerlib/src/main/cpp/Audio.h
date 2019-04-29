@@ -2,22 +2,23 @@
 // Created by jj on 2018/10/8.
 //
 
-#include "PlayerCallJava.h"
-#include "list"
-#include "queue"
-#include "common.h"
-#include "AndroidLog.h"
-#include <pthread.h>
-#include "Clock.h"
+
 
 #ifndef ZQPLAYER_AUDIO_H
 #define ZQPLAYER_AUDIO_H
 
+#import "PlayerCallJava.h"
+#import "list"
+#import "queue"
+#import "common.h"
+#import "AndroidLog.h"
+#import <pthread.h>
+#import "Clock.h"
 extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libswresample/swresample.h>
-#include <libavutil/time.h>
-#include <libavformat/avformat.h>
+#import <libavcodec/avcodec.h>
+#import <libswresample/swresample.h>
+#import <libavutil/time.h>
+#import <libavformat/avformat.h>
 
 }
 

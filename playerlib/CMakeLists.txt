@@ -9,6 +9,10 @@ add_library(player-lib
              src/main/cpp/PlayerCallJava.cpp
              src/main/cpp/Audio.cpp
              src/main/cpp/Video.cpp
+             src/main/cpp/Decoder.cpp
+             src/main/cpp/PlayerFrame.cpp
+             src/main/cpp/PlayerFrameAudio.cpp
+             src/main/cpp/PlayerFrameVideo.cpp
              )
 
 include_directories(libs/include)
