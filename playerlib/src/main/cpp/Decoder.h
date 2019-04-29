@@ -36,9 +36,16 @@ public:
     double mDuration;
     bool mHasVideo;
     //Audio
-    int out_sample_rate = 44100;
-    enum AVSampleFormat out_formart = AV_SAMPLE_FMT_S16;
-    uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;
+    //输出
+    int dst_rate = 44100;
+    enum AVSampleFormat dst_sample_fmt = AV_SAMPLE_FMT_S16;
+    uint64_t dst_ch_layout = AV_CH_LAYOUT_STEREO;
+    //输入
+    int src_rate;
+    enum AVSampleFormat src_sample_fmt;
+    uint64_t src_ch_layout;
+
+
     int mAudioStreamIndex;
     AVCodecContext *mAudioCodecContext;
     SwrContext *mAudioSwrContext;

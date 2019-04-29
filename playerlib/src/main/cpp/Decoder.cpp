@@ -175,17 +175,19 @@ bool Decoder::initAudioCoder(AVFormatContext *formatContext){
         }
 
 
-        uint64_t out_ch_layout = this->out_ch_layout; //输出的声道布局（立体声）
-        enum AVSampleFormat out_formart = this->out_formart;
-        int out_sample_rate = audioCodeCtx->sample_rate;//输出的采样率必须与输入相同
-//        int out_sample_rate = this->out_sample_rate;//输出的采样率必须与输入相同
+        src_ch_layout = audioCodeCtx->channel_layout;
+        src_sample_fmt = audioCodeCtx->sample_fmt;
+        src_rate = audioCodeCtx->sample_rate;
         //swr_alloc_set_opts将PCM源文件的采样格式转换为自己希望的采样格式
-        logd("5、audio遍历流信息 out_sample_rate = %d, in_sample_rate = %d", out_sample_rate, audioCodeCtx->sample_rate);
-        aswrctx = swr_alloc_set_opts(NULL, out_ch_layout, out_formart, out_sample_rate,
-                           audioCodeCtx->channel_layout, audioCodeCtx->sample_fmt,
-                           audioCodeCtx->sample_rate,
-                           0, NULL);
-//        uint8_t *out_buffer = (uint8_t *) av_malloc(44100 * 2);//缓存区
+        logd("5、audio遍历流信息 out_sample_rate = %d, in_sample_rate = %d", dst_rate, src_rate);
+        aswrctx = swr_alloc_set_opts(NULL,
+                                     dst_ch_layout,
+                                     dst_sample_fmt,
+                                     dst_rate,
+                                     src_ch_layout,
+                                     src_sample_fmt,
+                                     src_rate, 0, NULL);
+
         if (aswrctx == NULL) {
             audioStreamIndex = -1;
             if (audioCodeCtx != NULL) avcodec_free_context(&audioCodeCtx);
@@ -201,8 +203,8 @@ bool Decoder::initAudioCoder(AVFormatContext *formatContext){
             if (aframe != NULL) av_frame_free(&aframe);
             return NO;
         }
-        int out_channer_nb = av_get_channel_layout_nb_channels(out_ch_layout);//获取通道数  2
-        playerCallJava->initAudioTrack(this->out_sample_rate, out_channer_nb);
+        int out_channer_nb = av_get_channel_layout_nb_channels(dst_ch_layout);//获取通道数  2
+        playerCallJava->initAudioTrack(this->dst_rate, out_channer_nb);
     }else{
         logd("ffmpeg 获取编码器失败");
         if (formatContext != NULL){
@@ -381,11 +383,17 @@ std::list<PlayerFrame*> Decoder::handleAudioPacket(AVPacket *packet,AVCodecConte
 
         logd("audio frame start");
         AVFrame *pFrame = av_frame_alloc();
-        int out_channer_nb = av_get_channel_layout_nb_channels(out_ch_layout);//    获取通道数  2
-        int size = av_samples_get_buffer_size(NULL, out_channer_nb, frame->nb_samples, out_formart, 1);
-        logd("audio frame start 缓存区 %d", size);
-        *pFrame->data = (uint8_t *) av_malloc(size);//缓存区
-        swr_convert(swrContext, pFrame->data, out_sample_rate * 2, (const uint8_t **) frame->data, frame->nb_samples);
+        int dst_nb_channels = av_get_channel_layout_nb_channels(dst_ch_layout);//    获取通道数  2
+        //不同 采样率，一帧的时间应是相同，所以，按比例得出 新的采样率一帧的采样数， 同时考虑 延时问题。
+        int64_t dst_nb_samples = av_rescale_rnd(swr_get_delay(swrContext, src_rate) +
+                                                    frame->nb_samples, dst_rate, src_rate, AV_ROUND_UP);
+        ret = av_samples_alloc(pFrame->data, &pFrame->linesize[0], dst_nb_channels, dst_nb_samples, dst_sample_fmt, 1);
+        int size = pFrame->linesize[0];
+
+        //这里的in_count,out_count是一帧的样本数
+        int samplesPerChannel = swr_convert(swrContext, pFrame->data, dst_nb_samples, (const uint8_t **) frame->data, frame->nb_samples);
+        logd("audio frame start 缓存区 in_rate = %d, out_rate = %d, size = %d, samplesPerChannel = %d", frame->nb_samples,
+             dst_nb_samples, size, samplesPerChannel);
 
         auto *audioFrame = new PlayerFrameAudio();
         audioFrame->data = pFrame;
