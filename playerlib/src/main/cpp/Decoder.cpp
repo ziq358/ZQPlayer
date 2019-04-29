@@ -388,12 +388,14 @@ std::list<PlayerFrame*> Decoder::handleAudioPacket(AVPacket *packet,AVCodecConte
         int64_t dst_nb_samples = av_rescale_rnd(swr_get_delay(swrContext, src_rate) +
                                                     frame->nb_samples, dst_rate, src_rate, AV_ROUND_UP);
         ret = av_samples_alloc(pFrame->data, &pFrame->linesize[0], dst_nb_channels, dst_nb_samples, dst_sample_fmt, 1);
-        int size = pFrame->linesize[0];
+
 
         //这里的in_count,out_count是一帧的样本数
         int samplesPerChannel = swr_convert(swrContext, pFrame->data, dst_nb_samples, (const uint8_t **) frame->data, frame->nb_samples);
-        logd("audio frame start 缓存区 in_rate = %d, out_rate = %d, size = %d, samplesPerChannel = %d", frame->nb_samples,
-             dst_nb_samples, size, samplesPerChannel);
+        int size = av_samples_get_buffer_size(&pFrame->linesize[0], dst_nb_channels, samplesPerChannel, dst_sample_fmt, 1);
+
+        logd("audio frame start 缓存区 in_rate = %d, out_rate = %d, size = %d, samplesPerChannel = %d",
+                frame->nb_samples, dst_nb_samples, size, samplesPerChannel);
 
         auto *audioFrame = new PlayerFrameAudio();
         audioFrame->data = pFrame;
