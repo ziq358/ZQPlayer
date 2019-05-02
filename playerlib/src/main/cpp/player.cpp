@@ -8,6 +8,8 @@ Player *player;
 void* initRunnable(void *data);
 void* playRunnable(void *data);
 void* playAudioRunnable(void *data);
+void* playVideoRunnable(void *data);
+void* clearVideoFramesRunnable(void *data);
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     jint result = -1;
@@ -28,6 +30,14 @@ void Java_com_zq_playerlib_ZQPlayer_init(JNIEnv *env, jobject cls, jstring path)
 
     player = new Player(javaVM, playerCallJava);
     player->init(url);
+}
+
+void Java_com_zq_playerlib_ZQPlayer_setSurface(JNIEnv *env, jobject cls, jobject surface) {
+    // 获取native window
+    logd("获取native window");
+    //cmake文件要添加 -landroid # 解决ANativeWindow_fromSurface 找不到问题
+    ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
+    player->setNativeWindow(nativeWindow);
 }
 
 void Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject cls) {
@@ -52,12 +62,20 @@ jboolean Java_com_zq_playerlib_ZQPlayer_isPlaying(JNIEnv *env, jobject cls) {
 Player::Player(JavaVM *javaVM, PlayerCallJava *playerCallJava) {
     Player::javaVM = javaVM;
     Player::playerCallJava = playerCallJava;
+    clock = new Clock();
+
+
 }
 
 void Player::init(const char *url) {
     Player::url = url;
+    mBufferedDuration = 0;
     playerCallJava->onLoading();
     pthread_create(&player->initThread, NULL, initRunnable, player);
+}
+
+void Player::setNativeWindow(ANativeWindow *nativeWindow) {
+    Player::nativeWindow = nativeWindow;
 }
 
 void* initRunnable(void *data) {
@@ -75,8 +93,11 @@ void* initRunnable(void *data) {
 void Player::play() {
     if(status == STATUS_PREPARED || status == STATUS_PAUSE){
         status = STATUS_PLAYING;
+//        pthread_mutex_init(&videoFramesMutex, NULL);
         pthread_create(&player->playFrameThread, NULL, playRunnable, player);
         pthread_create(&player->playAudioFrameThread, NULL, playAudioRunnable, player);
+        pthread_create(&player->playVideoFrameThread, NULL, playVideoRunnable, player);
+        pthread_create(&player->clearVideoFrameThread, NULL, clearVideoFramesRunnable, player);
     }else{
         playerCallJava->onError("play()时状态错误");
     }
@@ -85,33 +106,32 @@ void Player::play() {
 void* playRunnable(void *data) {
     auto * player = (Player*)data;
     while (player->isPlaying() && !player->decoder->mIsEOF){
-        std::list<PlayerFrame*> frames = player->decoder->readFrames();
-        if(!frames.empty()){
-            std::list<PlayerFrame*>::iterator iter;
-            for(iter = frames.begin(); iter != frames.end() ;iter++)
-            {
-                if((*iter)->type == PlayerFrameTypeVideo){
-                    player->videoframes.push_back(*iter);
-                }else if((*iter)->type == PlayerFrameTypeAudio){
-                    player->audioframes.push_back(*iter);
+        if(player->mBufferedDuration < player->mMaxBufferDuration){
+            std::list<PlayerFrame*> frames = player->decoder->readFrames();
+            if(!frames.empty()){
+                std::list<PlayerFrame*>::iterator iter;
+                for(iter = frames.begin(); iter != frames.end() ;iter++)
+                {
+                    if((*iter)->type == PlayerFrameTypeVideo){
+                        if(player->nativeWindow == NULL){
+                            if((*iter)->data != NULL){
+                                av_free((*iter)->data->data[0]);
+                                av_frame_free(&(*iter)->data);
+                            }
+                        }else{
+                            player->videoframes.push_back(*iter);
+                        }
+                    }else if((*iter)->type == PlayerFrameTypeAudio){
+                        player->audioframes.push_back(*iter);
+                        player->mBufferedDuration += (*iter)->duration;
+                    }
                 }
-//                if((*iter)->data != NULL){
-//                    av_free((*iter)->data->data[0]);
-//                    av_frame_free(&(*iter)->data);
-//                }
+                frames.clear();
             }
-            frames.clear();
+            logd("时间：%f 缓存：%f, video: %d",player->clock->time, player->mBufferedDuration, player->videoframes.size());
+        }else{
+            av_usleep(1000 * 100);
         }
-        loge("---frame size: video = %d , audio = %d", player->videoframes.size(), player->audioframes.size());
-        std::list<PlayerFrame*>::iterator iter;
-        for(iter = player->videoframes.begin(); iter != player->videoframes.end() ;iter++)
-        {
-            if((*iter)->data != NULL){
-                av_free((*iter)->data->data[0]);
-                av_frame_free(&(*iter)->data);
-            }
-        }
-        player->videoframes.clear();
 
     }
 
@@ -122,9 +142,11 @@ void* playAudioRunnable(void *data) {
     auto * player = (Player*)data;
     while (player->isPlaying() && !player->decoder->mIsEOF){
         if(!player->audioframes.empty()){
-            loge("---渲染音频 %d", player->audioframes.size());
             PlayerFrame* audioFrame = (PlayerFrame*)player->audioframes.front();
             player->audioframes.pop_front();
+            player->clock->time = audioFrame->position;
+            player->mBufferedDuration -= audioFrame->duration;
+            logd("渲染音频，size = %d", player->audioframes.size());
             playerCallJava->sendDataToAudioTrack(audioFrame->data->data[0], audioFrame->size);
             if(audioFrame->data != NULL){
                 av_free(audioFrame->data->data[0]);
@@ -138,16 +160,147 @@ void* playAudioRunnable(void *data) {
     return NULL;
 }
 
+void* playVideoRunnable(void *data) {
+    auto * player = (Player*)data;
+
+    while (player->isPlaying() && !player->decoder->mIsEOF){
+        if(player->nativeWindow == NULL){
+            //还没设置 surface 时 ，等待
+            av_usleep(1000 * 10);
+        }else{
+            break;
+        }
+        return NULL;//停止线程
+    }
+
+    // 设置native window的buffer大小,可自动拉伸
+    int videoWidth = player->decoder->mVideoCodecContext->width;
+    int videoHeight = player->decoder->mVideoCodecContext->height;
+    ANativeWindow_setBuffersGeometry(player->nativeWindow, videoWidth, videoHeight, WINDOW_FORMAT_RGBA_8888);
+    ANativeWindow_Buffer windowBuffer;
+
+    while (player->isPlaying() && !player->decoder->mIsEOF){
+        if(!player->videoframes.empty()){
+            PlayerFrame* videoFrame = (PlayerFrame*)player->videoframes.front();
+            player->videoframes.pop_front();
+            //延时
+            if(videoFrame->position > player->clock->time){
+                av_usleep((double)1000 * (double)1000 * (videoFrame->position - player->clock->time));
+            }
+
+            logd("渲染视频，size = %d", player->videoframes.size());
+            // lock native window buffer
+            if (ANativeWindow_lock(player->nativeWindow, &windowBuffer, 0)) {
+                loge("出错 退出 native window");
+                return NULL;
+            };
+            // 获取stride
+            uint8_t *dst = (uint8_t *) windowBuffer.bits;
+            int dstStride = windowBuffer.stride * 4;
+            uint8_t *src = (videoFrame->data->data[0]);
+            int srcStride = videoFrame->data->linesize[0];
+            // 由于window的stride和帧的stride不同,因此需要逐行复制
+            int h;
+            for (h = 0; h < videoHeight; h++) {
+                memcpy(dst + h * dstStride, src + h * srcStride, srcStride);
+            }
+            ANativeWindow_unlockAndPost(player->nativeWindow);
+
+            if(!player->videoframes.empty()){
+                std::list<PlayerFrame*>::iterator iter;
+                for(iter = player->videoframes.begin(); iter != player->videoframes.end() ;iter++)
+                {
+                    if((*iter)->position > player->clock->time){
+                        break;
+                    }
+                }
+                player->abandonVideoframes.splice(player->abandonVideoframes.begin(),
+                        player->videoframes, player->videoframes.begin(), iter);
+            }
+
+
+
+            if(videoFrame->data != NULL){
+                av_free(videoFrame->data->data[0]);
+                av_frame_free(&videoFrame->data);
+                videoFrame = NULL;
+            }
+        }else{
+            av_usleep(1000 * 10);
+        }
+    }
+
+    return NULL;
+}
+
+void* clearVideoFramesRunnable(void *data) {
+    auto * player = (Player*)data;
+    while (player->isPlaying() && !player->decoder->mIsEOF){
+        if(!player->abandonVideoframes.empty()){
+            loge("---抛弃 视频  %d", player->abandonVideoframes.size());
+            PlayerFrame* videoFrame = (PlayerFrame*)player->abandonVideoframes.front();
+            player->abandonVideoframes.pop_front();
+            av_free(videoFrame->data->data[0]);
+            av_frame_free(&videoFrame->data);
+        }else{
+            av_usleep(1000 * 10);
+        }
+    }
+    return NULL;
+}
+
 
 void Player::pause() {
     status = STATUS_PAUSE;
     playerCallJava->onPause();
+    clear();
 }
 
 void Player::stop() {
     status = STATUS_STOP;
     playerCallJava->onStop();
+    clear();
+//    pthread_mutex_destroy(&videoFramesMutex);
 }
+
+void Player::clear(){
+    std::list<PlayerFrame*>::iterator iter;
+    mBufferedDuration = 0;
+    if(!videoframes.empty()){
+        for(iter = videoframes.begin(); iter != videoframes.end() ;iter++)
+        {
+            if((*iter)->data != NULL){
+                av_free((*iter)->data->data[0]);
+                av_frame_free(&(*iter)->data);
+            }
+        }
+        videoframes.clear();
+    }
+
+    if(!audioframes.empty()){
+        for(iter = audioframes.begin(); iter != audioframes.end() ;iter++)
+        {
+            if((*iter)->data != NULL){
+                av_free((*iter)->data->data[0]);
+                av_frame_free(&(*iter)->data);
+            }
+        }
+        audioframes.clear();
+    }
+
+    if(!abandonVideoframes.empty()){
+        for(iter = abandonVideoframes.begin(); iter != abandonVideoframes.end() ;iter++)
+        {
+            if((*iter)->data != NULL){
+                av_free((*iter)->data->data[0]);
+                av_frame_free(&(*iter)->data);
+            }
+        }
+        abandonVideoframes.clear();
+    }
+
+}
+
 
 bool Player::isPlaying() {
     return status == STATUS_PLAYING;
@@ -158,6 +311,8 @@ bool Player::isPlaying() {
 
 
 void Java_com_zq_playerlib_ZQPlayer_playdemo(JNIEnv *env, jobject cls, jobject surface, jobject surfaceFilter, jstring path, jint type) {
+
+    playerCallJava = new PlayerCallJava(javaVM, &cls);
     jboolean isCopy = JNI_TRUE;
     const char *file_name = (env)->GetStringUTFChars(path, &isCopy);
     logd("播放 = %s, %d\n", file_name, isLogEnable());
@@ -218,17 +373,14 @@ void Java_com_zq_playerlib_ZQPlayer_playdemo(JNIEnv *env, jobject cls, jobject s
     int videoHeight = videoCodecCtx->height;
     // 获取native window
     logd("获取native window");
-    ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env,
-                                                            surface);//cmake文件要添加 -landroid # 解决ANativeWindow_fromSurface 找不到问题
+    ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);//cmake文件要添加 -landroid # 解决ANativeWindow_fromSurface 找不到问题
     // 设置native window的buffer大小,可自动拉伸
-    ANativeWindow_setBuffersGeometry(nativeWindow, videoWidth, videoHeight,
-                                     WINDOW_FORMAT_RGBA_8888);
+    ANativeWindow_setBuffersGeometry(nativeWindow, videoWidth, videoHeight, WINDOW_FORMAT_RGBA_8888);
     ANativeWindow_Buffer windowBuffer;
     logd("获取native window Filter");
     ANativeWindow *nativeWindowFilter = ANativeWindow_fromSurface(env, surfaceFilter);
     // 设置native window的buffer大小,可自动拉伸
-    ANativeWindow_setBuffersGeometry(nativeWindowFilter, videoWidth, videoHeight,
-                                     WINDOW_FORMAT_RGBA_8888);
+    ANativeWindow_setBuffersGeometry(nativeWindowFilter, videoWidth, videoHeight, WINDOW_FORMAT_RGBA_8888);
     ANativeWindow_Buffer windowBufferFilter;
     logd("打开解码器");
     if (avcodec_open2(videoCodecCtx, pCodec, NULL) < 0) {

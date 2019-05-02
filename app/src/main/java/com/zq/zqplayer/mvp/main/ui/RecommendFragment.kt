@@ -28,6 +28,8 @@ import com.zq.zqplayer.mvp.main.dagger.component.DaggerRecommendComponent
 import com.zq.zqplayer.mvp.main.dagger.module.RecommendModule
 import com.zq.zqplayer.mvp.main.presenter.RecommendPresenter
 import com.zq.zqplayer.mvvm.login.LoginActivity
+import com.zq.zqplayer.test.OpenGL2Activity
+import com.zq.zqplayer.test.TempActivity
 import java.io.*
 
 
@@ -91,6 +93,8 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
         recycleView.layoutManager = layoutManager
         adapter!!.mOnActionListener = object : RecommendAdapter.OnActionListener {
             override fun onLiveItemClick(item: LiveListItemBean) {
+//                startActivity(Intent(activity, OpenGL2Activity::class.java))
+//                startActivity(Intent(activity, TempActivity::class.java))
                 mPresenter.getZqVideoUrl(item.live_id, item.live_type, item.game_type)
             }
         }

@@ -33,21 +33,31 @@ extern "C" {
 class Player {
 public:
     JavaVM *javaVM;
+    ANativeWindow *nativeWindow = NULL;
     PlayerCallJava *playerCallJava;
     const char *url;
+    Clock *clock;
     Decoder *decoder;
+    double mMaxBufferDuration = 1;// 缓存多了 占内存
+    double mBufferedDuration = 0;//当前缓存
     pthread_t initThread;
     pthread_t playFrameThread;
     pthread_t playAudioFrameThread;
-    std::list<PlayerFrame*> videoframes;
+    pthread_t playVideoFrameThread;
+    pthread_t clearVideoFrameThread;
     std::list<PlayerFrame*> audioframes;
+    std::list<PlayerFrame*> videoframes;
+    std::list<PlayerFrame*> abandonVideoframes;
+//    pthread_mutex_t videoFramesMutex;
     int status = STATUS_IDLE;
 public:
     Player(JavaVM *javaVM, PlayerCallJava *playerCallJava);
     void init(const char *url);
+    void setNativeWindow(ANativeWindow *nativeWindow);
     void play();
     void pause();
     void stop();
+    void clear();
     bool isPlaying();
 };
 
@@ -57,6 +67,9 @@ Java_com_zq_playerlib_ZQPlayer_playdemo(JNIEnv *env, jobject, jobject, jobject, 
 
 JNIEXPORT void JNICALL
 Java_com_zq_playerlib_ZQPlayer_init(JNIEnv *env, jobject, jstring);
+
+JNIEXPORT void JNICALL
+Java_com_zq_playerlib_ZQPlayer_setSurface(JNIEnv *env, jobject, jobject);
 
 JNIEXPORT void JNICALL
 Java_com_zq_playerlib_ZQPlayer_play(JNIEnv *env, jobject);

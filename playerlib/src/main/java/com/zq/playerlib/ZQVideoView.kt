@@ -13,7 +13,6 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 
 class ZQVideoView :FrameLayout, View.OnClickListener{
 
@@ -136,7 +135,7 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
 
             })
             player?.init(url!!)
-            player?.setSurfsce(surfaceHolder.surface)
+            player?.setSurfaceTarget(surfaceHolder.surface)
         }
 
     }

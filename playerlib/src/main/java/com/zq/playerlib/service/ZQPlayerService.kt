@@ -7,8 +7,6 @@ import android.os.IBinder
 import android.util.Log
 import android.view.*
 import android.view.WindowManager.LayoutParams.*
-import android.widget.ImageView
-import android.widget.TextView
 import com.zq.playerlib.R
 import com.zq.playerlib.StatusListener
 import com.zq.playerlib.ZQPlayer
@@ -145,7 +143,7 @@ class ZQPlayerService: Service() {
             }
         })
         zqPlayer?.init(playerItemInfo?.url!!)
-        zqPlayer?.setSurfsce(surface)
+        zqPlayer?.setSurfaceTarget(surface)
     }
 
     internal var floatingWindow: View? = null

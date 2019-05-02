@@ -67,6 +67,7 @@ class TempActivity : MvpBaseActivity<IBasePresenter>() {
 
             override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
                 mSurfaceHolderFilter = surfaceHolder
+                initPlayer()
             }
 
             override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
@@ -82,35 +83,36 @@ class TempActivity : MvpBaseActivity<IBasePresenter>() {
     }
 
     fun initPlayer(): Unit {
-        player = ZQPlayer()
-        player?.setStatusListener(object : StatusListener {
-            override fun onLoading() {
-                runOnUiThread {
-                    mBtnPlay.text = "初始化中。。。"
-                    mBtnPlay.isEnabled = false
+        if(isSurfaceReady()){
+            player = ZQPlayer()
+            player?.setStatusListener(object : StatusListener {
+                override fun onLoading() {
+                    runOnUiThread {
+                        mBtnPlay.text = "初始化中。。。"
+                        mBtnPlay.isEnabled = false
+                    }
                 }
-            }
 
-            override fun onPrepareFinished() {
-                runOnUiThread {
-                    mBtnPlay.text = "播放"
-                    mBtnPlay.isEnabled = true
+                override fun onPrepareFinished() {
+                    runOnUiThread {
+                        mBtnPlay.text = "播放"
+                        mBtnPlay.isEnabled = true
+                    }
                 }
-            }
 
-            override fun onPlaying() {
-                runOnUiThread {
-                    mBtnPlay.text = "暂停"
+                override fun onPlaying() {
+                    runOnUiThread {
+                        mBtnPlay.text = "暂停"
+                    }
                 }
-            }
-            override fun onPause() {
-                runOnUiThread {
-                    mBtnPlay.text = "播放"
+                override fun onPause() {
+                    runOnUiThread {
+                        mBtnPlay.text = "播放"
+                    }
                 }
-            }
-        })
-        player?.init(videoPath)
-        player?.setSurfsce(mSurfaceHolder?.surface)
+            })
+            player?.playdemo(mSurfaceHolder?.surface!!, mSurfaceHolderFilter?.surface!!, videoPath, -1)
+        }
     }
 
     @OnClick(R.id.play)

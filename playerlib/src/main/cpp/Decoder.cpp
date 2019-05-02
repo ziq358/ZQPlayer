@@ -313,8 +313,6 @@ std::list<PlayerFrame*> Decoder::handleVideoPacket(AVPacket *packet, AVCodecCont
             break;
         }
 
-        logd("video frame start");
-
         AVFrame *swsframe = av_frame_alloc();
         av_image_alloc(swsframe->data, swsframe->linesize, width, width, AV_PIX_FMT_RGBA, 1);
         sws_scale(swsctx,
@@ -339,11 +337,9 @@ std::list<PlayerFrame*> Decoder::handleVideoPacket(AVPacket *packet, AVCodecCont
         } else {
             videoFrame->duration = 1 / mVideoFPS;
         }
-        logd("video frame end");
         frames.push_back(videoFrame);
 
     } while(ret == 0);
-    logd("video frame return");
 
 //    if(!frames.empty()){
 //        loge("======read frame size: %d", frames.size());
@@ -381,7 +377,6 @@ std::list<PlayerFrame*> Decoder::handleAudioPacket(AVPacket *packet,AVCodecConte
         }
         if (frame->data[0] == NULL) continue;
 
-        logd("audio frame start");
         AVFrame *pFrame = av_frame_alloc();
         int dst_nb_channels = av_get_channel_layout_nb_channels(dst_ch_layout);//    获取通道数  2
         //不同 采样率，一帧的时间应是相同，所以，按比例得出 新的采样率一帧的采样数， 同时考虑 延时问题。
@@ -394,9 +389,6 @@ std::list<PlayerFrame*> Decoder::handleAudioPacket(AVPacket *packet,AVCodecConte
         int samplesPerChannel = swr_convert(swrContext, pFrame->data, dst_nb_samples, (const uint8_t **) frame->data, frame->nb_samples);
         int size = av_samples_get_buffer_size(&pFrame->linesize[0], dst_nb_channels, samplesPerChannel, dst_sample_fmt, 1);
 
-        logd("audio frame start 缓存区 in_rate = %d, out_rate = %d, size = %d, samplesPerChannel = %d",
-                frame->nb_samples, dst_nb_samples, size, samplesPerChannel);
-
         auto *audioFrame = new PlayerFrameAudio();
         audioFrame->data = pFrame;
         audioFrame->size = size;
@@ -405,10 +397,8 @@ std::list<PlayerFrame*> Decoder::handleAudioPacket(AVPacket *packet,AVCodecConte
         double pkt_duration = (double)frame->pkt_duration;
         audioFrame->position = best_effort_timestamp * mAudioTimebase;
         audioFrame->duration = pkt_duration * mAudioTimebase;
-        logd("audio frame end");
         frames.push_back(audioFrame);
     } while(ret == 0);
-    logd("audio frame return");
     return frames;
 
 }

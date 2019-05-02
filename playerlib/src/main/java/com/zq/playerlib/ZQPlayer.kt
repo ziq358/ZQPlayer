@@ -12,9 +12,18 @@ class ZQPlayer {
         System.loadLibrary("player-lib")
     }
 
+    private var audioTrack: AudioTrack? = null
+    private var surface: Surface? = null
+    private var mediaCodec:MediaCodec? = null
+    fun setSurfaceTarget(surface: Surface?): Unit {
+        this.surface = surface
+        setSurface(surface!!)
+    }
+
     external fun playdemo(surface: Surface, surfaceFilter: Surface, path: String, type: Int): Unit
     //native
-    external fun init(path: String): Int
+    external fun init(path: String)
+    external fun setSurface(surface: Surface)
     external fun play(): Unit
     external fun pause(): Unit
     external fun stop(): Unit
@@ -55,8 +64,6 @@ class ZQPlayer {
 
 
     // AudioTrack 播放 声音
-    private var audioTrack: AudioTrack? = null
-
     fun initAudioTrack(sampleRateInHz: Int, nb_channals: Int) {
         val channaleConfig: Int//通道数
         if (nb_channals == 1) {
@@ -77,12 +84,7 @@ class ZQPlayer {
         }
     }
 
-    private var surface: Surface? = null
-    private var mediaCodec:MediaCodec? = null
-    fun setSurfsce(surface: Surface?): Unit {
-        this.surface = surface
-    }
-
+    //视频硬解码
     fun initMediaCodec(mimetype: String, width: Int, height: Int, csd0: ByteArray, csd1: ByteArray) {
         if (surface != null) {
             try {
