@@ -40,11 +40,11 @@ public:
     Decoder *decoder;
     double mMaxBufferDuration = 1;// 缓存多了 占内存
     double mBufferedDuration = 0;//当前缓存
-    pthread_t initThread;
-    pthread_t playFrameThread;
-    pthread_t playAudioFrameThread;
-    pthread_t playVideoFrameThread;
-    pthread_t clearVideoFrameThread;
+    pthread_t initThread = NULL;
+    pthread_t playFrameThread= NULL;
+    pthread_t playAudioFrameThread= NULL;
+    pthread_t playVideoFrameThread= NULL;
+    pthread_t clearVideoFrameThread= NULL;
     std::list<PlayerFrame*> audioframes;
     std::list<PlayerFrame*> videoframes;
     std::list<PlayerFrame*> abandonVideoframes;

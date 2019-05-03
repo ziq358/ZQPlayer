@@ -16,7 +16,6 @@ import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.baserx.dagger.module.LifecycleProviderModule
 import com.ziq.base.mvp.MvpBaseFragment
 import com.zq.customviewlib.AutoRollViewPager
-import com.zq.playerlib.service.ZQPlayerService
 import com.zq.zqplayer.R
 import com.zq.zqplayer.bean.LiveItemDetailBean
 import com.zq.zqplayer.bean.LiveListItemBean
@@ -27,9 +26,7 @@ import com.zq.zqplayer.mvp.main.contract.RecommendContract
 import com.zq.zqplayer.mvp.main.dagger.component.DaggerRecommendComponent
 import com.zq.zqplayer.mvp.main.dagger.module.RecommendModule
 import com.zq.zqplayer.mvp.main.presenter.RecommendPresenter
-import com.zq.zqplayer.mvvm.login.LoginActivity
-import com.zq.zqplayer.test.OpenGL2Activity
-import com.zq.zqplayer.test.TempActivity
+import com.zq.zqplayer.test.ZQPlayerServiceTestActivity
 import java.io.*
 
 
@@ -94,7 +91,7 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
         adapter!!.mOnActionListener = object : RecommendAdapter.OnActionListener {
             override fun onLiveItemClick(item: LiveListItemBean) {
 //                startActivity(Intent(activity, OpenGL2Activity::class.java))
-//                startActivity(Intent(activity, TempActivity::class.java))
+//                startActivity(Intent(activity, ZQPlayerServiceTestActivity::class.java))
                 mPresenter.getZqVideoUrl(item.live_id, item.live_type, item.game_type)
             }
         }
@@ -135,8 +132,6 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
     override fun onGetVideoUrlSuccessful(detailBean: LiveItemDetailBean) {
         if(detailBean.stream_list != null && !detailBean.stream_list.isEmpty()){
             var stream = detailBean.stream_list[0]
-            val intent = Intent(ZQPlayerService.STOP_CMD)
-            activity?.sendBroadcast(intent)
             LiveActivity.openVideo(context, stream.url, detailBean.live_title)
         }else{
             Toast.makeText(activity, "暂无直播源", Toast.LENGTH_SHORT).show()

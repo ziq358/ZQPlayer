@@ -2,6 +2,7 @@ package com.zq.playerlib
 
 import android.content.Context
 import android.os.Handler
+import android.os.IBinder
 import android.os.Message
 import android.text.TextUtils
 import android.util.AttributeSet
@@ -13,6 +14,9 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import com.zq.playerlib.service.PlayerItemInfo
+import com.zq.playerlib.service.StatusListener
+import com.zq.playerlib.service.ZQPlayerServiceWrap
 
 class ZQVideoView :FrameLayout, View.OnClickListener{
 
@@ -38,11 +42,10 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
     var mIvStar:ImageView? = null
     var mIvFullScreen:ImageView? = null
 
-
-    internal var mSurfaceHolder: SurfaceHolder? = null
-    var mUrl:String? = null
+    var zqPlayerServiceWrap: ZQPlayerServiceWrap? = null
+    var playeriteminfo:PlayerItemInfo? = null;
     var mSurfaceView: SurfaceView? = null
-    var player: ZQPlayer? = null
+    internal var mSurfaceHolder: SurfaceHolder? = null
 
     private var onActionListener:OnActionListener? = null
 
@@ -55,6 +58,9 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
 
 
     private fun init() {
+
+        zqPlayerServiceWrap = ZQPlayerServiceWrap(context)
+
         LayoutInflater.from(context).inflate(R.layout.layout_zq_video_view, this)
 
         zqHandler = ZQHandler()
@@ -93,12 +99,12 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
 
             override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
                 mSurfaceHolder = surfaceHolder
-                initPlayer(mUrl, mSurfaceHolder)
+                initPlayer()
             }
 
             override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
                 mSurfaceHolder = surfaceHolder
-                initPlayer(mUrl, mSurfaceHolder)
+                initPlayer()
             }
 
             override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {
@@ -109,34 +115,36 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
     }
 
     fun setVideoPath(url:String?): Unit {
-        mUrl = url
-        initPlayer(mUrl, mSurfaceHolder)
+        playeriteminfo = PlayerItemInfo()
+        playeriteminfo!!.url = url
+        initPlayer()
     }
 
-    internal fun initPlayer(url:String?, surfaceHolder: SurfaceHolder?): Unit {
-        if(player == null && !TextUtils.isEmpty(url) && surfaceHolder != null){
-            player = ZQPlayer()
-            player?.setStatusListener(object : StatusListener {
-                //回调 在 子线程
+    internal fun initPlayer(): Unit {
+        if(playeriteminfo != null && mSurfaceHolder != null){
+            zqPlayerServiceWrap?.init(playeriteminfo!!, mSurfaceHolder?.surface!!, object : StatusListener.Stub(){
                 override fun onLoading() {
                     zqHandler?.sendEmptyMessage(STATUS_LOADING)
                 }
+
                 override fun onPrepareFinished() {
                     zqHandler?.sendEmptyMessage(STATUS_PREPAREFINISHED)
                 }
+
                 override fun onPlaying() {
                 }
+
                 override fun onPause() {
                 }
 
-                override fun onError(msg: String) {
-                    Log.e("ziq", msg)
+                override fun onStop() {
                 }
 
+                override fun onError(msg: String?) {
+                }
             })
-            player?.init(url!!)
-            player?.setSurfaceTarget(surfaceHolder.surface)
         }
+
 
     }
 
@@ -152,6 +160,7 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
                     mIvPlay?.isEnabled = true
                     mLoadingView?.visibility = View.GONE
                     onActionListener?.onPrepareFinished()
+                    zqPlayerServiceWrap?.play()
                 }
             }
         }
@@ -220,24 +229,28 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
     }
 
     fun isPlaying(): Boolean {
-        if(player != null){
-            return player!!.isPlaying()
+        if(zqPlayerServiceWrap != null){
+            return zqPlayerServiceWrap!!.isPlaying()
         }
         return false
     }
 
     fun play(): Unit {
         mIvPlay?.setBackgroundResource(R.drawable.ic_pause)
-        player?.play()
+        zqPlayerServiceWrap?.play()
     }
 
     fun pause(): Unit {
         mIvPlay?.setBackgroundResource(R.drawable.ic_play)
-        player?.pause()
+        zqPlayerServiceWrap?.pause()
     }
 
     fun stop(): Unit {
-        player?.stop()
+        zqPlayerServiceWrap?.stop()
+    }
+
+    fun showFloatingWindow(): Unit {
+        zqPlayerServiceWrap?.showFloatingWindow(null)
     }
 
     interface OnActionListener{

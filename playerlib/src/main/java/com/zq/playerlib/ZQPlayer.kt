@@ -1,9 +1,9 @@
 package com.zq.playerlib
 
 import android.media.*
-import android.os.AsyncTask
 import android.util.Log
 import android.view.Surface
+import com.zq.playerlib.service.StatusListener
 import java.nio.ByteBuffer
 
 class ZQPlayer {
@@ -15,14 +15,15 @@ class ZQPlayer {
     private var audioTrack: AudioTrack? = null
     private var surface: Surface? = null
     private var mediaCodec:MediaCodec? = null
-    fun setSurfaceTarget(surface: Surface?): Unit {
-        this.surface = surface
-        setSurface(surface!!)
-    }
+
 
     external fun playdemo(surface: Surface, surfaceFilter: Surface, path: String, type: Int): Unit
     //native
     external fun init(path: String)
+    fun setSurfaceTarget(surface: Surface?): Unit {
+        this.surface = surface
+        setSurface(surface!!)
+    }
     external fun setSurface(surface: Surface)
     external fun play(): Unit
     external fun pause(): Unit
@@ -51,6 +52,7 @@ class ZQPlayer {
     }
 
     fun onError(msg: String): Unit {
+        Log.e("ziq", msg)
         listener?.onError(msg)
     }
 
@@ -65,6 +67,7 @@ class ZQPlayer {
 
     // AudioTrack 播放 声音
     fun initAudioTrack(sampleRateInHz: Int, nb_channals: Int) {
+
         val channaleConfig: Int//通道数
         if (nb_channals == 1) {
             channaleConfig = AudioFormat.CHANNEL_OUT_MONO

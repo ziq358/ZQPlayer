@@ -3,8 +3,7 @@
 extern "C" {
 
 JavaVM *javaVM;
-PlayerCallJava *playerCallJava;
-Player *player;
+Player *player = NULL;
 void* initRunnable(void *data);
 void* playRunnable(void *data);
 void* playAudioRunnable(void *data);
@@ -26,9 +25,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 void Java_com_zq_playerlib_ZQPlayer_init(JNIEnv *env, jobject cls, jstring path) {
     jboolean isCopy = JNI_TRUE;
     const char *url = (env)->GetStringUTFChars(path, &isCopy);
-    playerCallJava = new PlayerCallJava(javaVM, &cls);
-
-    player = new Player(javaVM, playerCallJava);
+    player = new Player(javaVM, new PlayerCallJava(javaVM, &cls));
     player->init(url);
 }
 
@@ -62,13 +59,11 @@ jboolean Java_com_zq_playerlib_ZQPlayer_isPlaying(JNIEnv *env, jobject cls) {
 Player::Player(JavaVM *javaVM, PlayerCallJava *playerCallJava) {
     Player::javaVM = javaVM;
     Player::playerCallJava = playerCallJava;
-    clock = new Clock();
-
-
 }
 
 void Player::init(const char *url) {
     Player::url = url;
+    clock = new Clock();
     mBufferedDuration = 0;
     playerCallJava->onLoading();
     pthread_create(&player->initThread, NULL, initRunnable, player);
@@ -83,9 +78,9 @@ void* initRunnable(void *data) {
     player->decoder = new Decoder(player->playerCallJava);
     if(player->decoder->open(player->url)){
         player->status = STATUS_PREPARED;
-        playerCallJava->onPrepareFinished();
+        player->playerCallJava->onPrepareFinished();
     }else{
-        playerCallJava->onError("打开地址失败");
+        player->playerCallJava->onError("打开地址失败");
     }
     return NULL;
 }
@@ -106,6 +101,7 @@ void Player::play() {
 void* playRunnable(void *data) {
     auto * player = (Player*)data;
     while (player->isPlaying() && !player->decoder->mIsEOF){
+        player->playerCallJava->onPlaying();
         if(player->mBufferedDuration < player->mMaxBufferDuration){
             std::list<PlayerFrame*> frames = player->decoder->readFrames();
             if(!frames.empty()){
@@ -128,11 +124,11 @@ void* playRunnable(void *data) {
                 }
                 frames.clear();
             }
-            logd("时间：%f 缓存：%f, video: %d",player->clock->time, player->mBufferedDuration, player->videoframes.size());
+            logd("时间：%f 缓存：%f, video: %d, audio: %d",player->clock->time, player->mBufferedDuration, player->videoframes.size(), player->audioframes.size());
         }else{
             av_usleep(1000 * 100);
         }
-
+        player->playerCallJava->onPause();
     }
 
     return NULL;
@@ -146,13 +142,14 @@ void* playAudioRunnable(void *data) {
             player->audioframes.pop_front();
             player->clock->time = audioFrame->position;
             player->mBufferedDuration -= audioFrame->duration;
-            logd("渲染音频，size = %d", player->audioframes.size());
-            playerCallJava->sendDataToAudioTrack(audioFrame->data->data[0], audioFrame->size);
+            logd("渲染音频，size = %d, time = %f", player->audioframes.size(), player->clock->time);
+            player->playerCallJava->sendDataToAudioTrack(audioFrame->data->data[0], audioFrame->size);
             if(audioFrame->data != NULL){
                 av_free(audioFrame->data->data[0]);
                 av_frame_free(&audioFrame->data);
             }
         }else{
+            logd("渲染音频，sleep");
             av_usleep(1000 * 10);
         }
     }
@@ -163,20 +160,17 @@ void* playAudioRunnable(void *data) {
 void* playVideoRunnable(void *data) {
     auto * player = (Player*)data;
 
-    while (player->isPlaying() && !player->decoder->mIsEOF){
-        if(player->nativeWindow == NULL){
-            //还没设置 surface 时 ，等待
+    while (player->nativeWindow == NULL){
+        if(player->isPlaying() && !player->decoder->mIsEOF){
             av_usleep(1000 * 10);
         }else{
-            break;
+            return NULL;//停止线程
         }
-        return NULL;//停止线程
     }
 
     // 设置native window的buffer大小,可自动拉伸
     int videoWidth = player->decoder->mVideoCodecContext->width;
     int videoHeight = player->decoder->mVideoCodecContext->height;
-    ANativeWindow_setBuffersGeometry(player->nativeWindow, videoWidth, videoHeight, WINDOW_FORMAT_RGBA_8888);
     ANativeWindow_Buffer windowBuffer;
 
     while (player->isPlaying() && !player->decoder->mIsEOF){
@@ -185,26 +179,30 @@ void* playVideoRunnable(void *data) {
             player->videoframes.pop_front();
             //延时
             if(videoFrame->position > player->clock->time){
-                av_usleep((double)1000 * (double)1000 * (videoFrame->position - player->clock->time));
+                int delay = (double)1000 * (double)1000 * (videoFrame->position - player->clock->time);
+                logd("position = %f, time = %f, 延时 = %d", videoFrame->position, player->clock->time, delay);
+                av_usleep(delay);
             }
 
             logd("渲染视频，size = %d", player->videoframes.size());
             // lock native window buffer
+            ANativeWindow_setBuffersGeometry(player->nativeWindow, videoWidth, videoHeight, WINDOW_FORMAT_RGBA_8888);
             if (ANativeWindow_lock(player->nativeWindow, &windowBuffer, 0)) {
                 loge("出错 退出 native window");
-                return NULL;
-            };
-            // 获取stride
-            uint8_t *dst = (uint8_t *) windowBuffer.bits;
-            int dstStride = windowBuffer.stride * 4;
-            uint8_t *src = (videoFrame->data->data[0]);
-            int srcStride = videoFrame->data->linesize[0];
-            // 由于window的stride和帧的stride不同,因此需要逐行复制
-            int h;
-            for (h = 0; h < videoHeight; h++) {
-                memcpy(dst + h * dstStride, src + h * srcStride, srcStride);
+            }else{
+                // 获取stride
+                uint8_t *dst = (uint8_t *) windowBuffer.bits;
+                int dstStride = windowBuffer.stride * 4;
+                uint8_t *src = (videoFrame->data->data[0]);
+                int srcStride = videoFrame->data->linesize[0];
+                // 由于window的stride和帧的stride不同,因此需要逐行复制
+                int h;
+                for (h = 0; h < videoHeight; h++) {
+                    memcpy(dst + h * dstStride, src + h * srcStride, srcStride);
+                }
+                ANativeWindow_unlockAndPost(player->nativeWindow);
             }
-            ANativeWindow_unlockAndPost(player->nativeWindow);
+
 
             if(!player->videoframes.empty()){
                 std::list<PlayerFrame*>::iterator iter;
@@ -252,7 +250,6 @@ void* clearVideoFramesRunnable(void *data) {
 
 void Player::pause() {
     status = STATUS_PAUSE;
-    playerCallJava->onPause();
     clear();
 }
 
@@ -299,6 +296,7 @@ void Player::clear(){
         abandonVideoframes.clear();
     }
 
+    loge("clear，videosize = %d, audioframes = %d, abandonVideoframes = %d", player->videoframes.size(), player->audioframes.size(), player->abandonVideoframes.size());
 }
 
 
@@ -312,7 +310,7 @@ bool Player::isPlaying() {
 
 void Java_com_zq_playerlib_ZQPlayer_playdemo(JNIEnv *env, jobject cls, jobject surface, jobject surfaceFilter, jstring path, jint type) {
 
-    playerCallJava = new PlayerCallJava(javaVM, &cls);
+    PlayerCallJava* playerCallJava = new PlayerCallJava(javaVM, &cls);
     jboolean isCopy = JNI_TRUE;
     const char *file_name = (env)->GetStringUTFChars(path, &isCopy);
     logd("播放 = %s, %d\n", file_name, isLogEnable());

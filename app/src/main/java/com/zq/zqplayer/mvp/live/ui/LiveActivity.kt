@@ -1,11 +1,8 @@
 package com.zq.zqplayer.mvp.live.ui
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.widget.Toast
 import androidx.viewpager.widget.ViewPager
 import butterknife.BindView
@@ -16,8 +13,6 @@ import com.ziq.base.mvp.IBasePresenter
 import com.ziq.base.mvp.MvpBaseActivity
 import com.zq.playerlib.ZQVideoView
 import com.zq.playerlib.service.PlayerItemInfo
-import com.zq.playerlib.service.ZQPlayerService
-import com.zq.playerlib.service.ZQPlayerServiceBinder
 import com.zq.zqplayer.R
 import com.zq.zqplayer.mvp.adapter.FragmentViewPagerAdapter
 import me.leolin.shortcutbadger.ShortcutBadger
@@ -59,8 +54,6 @@ class LiveActivity : MvpBaseActivity<IBasePresenter>(){
     }
 
     override fun initData(savedInstanceState: Bundle?) {
-        ZQPlayerService.startZQPlayerService(this)
-        ZQPlayerService.bindZQPlayerService(this, serviceConnection)
         initViewPager()
         initVideoView()
         ShortcutBadger.removeCount(this)
@@ -143,30 +136,12 @@ class LiveActivity : MvpBaseActivity<IBasePresenter>(){
     }
 
 
-    override fun onPause() {
-        mZQVideoView.pause()
-        super.onPause()
-    }
-
     override fun onDestroy() {
-        var playeriteminfo = PlayerItemInfo()
-        playeriteminfo.url = videoPath
-//        serviceBinder?.showFloatingWindow(playeriteminfo)
-        mZQVideoView.stop()
+        if(mZQVideoView.isPlaying()){
+            mZQVideoView.showFloatingWindow()
+        }
         super.onDestroy()
     }
-
-    var serviceBinder: ZQPlayerServiceBinder? = null
-    var serviceConnection: ServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            serviceBinder = ZQPlayerServiceBinder.Stub.asInterface(service)
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            serviceBinder = null
-        }
-    }
-
 
     private fun showShare() {
         val oks = OnekeyShare()

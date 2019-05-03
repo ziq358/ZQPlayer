@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.*
 import android.view.WindowManager.LayoutParams.*
 import com.zq.playerlib.R
-import com.zq.playerlib.StatusListener
 import com.zq.playerlib.ZQPlayer
 import java.lang.ref.WeakReference
 
@@ -17,6 +16,7 @@ import java.lang.ref.WeakReference
  *@date 2019/1/16
  */
 class ZQPlayerService: Service() {
+
 
     companion object {
         fun startZQPlayerService(context: Context) {
@@ -43,6 +43,8 @@ class ZQPlayerService: Service() {
 
         val TAG = "ZQPlayerService"
 
+        val PLAY_CMD = "com.zq.playerlib.service.zqplayerservice.play"
+        val PAUSE_CMD = "com.zq.playerlib.service.zqplayerservice.pause"
         val STOP_CMD = "com.zq.playerlib.service.zqplayerservice.stop"
 
     }
@@ -50,7 +52,9 @@ class ZQPlayerService: Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate")
-        val intentFilter: IntentFilter = IntentFilter()
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(PLAY_CMD)
+        intentFilter.addAction(PAUSE_CMD)
         intentFilter.addAction(STOP_CMD)
         registerReceiver(mBroadcastReceiver, intentFilter)
     }
@@ -76,17 +80,20 @@ class ZQPlayerService: Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        Log.d(TAG, "onBind")
         return ZQPlayerBind(this)
     }
 
     class ZQPlayerBind() : ZQPlayerServiceBinder.Stub() {
-        override fun showFloatingWindow(info: PlayerItemInfo?) {
-            mService?.get()?.showFloatingWindow(info)
+        override fun isPlaying(): Boolean {
+            return mService?.get()?.isPlaying()!!
         }
 
-        override fun initPlayer(info: PlayerItemInfo?, surface: Surface?) {
-            mService?.get()?.initPlayer(info, surface)
+        override fun initPlayer(info: PlayerItemInfo?, surface: Surface?, listener: StatusListener?) {
+            mService?.get()?.initPlayer(info, surface, listener)
+        }
+
+        override fun showFloatingWindow(info: PlayerItemInfo?) {
+            mService?.get()?.showFloatingWindow(info)
         }
 
         private var mService: WeakReference<ZQPlayerService>? = null
@@ -101,6 +108,8 @@ class ZQPlayerService: Service() {
     fun handleIntent(intent: Intent?): Unit {
         val action = intent?.action
         when(action){
+            PLAY_CMD -> {zqPlayer?.play()}
+            PAUSE_CMD -> {zqPlayer?.pause()}
             STOP_CMD -> stop()
             else ->{
             }
@@ -118,33 +127,49 @@ class ZQPlayerService: Service() {
     var zqPlayer:ZQPlayer? = null
     var playerItemInfo: PlayerItemInfo? = null
 
-    fun initPlayer(info: PlayerItemInfo?, surface: Surface?): Unit {
+    fun initPlayer(info: PlayerItemInfo?, surface: Surface?, listener: StatusListener?): Unit {
         if(zqPlayer != null){
             zqPlayer?.stop()
         }
         Log.d(TAG, info?.url)
         playerItemInfo = info
         zqPlayer = ZQPlayer()
-        zqPlayer?.setStatusListener(object : StatusListener {
+        zqPlayer?.setStatusListener(object : StatusListener.Stub() {
             override fun onLoading() {
-                Log.d(TAG, "onLoading")
+                listener?.onLoading()
             }
 
             override fun onPrepareFinished() {
-                Log.d(TAG, "onPrepareFinished")
-                zqPlayer?.play()
+                listener?.onPrepareFinished()
             }
 
             override fun onPlaying() {
-                Log.d(TAG, "onPlaying")
+                listener?.onPlaying()
             }
+
             override fun onPause() {
-                Log.d(TAG, "onPause")
+                listener?.onPause()
+            }
+
+            override fun onStop() {
+                listener?.onStop()
+            }
+
+            override fun onError(msg: String?) {
+                listener?.onError(msg)
             }
         })
         zqPlayer?.init(playerItemInfo?.url!!)
         zqPlayer?.setSurfaceTarget(surface)
     }
+
+    fun isPlaying() : Boolean {
+        if(zqPlayer != null){
+            return zqPlayer!!.isPlaying()
+        }
+        return false
+    }
+
 
     internal var floatingWindow: View? = null
     internal var windowManager: WindowManager? = null
@@ -161,14 +186,19 @@ class ZQPlayerService: Service() {
             displayWidth = DeviceInfoUtil.getDisplayWidth(applicationContext)
             statusBarHeight = DeviceInfoUtil.getStatusBarHeight(applicationContext)
 
-            windowManager = application.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            windowManager = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
             wmParams = WindowManager.LayoutParams()
+//            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1 && Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+//                wmParams?.type = WindowManager.LayoutParams.TYPE_TOAST
+//            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1){
+//                wmParams?.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
+//            }else{
+//                wmParams?.type = WindowManager.LayoutParams.TYPE_PHONE
+//            }
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1 && Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-                wmParams?.type = WindowManager.LayoutParams.TYPE_TOAST
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1){
-                wmParams?.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
-            }else{
-                wmParams?.type = WindowManager.LayoutParams.TYPE_PHONE
+                wmParams!!.type = WindowManager.LayoutParams.TYPE_TOAST
+            } else {
+                wmParams!!.type = WindowManager.LayoutParams.TYPE_PHONE
             }
 
             wmParams?.flags = FLAG_NOT_TOUCH_MODAL or FLAG_NOT_FOCUSABLE or FLAG_LAYOUT_NO_LIMITS
@@ -182,7 +212,7 @@ class ZQPlayerService: Service() {
             surfaceView?.visibility = View.INVISIBLE
             surfaceView?.visibility = View.VISIBLE
         }else {
-            val inflater = LayoutInflater.from(application)
+            val inflater = LayoutInflater.from(this)
             floatingWindow = inflater.inflate(R.layout.layout_service_video, null)
             surfaceView = floatingWindow?.findViewById(R.id.surfaceView)
             val ivClose: View? = floatingWindow?.findViewById(R.id.iv_close)
@@ -220,11 +250,10 @@ class ZQPlayerService: Service() {
             surfaceView?.holder?.addCallback(object : SurfaceHolder.Callback {
 
                 override fun surfaceCreated(holder: SurfaceHolder?) {
-                    initPlayer(info, holder?.surface)
+                    zqPlayer?.setSurfaceTarget(holder?.surface)
                 }
 
                 override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
-//                    initPlayer(info, holder?.surface)
                 }
 
                 override fun surfaceDestroyed(holder: SurfaceHolder?) {
