@@ -7,6 +7,7 @@ import com.zq.zqplayer.bean.LiveListItemBean;
 import com.zq.zqplayer.bean.LiveItemDetailBean;
 import com.zq.zqplayer.http.serviceapi.VideoServiceApi;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ import retrofit2.http.POST;
 public interface VideoService {
 
     @POST(VideoServiceApi.LIVE_LIST)
-    Observable<BaseResponse<List<LiveListItemBean>>> getZQVideoList(@HeaderMap Map<String, String> headers, @Body ZQPlayerVideoListRequest zqPlayerVideoListRequest);
+    Observable<BaseResponse<ArrayList<LiveListItemBean>>> getZQVideoList(@HeaderMap Map<String, String> headers, @Body ZQPlayerVideoListRequest zqPlayerVideoListRequest);
 
     @POST(VideoServiceApi.LIVE_LIST_ITEM)
     Observable<BaseResponse<LiveItemDetailBean>> getZQVideoListUrl(@HeaderMap Map<String, String> headers, @Body ZQPlayerVideoUrlRequest request);

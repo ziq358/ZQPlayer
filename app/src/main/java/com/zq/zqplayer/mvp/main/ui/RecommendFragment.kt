@@ -1,7 +1,6 @@
 package com.zq.zqplayer.mvp.main.ui
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -19,14 +18,12 @@ import com.zq.customviewlib.AutoRollViewPager
 import com.zq.zqplayer.R
 import com.zq.zqplayer.bean.LiveItemDetailBean
 import com.zq.zqplayer.bean.LiveListItemBean
-import com.zq.zqplayer.bean.RecommendLiveItemMultiItem
 import com.zq.zqplayer.mvp.adapter.RecommendAdapter
 import com.zq.zqplayer.mvp.live.ui.LiveActivity
 import com.zq.zqplayer.mvp.main.contract.RecommendContract
 import com.zq.zqplayer.mvp.main.dagger.component.DaggerRecommendComponent
 import com.zq.zqplayer.mvp.main.dagger.module.RecommendModule
 import com.zq.zqplayer.mvp.main.presenter.RecommendPresenter
-import com.zq.zqplayer.test.ZQPlayerServiceTestActivity
 import java.io.*
 
 
@@ -140,55 +137,6 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
 
     override fun showMessage(msg: String?) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun getLiveData(): List<RecommendLiveItemMultiItem> {
-        val data:ArrayList<RecommendLiveItemMultiItem> = arrayListOf()
-
-        data.add(RecommendLiveItemMultiItem("100胜率上砖石已上9个共...", "android.resource://" + context!!.packageName + "/" + R.raw.pic_1))
-        data.add(RecommendLiveItemMultiItem("世界锦标赛秋季赛-Day1...", "android.resource://" + context!!.packageName + "/" + R.raw.pic_2))
-        data.add(RecommendLiveItemMultiItem("哇，妲己也能打野？", "android.resource://" + context!!.packageName + "/" + R.raw.pic_3))
-        data.add(RecommendLiveItemMultiItem("奇老板的早间上分砖石至...", "android.resource://" + context!!.packageName + "/" + R.raw.pic_4))
-        data.add(RecommendLiveItemMultiItem("晚上好", "android.resource://" + context!!.packageName + "/" + R.raw.pic_5))
-        data.add(RecommendLiveItemMultiItem("小苍车队：888现金红包送...", "android.resource://" + context!!.packageName + "/" + R.raw.pic_6))
-        data.add(RecommendLiveItemMultiItem("震惊！尺帝 VS Blank", "android.resource://" + context!!.packageName + "/" + R.raw.pic_7))
-        data.add(RecommendLiveItemMultiItem("【大号冲分】输了发10000...", "android.resource://" + context!!.packageName + "/" + R.raw.pic_8))
-        data.add(RecommendLiveItemMultiItem("峡谷之巅单排第一剑圣", "android.resource://" + context!!.packageName + "/" + R.raw.pic_9))
-        data.add(RecommendLiveItemMultiItem("岚切千钰3000米外秒杀！...", "android.resource://" + context!!.packageName + "/" + R.raw.pic_10))
-
-        return data
-    }
-
-
-    private fun getData():String {
-        var videoPath: String  = getDataDirPath(context!!, "meidacodec") + File.separator + "gao_bai_qi_qiu.mp4"
-        val `in` = BufferedInputStream(resources.openRawResource(R.raw.gao_bai_qi_qiu))
-        val out: BufferedOutputStream
-        try {
-            val outputStream = FileOutputStream(videoPath)
-            out = BufferedOutputStream(outputStream)
-            val buf = ByteArray(1024)
-            var size = `in`.read(buf)
-            while (size > 0) {
-                out.write(buf, 0, size)
-                size = `in`.read(buf)
-            }
-            `in`.close()
-            out.flush()
-            out.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return videoPath
-    }
-
-    fun getDataDirPath(context: Context, dir: String): String {
-        val path = context.externalCacheDir!!.absolutePath + File.separator + dir
-        val file = File(path)
-        if (!file.exists()) {
-            file.mkdir()
-        }
-        return path
     }
 
 }

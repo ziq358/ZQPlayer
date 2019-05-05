@@ -13,14 +13,6 @@ import com.zq.zqplayer.wiget.GlideRoundTransform
 
 class RecommendAdapter : BaseQuickAdapter<LiveListItemBean, BaseViewHolder> {
 
-
-
-    companion object {
-        const val RECOMMEND_TYPE_LIVE_ITEM = 4
-    }
-
-
-
     constructor(data: List<LiveListItemBean>?) : super(R.layout.item_recommend_live_item, data){
     }
 

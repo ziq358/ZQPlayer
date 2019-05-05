@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
     >
-    <com.zq.customviewlib.AutoRollViewPager
-        android:id="@+id/autoRollViewPager"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="112dp"/>
-</FrameLayout>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        >
+        <com.zq.customviewlib.AutoRollViewPager
+            android:id="@+id/autoRollViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="112dp"/>
+    </FrameLayout>
+</layout>

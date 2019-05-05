@@ -14,6 +14,7 @@ import com.ziq.base.mvp.MvpBaseFragment
 import com.zq.customviewlib.HorizontalScrollViewTab
 import com.zq.zqplayer.R
 import com.zq.zqplayer.bean.TopNavigationItemBean
+import com.zq.zqplayer.mvvm.recommend.NewRecommendFragment
 import java.util.*
 
 /**
@@ -35,9 +36,14 @@ class HomeFragment : MvpBaseFragment<IBasePresenter>() {
     }
     override fun initData(view: View, savedInstanceState: Bundle?) {
         var data: ArrayList<TopNavigationItemBean> = arrayListOf()
-        data.add(object : TopNavigationItemBean("推荐") {
+        data.add(object : TopNavigationItemBean("mvp") {
             override fun getFragment(): Fragment {
                 return RecommendFragment()
+            }
+        })
+        data.add(object : TopNavigationItemBean("mvvm") {
+            override fun getFragment(): Fragment {
+                return NewRecommendFragment()
             }
         })
         data.add(TopNavigationItemBean.getEmptyInstance("王者荣耀"))
