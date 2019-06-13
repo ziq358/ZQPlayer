@@ -1,8 +1,10 @@
-package com.isoftstone.geelyauto.app.view;
+package com.zq.zqplayer.util;
 
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.RecyclerView;
+import android.annotation.SuppressLint;
 import android.view.View;
+
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class FloatingActionButtonUtil {
 
