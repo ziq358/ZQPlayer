@@ -1,3 +1,6 @@
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -67,6 +70,27 @@ android {
         enabled = true
     }
 
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                def fileName = outputFile.name.replace(outputFile.name, "zqplayer_${getGitBranch()}_${variant.buildType.name}_${releaseTime()}.apk")
+                outputFileName = fileName
+            }
+        }
+    }
+}
+
+// 打包时间
+def releaseTime() {
+    DateFormat df = new SimpleDateFormat("yyyyMMddHHmm")
+    Calendar calendar = Calendar.getInstance()
+    String dateName = df.format(calendar.getTime())
+    return dateName
+}
+
+def getGitBranch() {
+    return 'git symbolic-ref --short -q HEAD'.execute().text.trim()
 }
 
 dependencies {
@@ -79,8 +103,8 @@ dependencies {
 
     api project(":playerlib")
     //ZQSDK 会添加以下依赖
-//    api 'com.ziq.base:base:3.1.5'
-//    api 'com.zq.customviewlib:customviewlib:2.0.4'
+//    api 'com.ziq.base:base:+'
+//    api 'com.zq.customviewlib:customviewlib:+'
 
     kapt(rootProject.ext.dependencies["butterknife-compiler"]) {
         exclude module: 'support-annotations'
