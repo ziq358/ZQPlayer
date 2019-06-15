@@ -7,6 +7,6 @@ import com.zq.playerlib.service.StatusListener;
 
 interface ZQPlayerServiceBinder {
     void initPlayer(in PlayerItemInfo info, in Surface surface, in StatusListener listener);
-    void showFloatingWindow(in PlayerItemInfo info);
+    void showFloatingWindow();
     boolean isPlaying();
 }

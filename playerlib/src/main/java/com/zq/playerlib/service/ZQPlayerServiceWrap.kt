@@ -61,8 +61,8 @@ class ZQPlayerServiceWrap {
         return false
     }
 
-    fun showFloatingWindow(info: PlayerItemInfo?): Unit {
-        serviceBinder?.showFloatingWindow(info)
+    fun showFloatingWindow(): Unit {
+        serviceBinder?.showFloatingWindow()
     }
 
 }

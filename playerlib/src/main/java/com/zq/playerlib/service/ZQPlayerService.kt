@@ -2,11 +2,14 @@ package com.zq.playerlib.service
 
 import android.app.Service
 import android.content.*
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
+import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.view.WindowManager.LayoutParams.*
+import android.widget.Toast
 import com.zq.playerlib.R
 import com.zq.playerlib.ZQPlayer
 import java.lang.ref.WeakReference
@@ -92,8 +95,8 @@ class ZQPlayerService: Service() {
             mService?.get()?.initPlayer(info, surface, listener)
         }
 
-        override fun showFloatingWindow(info: PlayerItemInfo?) {
-            mService?.get()?.showFloatingWindow(info)
+        override fun showFloatingWindow() {
+            mService?.get()?.showFloatingWindow()
         }
 
         private var mService: WeakReference<ZQPlayerService>? = null
@@ -180,7 +183,14 @@ class ZQPlayerService: Service() {
     internal var floatingWindowHeight: Int = 0
     internal var floatingWindowWidth: Int = 0
     internal var surfaceView: SurfaceView? = null
-    fun showFloatingWindow(info: PlayerItemInfo?) {
+    fun showFloatingWindow() {
+
+        if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, "当前无权限使用悬浮窗，请授权！", Toast.LENGTH_SHORT).show()
+            stop()
+            return
+        }
+
         if(windowManager == null){
             displayHeight = DeviceInfoUtil.getDisplayHeight(applicationContext)
             displayWidth = DeviceInfoUtil.getDisplayWidth(applicationContext)

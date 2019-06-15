@@ -122,7 +122,7 @@ class ZQPlayerServiceTestActivity : MvpBaseActivity<IBasePresenter>() {
                 zqPlayerServiceWrap?.stop()
             }
             R.id.btn_play_window -> {
-                zqPlayerServiceWrap?.showFloatingWindow(playeriteminfo)
+                zqPlayerServiceWrap?.showFloatingWindow()
             }
             else -> {}
         }

@@ -250,7 +250,7 @@ class ZQVideoView :FrameLayout, View.OnClickListener{
     }
 
     fun showFloatingWindow(): Unit {
-        zqPlayerServiceWrap?.showFloatingWindow(null)
+        zqPlayerServiceWrap?.showFloatingWindow()
     }
 
     interface OnActionListener{
