@@ -4,8 +4,8 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.ziq.base.glide.GlideRoundTransform;
 import com.zq.zqplayer.R;
-import com.zq.zqplayer.wiget.GlideRoundTransform;
 
 import androidx.databinding.BindingAdapter;
 

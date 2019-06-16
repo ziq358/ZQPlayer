@@ -1,5 +1,6 @@
 package com.zq.playerlib.service
 
+import android.app.AppOpsManager
 import android.app.Service
 import android.content.*
 import android.net.Uri
@@ -205,7 +206,8 @@ class ZQPlayerService: Service() {
 //            }else{
 //                wmParams?.type = WindowManager.LayoutParams.TYPE_PHONE
 //            }
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1 && Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+            //19-25
+            if (Build.VERSION_CODES.KITKAT < Build.VERSION.SDK_INT  && Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
                 wmParams!!.type = WindowManager.LayoutParams.TYPE_TOAST
             } else {
                 wmParams!!.type = WindowManager.LayoutParams.TYPE_PHONE

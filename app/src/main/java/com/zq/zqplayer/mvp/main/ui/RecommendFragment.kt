@@ -10,14 +10,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import com.bumptech.glide.Glide
+import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.baserx.dagger.module.LifecycleProviderModule
 import com.ziq.base.mvp.MvpBaseFragment
 import com.zq.customviewlib.AutoRollViewPager
 import com.zq.zqplayer.R
-import com.zq.zqplayer.bean.LiveItemDetailBean
-import com.zq.zqplayer.bean.LiveListItemBean
+import com.zq.zqplayer.bean.*
 import com.zq.zqplayer.mvp.adapter.RecommendAdapter
 import com.zq.zqplayer.mvp.live.ui.LiveActivity
 import com.zq.zqplayer.mvp.main.contract.RecommendContract
@@ -40,7 +40,7 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
     lateinit var recycleView: RecyclerView;
 
 
-    var data:ArrayList<LiveListItemBean> = arrayListOf()
+    var data:ArrayList<MultiItemEntity> = arrayListOf()
     var adapter:RecommendAdapter? = null
 
     override fun initLayoutResourceId(): Int {
@@ -57,38 +57,23 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
 
     override fun initData(view: View, savedInstanceState: Bundle?) {
 
-        val recommendBannerList:ArrayList<Int> = arrayListOf()
-        recommendBannerList.add(R.drawable.home_recommend_live_app_1523155786)
-        recommendBannerList.add(R.drawable.home_recommend_live_app_1526869950)
-        recommendBannerList.add(R.drawable.home_recommend_live_app_1530243925)
-        recommendBannerList.add(R.drawable.home_recommend_live_app_1540959428)
-        val autoRollViewPager: AutoRollViewPager = view.findViewById(R.id.autoRollViewPager)
-        autoRollViewPager.adapter = object : AutoRollViewPager.RollViewPagerAdapter<Int>(recommendBannerList) {
-            override fun getItemLayoutRes(): Int {
-                return R.layout.item_in_recommend_banner
-            }
 
-            override fun onBindItemView(rootView: ViewGroup?, position: Int, realPosition: Int) {
-                val imageUrl:Int = getItem(realPosition)
-                val ivContent: ImageView = rootView!!.findViewById(R.id.iv_content);
-                Glide.with(rootView.context).load(imageUrl).into(ivContent)
-            }
-        }
-
+        data.add(BannerMultiItemEntity())
+        data.add(TitleMultiItemEntity())
         adapter = RecommendAdapter(data)
         recycleView.adapter = adapter // 要先设置 adapter  SpanSizeLookup才有效
         val layoutManager: GridLayoutManager = GridLayoutManager(context, 2)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
+                if(position == 0 || position == 1){
+                    return 2
+                }
                 return 1
             }
-
         }
         recycleView.layoutManager = layoutManager
         adapter!!.mOnActionListener = object : RecommendAdapter.OnActionListener {
             override fun onLiveItemClick(item: LiveListItemBean) {
-//                startActivity(Intent(activity, OpenGL2Activity::class.java))
-//                startActivity(Intent(activity, ZQPlayerServiceTestActivity::class.java))
                 mPresenter.getZqVideoUrl(item.live_id, item.live_type, item.game_type)
             }
         }
@@ -117,12 +102,18 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
     override fun setData(items: List<LiveListItemBean>) {
         if (mSmartRefreshLayout.isRefreshing) {
             adapter!!.data.clear()
+            adapter!!.data.add(BannerMultiItemEntity())
+            adapter!!.data.add(TitleMultiItemEntity())
             mSmartRefreshLayout.finishRefresh()
         } else {
             mSmartRefreshLayout.finishLoadMore()
         }
         mSmartRefreshLayout.isEnableLoadMore = !items.isEmpty()
-        adapter!!.data.addAll(items)
+        var dataList:ArrayList<LiveItemMultiItemEntity> = arrayListOf<LiveItemMultiItemEntity>()
+        for (itemBean in items){
+            dataList.add(LiveItemMultiItemEntity(itemBean))
+        }
+        adapter!!.data.addAll(dataList)
         adapter!!.notifyDataSetChanged()
     }
 

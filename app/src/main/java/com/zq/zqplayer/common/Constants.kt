@@ -9,5 +9,12 @@ class Constants {
         const val baseUrl = "http://193.112.65.251:1234"//服务器
 
         const val SP_KEY_USER_INFO = "sp_key_user_info"
+
+        const val MULTI_ITEM_TYPE_BANNER = 0
+        const val MULTI_ITEM_TYPE_TITLE = 1
+        const val MULTI_ITEM_TYPE_LIVE_ITEM = 2
+
+
+
     }
 }

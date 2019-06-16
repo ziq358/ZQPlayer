@@ -6,12 +6,15 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical"
+    android:paddingTop="8dp"
     >
+
+    <include layout="@layout/item_recommend_search" />
 
     <com.zq.customviewlib.HorizontalScrollViewTab
         android:id="@+id/HorizontalScrollViewTab"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         />
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/ViewPager"
