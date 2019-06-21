@@ -8,6 +8,13 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.mob.sdk'
 apply plugin: 'com.zq.sdk'
 
+
+kotlin {
+    experimental {
+        coroutines 'enable'
+    }
+}
+
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
     buildToolsVersion rootProject.ext.android.buildToolsVersion
@@ -130,6 +137,9 @@ dependencies {
     // Architecture Components
     implementation rootProject.ext.dependencies["lifecycle-extensions"]
     annotationProcessor rootProject.ext.dependencies["lifecycle-compiler"]
+
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.27.0-eap13'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.27.0-eap13'
 
 }
 
