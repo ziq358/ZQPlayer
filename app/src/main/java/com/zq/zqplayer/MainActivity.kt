@@ -88,8 +88,10 @@ class MainActivity : MvpBaseActivity<IBasePresenter>() {
         ShortcutBadger.applyCount(this, 5)
 
         loadData()
+        loadData2()
     }
 
+    //协程
     private val uiContext: CoroutineContext = Dispatchers.Main
     private val bgContext: CoroutineContext = Dispatchers.Default
 
@@ -98,6 +100,7 @@ class MainActivity : MvpBaseActivity<IBasePresenter>() {
         Log.d("ziq", String.format("GlobalScope.launch1 %s  ", Thread.currentThread()) )
 
         val task = async(bgContext) {
+            delay(TimeUnit.SECONDS.toMillis(1))
             Log.d("ziq", String.format("async %s  ", Thread.currentThread()) )
 
         }
@@ -108,5 +111,28 @@ class MainActivity : MvpBaseActivity<IBasePresenter>() {
 
     }
 
+    private fun loadData2() = runBlocking { // this: CoroutineScope
+        launch {
+            doWorld()
+        }
+        println("launch is over")
+        //阻塞线程 结构化的并发
+        coroutineScope { // 创建一个协程作用域
+            launch {
+                delay(500L)
+                println("Task from nested launch")
+            }
 
+            delay(100L)
+            println("Task from coroutine scope") // 这一行会在内嵌 launch 之前输出
+        }
+
+        println("Coroutine scope is over") // 这一行在内嵌 launch 执行完毕后才输出
+    }
+
+    // 挂起函数
+    private suspend fun doWorld() {
+        delay(200L)
+        println("Task from runBlocking")
+    }
 }
