@@ -6,13 +6,13 @@
     android:orientation="vertical"
     >
     <TextView
-        android:id="@+id/tv_logout"
+        android:id="@+id/tv_login_or_logout"
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center"
         android:background="@color/color_main_theme"
         android:textColor="@color/white"
-        android:text="退出登录"
+        android:text="登录"
         />
 </LinearLayout>

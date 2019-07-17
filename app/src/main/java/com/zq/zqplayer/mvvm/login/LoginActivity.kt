@@ -21,7 +21,7 @@ import javax.inject.Inject
 class LoginActivity : MvvmBaseActivity() {
     @Inject lateinit var loginViewModel : ILoginViewModel
 
-    var activityLoginBinding:ActivityLoginBinding? = null
+    private var activityLoginBinding:ActivityLoginBinding? = null
 
     override fun initView(savedInstanceState: Bundle?) {
         activityLoginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login)

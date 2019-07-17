@@ -44,18 +44,17 @@
             android:name="com.zq.zqplayer.GlobalConfiguration"
             android:value="ConfigModule" />
 
-
-        <activity android:name=".mvvm.login.LoginActivity">
+        <activity android:name=".MainActivity" android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".mvvm.login.LoginActivity"/>
         <activity android:name=".mvvm.register.RegisterActivity"/>
-        <activity android:name=".MainActivity">
-        </activity>
+
         <activity android:name=".mvp.live.ui.LiveActivity"/>
-        <activity android:name=".test.TempActivity"/>
         <activity android:name=".test.ZQPlayerServiceTestActivity"/>
         <activity android:name=".test.OpenGL2Activity"/>
 
