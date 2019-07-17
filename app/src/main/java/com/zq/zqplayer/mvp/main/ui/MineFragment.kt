@@ -11,6 +11,7 @@ import com.ziq.base.mvp.IBasePresenter
 import com.ziq.base.mvp.MvpBaseFragment
 import com.zq.zqplayer.R
 import com.zq.zqplayer.bean.UserInfoBean
+import com.zq.zqplayer.mvp.live.ui.PushTheFlowActivity
 import com.zq.zqplayer.mvvm.login.LoginActivity
 import com.zq.zqplayer.util.UserInfoUtil
 
@@ -22,6 +23,8 @@ class MineFragment : MvpBaseFragment<IBasePresenter>() {
 
     @BindView(R.id.tv_login_or_logout)
     lateinit var tv_login_or_logout: TextView
+    @BindView(R.id.tv_push_the_flow)
+    lateinit var tv_push_the_flow: TextView
 
     override fun initLayoutResourceId(): Int {
         return R.layout.fragment_mine
@@ -38,7 +41,7 @@ class MineFragment : MvpBaseFragment<IBasePresenter>() {
         tv_login_or_logout.text = if (userInfoBean == null) "登录" else "退出登录"
     }
 
-    @OnClick(R.id.tv_login_or_logout)
+    @OnClick(R.id.tv_login_or_logout, R.id.tv_push_the_flow)
     fun onclick(view: View): Unit {
         when(view.id){
             R.id.tv_login_or_logout -> {
@@ -49,6 +52,9 @@ class MineFragment : MvpBaseFragment<IBasePresenter>() {
                     UserInfoUtil.cleanSP()
                     tv_login_or_logout.text = "登录"
                 }
+            }
+            R.id.tv_push_the_flow -> {
+                startActivity(Intent(activity, PushTheFlowActivity::class.java))
             }
             else -> {}
         }

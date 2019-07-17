@@ -15,4 +15,16 @@
         android:textColor="@color/white"
         android:text="登录"
         />
+
+    <TextView
+        android:id="@+id/tv_push_the_flow"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:background="@color/color_main_theme"
+        android:textColor="@color/white"
+        android:text="推流"
+        />
+
 </LinearLayout>

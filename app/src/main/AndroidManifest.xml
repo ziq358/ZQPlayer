@@ -55,6 +55,7 @@
         <activity android:name=".mvvm.register.RegisterActivity"/>
 
         <activity android:name=".mvp.live.ui.LiveActivity"/>
+        <activity android:name=".mvp.live.ui.PushTheFlowActivity"/>
         <activity android:name=".test.ZQPlayerServiceTestActivity"/>
         <activity android:name=".test.OpenGL2Activity"/>
 
