@@ -413,8 +413,8 @@ void Java_com_zq_playerlib_ZQPlayer_playdemo(JNIEnv *env, jobject cls, jobject s
     AVFilterGraph *filter_graph = avfilter_graph_alloc();
     AVFilterContext *buffersink_ctx;
     AVFilterContext *buffersrc_ctx;
-    AVFilter *buffersrc = avfilter_get_by_name("buffer");
-    AVFilter *buffersink = avfilter_get_by_name("buffersink");//新版的ffmpeg库必须为buffersink
+    const AVFilter *buffersrc = avfilter_get_by_name("buffer");
+    const AVFilter *buffersink = avfilter_get_by_name("buffersink");//新版的ffmpeg库必须为buffersink
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs = avfilter_inout_alloc();
     /* buffer video source: the decoded frames from the decoder will be inserted here. */

@@ -22,7 +22,7 @@ extern "C" {
 #import <android/native_window.h>
 #import <android/native_window_jni.h>
 //filter
-#import <libavfilter/avfiltergraph.h>
+#import <libavfilter/avfilter.h>
 #import <libavfilter/buffersrc.h>
 #import <libavfilter/buffersink.h>
 #import "libswresample/swresample.h"
