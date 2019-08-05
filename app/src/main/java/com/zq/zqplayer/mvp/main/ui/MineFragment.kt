@@ -1,14 +1,18 @@
 package com.zq.zqplayer.mvp.main.ui
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import butterknife.BindView
 import butterknife.OnClick
+import com.tbruyelle.rxpermissions2.RxPermissions
 import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvp.IBasePresenter
 import com.ziq.base.mvp.MvpBaseFragment
+import com.ziq.base.utils.PermissionUtil
 import com.zq.zqplayer.R
 import com.zq.zqplayer.bean.UserInfoBean
 import com.zq.zqplayer.mvp.live.ui.PushTheFlowActivity
@@ -54,7 +58,24 @@ class MineFragment : MvpBaseFragment<IBasePresenter>() {
                 }
             }
             R.id.tv_push_the_flow -> {
-                startActivity(Intent(activity, PushTheFlowActivity::class.java))
+
+                PermissionUtil.requestPermission(
+                        object : PermissionUtil.RequestPermission {
+                            override fun onRequestPermissionSuccess() {
+                                startActivity(Intent(activity, PushTheFlowActivity::class.java))
+                            }
+
+                            override fun onRequestPermissionFailure(permissions: List<String>) {
+                                Log.e("ziq", "onRequestPermissionFailure: \n$permissions")
+                            }
+
+                            override fun onRequestPermissionFailureWithAskNeverAgain(permissions: List<String>) {
+                                Log.e("ziq", "onRequestPermissionFailureWithAskNeverAgain: \n$permissions")
+                            }
+                        }, RxPermissions(this),
+                        Manifest.permission.CAMERA
+                )
+
             }
             else -> {}
         }
