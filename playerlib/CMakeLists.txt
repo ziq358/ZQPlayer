@@ -37,6 +37,9 @@ set_target_properties(swresample-3 PROPERTIES IMPORTED_LOCATION ${JNI_LIBS_ABI_D
 add_library(swscale-5 SHARED IMPORTED)
 set_target_properties(swscale-5 PROPERTIES IMPORTED_LOCATION ${JNI_LIBS_ABI_DIR}/libswscale-5.so)
 
+add_library(postproc-55 SHARED IMPORTED)
+set_target_properties(postproc-55 PROPERTIES IMPORTED_LOCATION ${JNI_LIBS_ABI_DIR}/libpostproc-55.so)
+
 #查找一个库文件
 find_library(log-lib log )
 #将给定的库链接到一个目标上。
@@ -47,5 +50,6 @@ target_link_libraries( player-lib
                        avutil-56
                        swresample-3
                        swscale-5
+                       postproc-55
                        -landroid # 解决ANativeWindow_fromSurface 找不到问题
                        ${log-lib} )

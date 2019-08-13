@@ -1,8 +1,7 @@
-#include "player.h"
+#import "player.h"
 
 extern "C" {
 
-JavaVM *javaVM;
 Player *player = NULL;
 void* initRunnable(void *data);
 void* playRunnable(void *data);
@@ -10,17 +9,7 @@ void* playAudioRunnable(void *data);
 void* playVideoRunnable(void *data);
 void* clearVideoFramesRunnable(void *data);
 
-jint JNI_OnLoad(JavaVM *vm, void *reserved) {
-    jint result = -1;
-    javaVM = vm;
-    JNIEnv *env;
-    logd("JNI_OnLoad");
-    if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
-        loge("GetEnv 失败");
-        return result;
-    }
-    return JNI_VERSION_1_6;
-}
+
 
 void Java_com_zq_playerlib_ZQPlayer_init(JNIEnv *env, jobject cls, jstring path) {
     jboolean isCopy = JNI_TRUE;

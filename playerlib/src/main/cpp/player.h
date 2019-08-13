@@ -1,4 +1,4 @@
-#import <jni.h>
+#import "LibInit.h"
 #import <unistd.h> // sleep 的头文件
 #import <string>
 #import <iostream>
