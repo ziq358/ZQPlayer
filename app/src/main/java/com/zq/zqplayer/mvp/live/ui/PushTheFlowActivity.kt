@@ -1,29 +1,19 @@
 package com.zq.zqplayer.mvp.live.ui
 
-import android.Manifest
-import android.content.Intent
 import android.hardware.Camera
 import android.os.Bundle
-import android.util.Log
-import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.widget.Toast
 import butterknife.BindView
 import butterknife.OnClick
-import com.tbruyelle.rxpermissions2.RxPermissions
 import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvp.IBasePresenter
 import com.ziq.base.mvp.MvpBaseActivity
 import com.ziq.base.utils.CameraUtils
-import com.ziq.base.utils.PermissionUtil
 import com.zq.playerlib.ZQPusher
-import com.zq.playerlib.ZQVideoView
 import com.zq.zqplayer.R
-import com.zq.zqplayer.bean.UserInfoBean
-import com.zq.zqplayer.mvvm.login.LoginActivity
-import com.zq.zqplayer.util.UserInfoUtil
 
 class PushTheFlowActivity : MvpBaseActivity<IBasePresenter>(), SurfaceHolder.Callback, Camera.PreviewCallback {
 

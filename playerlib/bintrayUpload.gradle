@@ -1,0 +1,82 @@
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+// 定义参数
+def P_REPO_NAME = "anZhuo"
+def P_GROUP_ID = "com.zq.zqplayer"
+def P_ARTIFACT_ID = "zqplayer"
+def P_VERSION = rootProject.ext.android["versionName"]
+def P_NAME = "zqplayer"
+def P_GIT_URL = "https://github.com/ziq358/ZQPlayer"
+def P_VCS_URL = "https://github.com/ziq358/ZQPlayer.git"
+def P_ISSUE_TRACKER_URL = "https://github.com/ziq358/ZQPlayer/issues"
+def P_DESCRIPTION = "自定义播放器"
+
+def DEVELOPER_ID=""
+def DEVELOPER_NAME="ziq358"
+def DEVELOPER_EMAIL="461804160@qq.com"
+
+group = "$P_GROUP_ID"
+version = "$P_VERSION"
+project.archivesBaseName = "$P_ARTIFACT_ID"
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name P_NAME
+            description P_DESCRIPTION //project description
+            url P_GIT_URL //project weiste url
+
+            groupId P_GROUP_ID  //group
+            artifactId P_ARTIFACT_ID //artifactId
+            version P_VERSION  //version
+            packaging 'aar'
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                connection P_VCS_URL
+                url P_GIT_URL
+            }
+            developers {
+                developer {
+                    id DEVELOPER_ID
+                    name DEVELOPER_NAME
+                    email DEVELOPER_EMAIL
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    user = properties.getProperty('BINTRAY_USER')
+    key = properties.getProperty('BINTRAY_KEY')
+    configurations = ['archives']
+    dryRun = false
+    publish = true
+    pkg {
+        repo = P_REPO_NAME
+        name = P_NAME
+        licenses = ['Apache-2.0']
+        vcsUrl = P_VCS_URL
+        websiteUrl = P_GIT_URL
+        issueTrackerUrl = P_ISSUE_TRACKER_URL
+        publicDownloadNumbers = true
+        version {
+            name = P_VERSION
+            desc = P_DESCRIPTION
+            vcsTag = P_VERSION
+            gpg {
+                sign = true
+            }
+        }
+    }
+}

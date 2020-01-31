@@ -101,14 +101,10 @@ def getGitBranch() {
 }
 
 dependencies {
-
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    api project(":playerlib")
+//    api project(":playerlib")
     //ZQSDK 会添加以下依赖
 //    api 'com.ziq.base:base:+'
 //    api 'com.zq.customviewlib:customviewlib:+'
@@ -120,6 +116,7 @@ dependencies {
         exclude module: 'support-annotations'
     }
 
+    api rootProject.ext.dependencies["constraintlayout"]
     api rootProject.ext.dependencies["appcompat"]
     api rootProject.ext.dependencies["recyclerview"]
     api rootProject.ext.dependencies["design"]
@@ -147,9 +144,11 @@ ZQSDK {
     //依赖 库
     //添加了基础库依赖，默认是添加最新版 “+”
     BaseLib{
-//            versionName '3.1.2'
+       versionName '3.3.2'
     }
-    CustomViewLib{}
+    CustomViewLib{
+        versionName '3.3.2'
+    }
 
     //会移除 基础库依赖
 //    configurations.all {

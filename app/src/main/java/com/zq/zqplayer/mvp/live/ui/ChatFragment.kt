@@ -1,15 +1,17 @@
 package com.zq.zqplayer.mvp.live.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
-import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.BaseViewHolder
 import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvp.IBasePresenter
 import com.ziq.base.mvp.MvpBaseFragment
+import com.ziq.base.recycleview.BaseViewHolder
+import com.ziq.base.recycleview.adapter.ListRecyclerAdapter
 import com.zq.zqplayer.R
 
 /**
@@ -39,7 +41,7 @@ class ChatFragment : MvpBaseFragment<IBasePresenter>() {
         dataList.add(Data("皮一皮十年少", "6666"))
         dataList.add(Data("心随", "6666"))
 
-        var adapter: ChatListAdapter = ChatListAdapter(dataList)
+        var adapter: ChatListAdapter = ChatListAdapter(context,dataList)
         recycleView.layoutManager = LinearLayoutManager(context)
         recycleView.adapter = adapter
     }
@@ -47,15 +49,14 @@ class ChatFragment : MvpBaseFragment<IBasePresenter>() {
     class Data(var name:String, var content:String){
     }
 
-    class ChatListAdapter:BaseQuickAdapter<Data, BaseViewHolder>{
-
-        constructor(data: List<Data>?) : super(R.layout.item_chat, data){
-
+    class ChatListAdapter(context: Context?, data: MutableList<Data>?) : ListRecyclerAdapter<Data>(context, data) {
+        override fun getItemLayoutRes(): Int {
+            return R.layout.item_chat
         }
 
-        override fun convert(helper: BaseViewHolder?, item: Data?) {
-            helper?.setText(R.id.name, item?.name)
-            helper?.setText(R.id.content, item?.content)
+        override fun bindDataViewHolder(holder: BaseViewHolder?, position: Int) {
+            holder?.getViewById<TextView>(R.id.name)?.text = getItem(position).name
+            holder?.getViewById<TextView>(R.id.content)?.text = getItem(position).content
         }
     }
 

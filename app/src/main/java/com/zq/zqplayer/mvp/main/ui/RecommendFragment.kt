@@ -1,6 +1,5 @@
 package com.zq.zqplayer.mvp.main.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -10,21 +9,20 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import com.bumptech.glide.Glide
-import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.baserx.dagger.module.LifecycleProviderModule
 import com.ziq.base.mvp.MvpBaseFragment
 import com.zq.customviewlib.AutoRollViewPager
 import com.zq.zqplayer.R
-import com.zq.zqplayer.bean.*
+import com.zq.zqplayer.bean.LiveItemDetailBean
+import com.zq.zqplayer.bean.LiveListItemBean
 import com.zq.zqplayer.mvp.adapter.RecommendAdapter
 import com.zq.zqplayer.mvp.live.ui.LiveActivity
 import com.zq.zqplayer.mvp.main.contract.RecommendContract
 import com.zq.zqplayer.mvp.main.dagger.component.DaggerRecommendComponent
 import com.zq.zqplayer.mvp.main.dagger.module.RecommendModule
 import com.zq.zqplayer.mvp.main.presenter.RecommendPresenter
-import java.io.*
 
 
 /**
@@ -40,7 +38,7 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
     lateinit var recycleView: RecyclerView;
 
 
-    var data:ArrayList<MultiItemEntity> = arrayListOf()
+    var data:ArrayList<LiveListItemBean> = arrayListOf()
     var adapter:RecommendAdapter? = null
 
     override fun initLayoutResourceId(): Int {
@@ -53,21 +51,16 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
                 .lifecycleProviderModule(LifecycleProviderModule(this))
                 .recommendModule(RecommendModule(this))
                 .build().inject(this)
+
     }
 
     override fun initData(view: View, savedInstanceState: Bundle?) {
-
-
-        data.add(BannerMultiItemEntity())
-        data.add(TitleMultiItemEntity())
-        adapter = RecommendAdapter(data)
+        initBanner()
+        adapter = RecommendAdapter(context,data)
         recycleView.adapter = adapter // 要先设置 adapter  SpanSizeLookup才有效
         val layoutManager: GridLayoutManager = GridLayoutManager(context, 2)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                if(position == 0 || position == 1){
-                    return 2
-                }
                 return 1
             }
         }
@@ -82,6 +75,27 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
         mSmartRefreshLayout.setOnRefreshListener { onRefreshLive() }
         mSmartRefreshLayout.setOnLoadMoreListener { onLoadMoreLive() }
         mSmartRefreshLayout.autoRefresh()
+    }
+
+    private fun initBanner() {
+        val recommendBannerList:ArrayList<Int> = arrayListOf()
+        recommendBannerList.add(R.drawable.home_recommend_live_app_1523155786)
+        recommendBannerList.add(R.drawable.home_recommend_live_app_1526869950)
+        recommendBannerList.add(R.drawable.home_recommend_live_app_1530243925)
+        recommendBannerList.add(R.drawable.home_recommend_live_app_1540959428)
+        val autoRollViewPager: AutoRollViewPager = view?.findViewById(R.id.autoRollViewPager)!!
+        autoRollViewPager.adapter = object : AutoRollViewPager.RollViewPagerAdapter<Int>(recommendBannerList) {
+            override fun getItemLayoutRes(): Int {
+                return R.layout.item_in_recommend_banner
+            }
+
+            override fun onBindItemView(rootView: ViewGroup?, position: Int, realPosition: Int) {
+                val imageUrl:Int = getItem(realPosition)
+                val ivContent: ImageView = rootView!!.findViewById(R.id.iv_content);
+                Glide.with(rootView.context).load(imageUrl).into(ivContent)
+            }
+        }
+        autoRollViewPager.startRoll()
     }
 
 
@@ -101,20 +115,13 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
 
     override fun setData(items: List<LiveListItemBean>) {
         if (mSmartRefreshLayout.isRefreshing) {
-            adapter!!.data.clear()
-            adapter!!.data.add(BannerMultiItemEntity())
-            adapter!!.data.add(TitleMultiItemEntity())
+            adapter?.setData(items)
             mSmartRefreshLayout.finishRefresh()
         } else {
+            adapter?.addDataList(items)
             mSmartRefreshLayout.finishLoadMore()
         }
         mSmartRefreshLayout.isEnableLoadMore = !items.isEmpty()
-        var dataList:ArrayList<LiveItemMultiItemEntity> = arrayListOf<LiveItemMultiItemEntity>()
-        for (itemBean in items){
-            dataList.add(LiveItemMultiItemEntity(itemBean))
-        }
-        adapter!!.data.addAll(dataList)
-        adapter!!.notifyDataSetChanged()
     }
 
     override fun onGetVideoUrlSuccessful(detailBean: LiveItemDetailBean) {
