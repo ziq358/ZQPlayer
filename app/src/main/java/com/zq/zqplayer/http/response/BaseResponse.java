@@ -48,7 +48,7 @@ public class BaseResponse<T> {
     }
 
     public boolean isSuccess(){
-        return "1".equalsIgnoreCase(code);
+        return "0".equalsIgnoreCase(code);
     }
 
 }

@@ -2,13 +2,10 @@ package com.zq.zqplayer.mvp.main.presenter
 
 import com.ziq.base.baserx.dagger.bean.IRepositoryManager
 import com.ziq.base.mvp.BasePresenter
-import com.ziq.base.utils.RetrofitUtil
-import com.zq.zqplayer.http.request.ZQPlayerVideoListRequest
-import com.zq.zqplayer.http.request.ZQPlayerVideoUrlRequest
+import com.zq.zqplayer.http.request.LiveRequest
 import com.zq.zqplayer.http.BaseObserver
 import com.zq.zqplayer.http.response.BaseResponse
-import com.zq.zqplayer.bean.LiveListItemBean
-import com.zq.zqplayer.bean.LiveItemDetailBean
+import com.zq.zqplayer.bean.RoomInfoBean
 import com.zq.zqplayer.mvp.main.contract.RecommendContract
 import com.zq.zqplayer.http.service.VideoService
 import com.zq.zqplayer.util.UserInfoUtil
@@ -38,19 +35,18 @@ class RecommendPresenter : BasePresenter {
     }
 
     var currentPage:Int = 0;
-    fun getZqVideoList(isRefresh:Boolean) {
+    fun getLiveList(isRefresh:Boolean) {
 
         if(isRefresh){
             currentPage = 0;
         }
 
-        val request = ZQPlayerVideoListRequest()
+        val request = LiveRequest()
         request.offset = "${currentPage * 20}"
         request.limit = "20"
-        request.game_type = "ow"
 
-        mRepositoryManager.createService(VideoService::class.java!!)
-                .getZQVideoList(headers, request)
+        mRepositoryManager.createService(VideoService::class.java)
+                .getLiveList(headers, request)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     mView.showLoading()
@@ -61,8 +57,8 @@ class RecommendPresenter : BasePresenter {
                     mView.hideLoading()
                 }
                 .compose(this.getDestroyLifecycleTransformer())
-                .subscribe(object : BaseObserver<BaseResponse<ArrayList<LiveListItemBean>>>() {
-                    override fun onSuccessful(t: BaseResponse<ArrayList<LiveListItemBean>>?) {
+                .subscribe(object : BaseObserver<BaseResponse<ArrayList<RoomInfoBean>>>() {
+                    override fun onSuccessful(t: BaseResponse<ArrayList<RoomInfoBean>>?) {
                         if(t?.data != null){
                             currentPage++
                             mView.setData(t.data)
@@ -75,38 +71,6 @@ class RecommendPresenter : BasePresenter {
 
                 })
     }
-
-    fun getZqVideoUrl(roomId:String , live_type:String, game_type:String) {
-        val request: ZQPlayerVideoUrlRequest = ZQPlayerVideoUrlRequest();
-        request.live_id = roomId
-        request.live_type = live_type
-        request.game_type = game_type
-        mRepositoryManager.createService(VideoService::class.java!!)
-                .getZQVideoListUrl(headers, request)
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe {
-                    mView.showLoading()
-                }
-                .subscribeOn(AndroidSchedulers.mainThread())//控制doOnSubscribe 所在线程
-                .observeOn(AndroidSchedulers.mainThread())
-                .doFinally {
-                    mView.hideLoading()
-                }
-                .compose(this.getDestroyLifecycleTransformer())
-                .subscribe(object : BaseObserver<BaseResponse<LiveItemDetailBean>>() {
-                    override fun onSuccessful(t: BaseResponse<LiveItemDetailBean>?) {
-                        if(t?.data != null){
-                            mView.onGetVideoUrlSuccessful(t.data)
-                        }
-                    }
-
-                    override fun onFailed(msg: String?) {
-                        mView.showMessage(msg)
-                    }
-
-                })
-    }
-
 
     override fun destroy() {
     }

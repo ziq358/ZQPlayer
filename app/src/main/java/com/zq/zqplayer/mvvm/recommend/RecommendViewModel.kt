@@ -6,11 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import com.trello.rxlifecycle3.LifecycleProvider
 import com.ziq.base.baserx.dagger.bean.IRepositoryManager
 import com.ziq.base.utils.LifecycleUtil
-import com.zq.zqplayer.bean.LiveItemDetailBean
-import com.zq.zqplayer.bean.LiveListItemBean
+import com.zq.zqplayer.bean.RoomInfoBean
 import com.zq.zqplayer.http.BaseObserver
-import com.zq.zqplayer.http.request.ZQPlayerVideoListRequest
-import com.zq.zqplayer.http.request.ZQPlayerVideoUrlRequest
+import com.zq.zqplayer.http.request.LiveRequest
 import com.zq.zqplayer.http.response.BaseResponse
 import com.zq.zqplayer.http.service.VideoService
 import com.zq.zqplayer.util.UserInfoUtil
@@ -27,9 +25,8 @@ class RecommendViewModel : AndroidViewModel, IRecommendViewModel{
 
     override val toastMsg = MutableLiveData<String>()
     override val isLoading = MutableLiveData<Boolean>()
-    override val onRefreshItems = MutableLiveData<ArrayList<LiveListItemBean>>()
-    override val onLoadMoreItems = MutableLiveData<ArrayList<LiveListItemBean>>()
-    override val onDetailClick =  MutableLiveData<LiveItemDetailBean>()
+    override val onRefreshItems = MutableLiveData<ArrayList<RoomInfoBean>>()
+    override val onLoadMoreItems = MutableLiveData<ArrayList<RoomInfoBean>>()
 
 
     @Inject
@@ -50,13 +47,12 @@ class RecommendViewModel : AndroidViewModel, IRecommendViewModel{
             currentPage = 0;
         }
 
-        val request = ZQPlayerVideoListRequest()
+        val request = LiveRequest()
         request.offset = "${currentPage * 20}"
         request.limit = "20"
-        request.game_type = "ow"
 
-        mRepositoryManager.createService(VideoService::class.java!!)
-                .getZQVideoList(headers, request)
+        mRepositoryManager.createService(VideoService::class.java)
+                .getLiveList(headers, request)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     isLoading.value = true
@@ -67,8 +63,8 @@ class RecommendViewModel : AndroidViewModel, IRecommendViewModel{
                     isLoading.value = false
                 }
                 .compose(LifecycleUtil.bindToDestroy(lifecycleProvider))
-                .subscribe(object : BaseObserver<BaseResponse<ArrayList<LiveListItemBean>>>() {
-                    override fun onSuccessful(t: BaseResponse<ArrayList<LiveListItemBean>>?) {
+                .subscribe(object : BaseObserver<BaseResponse<ArrayList<RoomInfoBean>>>() {
+                    override fun onSuccessful(t: BaseResponse<ArrayList<RoomInfoBean>>?) {
                         if(t?.data != null){
                             currentPage++
                             if(isRefresh){
@@ -76,37 +72,6 @@ class RecommendViewModel : AndroidViewModel, IRecommendViewModel{
                             }else{
                                 onLoadMoreItems.value = t.data
                             }
-                        }
-                    }
-
-                    override fun onFailed(msg: String?) {
-                        toastMsg.value = msg
-                    }
-
-                })
-    }
-
-    override fun getZqVideoUrl(roomId:String, live_type:String, game_type:String) {
-        val request: ZQPlayerVideoUrlRequest = ZQPlayerVideoUrlRequest();
-        request.live_id = roomId
-        request.live_type = live_type
-        request.game_type = game_type
-        mRepositoryManager.createService(VideoService::class.java!!)
-                .getZQVideoListUrl(headers, request)
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe {
-                    isLoading.value = true
-                }
-                .subscribeOn(AndroidSchedulers.mainThread())//控制doOnSubscribe 所在线程
-                .observeOn(AndroidSchedulers.mainThread())
-                .doFinally {
-                    isLoading.value = false
-                }
-                .compose(LifecycleUtil.bindToDestroy(lifecycleProvider))
-                .subscribe(object : BaseObserver<BaseResponse<LiveItemDetailBean>>() {
-                    override fun onSuccessful(t: BaseResponse<LiveItemDetailBean>?) {
-                        if(t?.data != null){
-                            onDetailClick.value = t.data
                         }
                     }
 

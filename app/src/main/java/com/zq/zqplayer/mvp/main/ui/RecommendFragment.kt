@@ -15,8 +15,7 @@ import com.ziq.base.baserx.dagger.module.LifecycleProviderModule
 import com.ziq.base.mvp.MvpBaseFragment
 import com.zq.customviewlib.AutoRollViewPager
 import com.zq.zqplayer.R
-import com.zq.zqplayer.bean.LiveItemDetailBean
-import com.zq.zqplayer.bean.LiveListItemBean
+import com.zq.zqplayer.bean.RoomInfoBean
 import com.zq.zqplayer.mvp.adapter.RecommendAdapter
 import com.zq.zqplayer.mvp.live.ui.LiveActivity
 import com.zq.zqplayer.mvp.main.contract.RecommendContract
@@ -38,7 +37,7 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
     lateinit var recycleView: RecyclerView;
 
 
-    var data:ArrayList<LiveListItemBean> = arrayListOf()
+    var data:ArrayList<RoomInfoBean> = arrayListOf()
     var adapter:RecommendAdapter? = null
 
     override fun initLayoutResourceId(): Int {
@@ -66,8 +65,8 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
         }
         recycleView.layoutManager = layoutManager
         adapter!!.mOnActionListener = object : RecommendAdapter.OnActionListener {
-            override fun onLiveItemClick(item: LiveListItemBean) {
-                mPresenter.getZqVideoUrl(item.live_id, item.live_type, item.game_type)
+            override fun onLiveItemClick(item: RoomInfoBean) {
+                LiveActivity.openVideo(context, item.live_url, item.room_name)
             }
         }
 
@@ -100,11 +99,11 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
 
 
     private fun onRefreshLive(): Unit {
-        mPresenter.getZqVideoList(true)
+        mPresenter.getLiveList(true)
     }
 
     private fun onLoadMoreLive(): Unit {
-        mPresenter.getZqVideoList(false)
+        mPresenter.getLiveList(false)
     }
 
     override fun hideLoading() {
@@ -113,7 +112,7 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
         mSmartRefreshLayout.finishLoadMore()
     }
 
-    override fun setData(items: List<LiveListItemBean>) {
+    override fun setData(items: List<RoomInfoBean>) {
         if (mSmartRefreshLayout.isRefreshing) {
             adapter?.setData(items)
             mSmartRefreshLayout.finishRefresh()
@@ -122,15 +121,6 @@ class RecommendFragment : MvpBaseFragment<RecommendPresenter>(), RecommendContra
             mSmartRefreshLayout.finishLoadMore()
         }
         mSmartRefreshLayout.isEnableLoadMore = !items.isEmpty()
-    }
-
-    override fun onGetVideoUrlSuccessful(detailBean: LiveItemDetailBean) {
-        if(detailBean.stream_list != null && !detailBean.stream_list.isEmpty()){
-            var stream = detailBean.stream_list[0]
-            LiveActivity.openVideo(context, stream.url, detailBean.live_title)
-        }else{
-            Toast.makeText(activity, "暂无直播源", Toast.LENGTH_SHORT).show()
-        }
     }
 
     override fun showMessage(msg: String?) {

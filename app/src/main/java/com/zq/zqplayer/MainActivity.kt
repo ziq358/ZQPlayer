@@ -14,11 +14,8 @@ import com.zq.customviewlib.NoScrollViewPager
 import com.zq.zqplayer.mvp.adapter.FragmentViewPagerAdapter
 import com.zq.zqplayer.mvp.main.ui.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.android.Main
-import kotlinx.coroutines.android.UI
-import kotlinx.coroutines.timeunit.TimeUnit
-import me.leolin.shortcutbadger.ShortcutBadger
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : MvpBaseActivity<IBasePresenter>() {
@@ -85,8 +82,7 @@ class MainActivity : MvpBaseActivity<IBasePresenter>() {
 
         })
 
-        ShortcutBadger.applyCount(this, 5)
-
+        //协程
         loadData()
         loadData2()
     }

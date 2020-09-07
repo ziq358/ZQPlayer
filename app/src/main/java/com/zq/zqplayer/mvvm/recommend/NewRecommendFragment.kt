@@ -13,8 +13,7 @@ import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvvm.MvvmBaseFragment
 import com.zq.customviewlib.AutoRollViewPager
 import com.zq.zqplayer.R
-import com.zq.zqplayer.bean.LiveItemDetailBean
-import com.zq.zqplayer.bean.LiveListItemBean
+import com.zq.zqplayer.bean.RoomInfoBean
 import com.zq.zqplayer.databinding.FragmentNewRecommendBinding
 import com.zq.zqplayer.mvp.live.ui.LiveActivity
 import com.zq.zqplayer.mvvm.LifecycleProviderModule
@@ -80,8 +79,8 @@ class NewRecommendFragment: MvvmBaseFragment() {
         }
         binding?.recycleView?.layoutManager = layoutManager
         adapter!!.mOnActionListener = object : NewRecommendAdapter.OnActionListener {
-            override fun onLiveItemClick(item: LiveListItemBean) {
-                mRecommendViewModel.getZqVideoUrl(item.live_id, item.live_type, item.game_type)
+            override fun onLiveItemClick(item: RoomInfoBean) {
+                LiveActivity.openVideo(context, item.live_url, item.room_name)
             }
         }
     }
@@ -103,31 +102,23 @@ class NewRecommendFragment: MvvmBaseFragment() {
             }
         })
 
-        mRecommendViewModel.onRefreshItems.observe(this, object : Observer<ArrayList<LiveListItemBean>> {
-            override fun onChanged(t: ArrayList<LiveListItemBean>?) {
+        mRecommendViewModel.onRefreshItems.observe(this, object : Observer<ArrayList<RoomInfoBean>> {
+            override fun onChanged(t: ArrayList<RoomInfoBean>?) {
                 adapter?.data?.clear()
                 adapter?.data?.addAll(t!!)
                 adapter?.notifyDataSetChanged()
+                binding?.smartRefreshLayout?.isEnableLoadMore = t!!.isNotEmpty()
             }
         })
 
-        mRecommendViewModel.onLoadMoreItems.observe(this, object : Observer<ArrayList<LiveListItemBean>> {
-            override fun onChanged(t: ArrayList<LiveListItemBean>?) {
+        mRecommendViewModel.onLoadMoreItems.observe(this, object : Observer<ArrayList<RoomInfoBean>> {
+            override fun onChanged(t: ArrayList<RoomInfoBean>?) {
                 adapter?.data?.addAll(t!!)
                 adapter?.notifyDataSetChanged()
+                binding?.smartRefreshLayout?.isEnableLoadMore = t!!.isNotEmpty()
             }
         })
 
-        mRecommendViewModel.onDetailClick.observe(this, object : Observer<LiveItemDetailBean> {
-            override fun onChanged(detailBean: LiveItemDetailBean?) {
-                if(detailBean!!.stream_list != null && !detailBean.stream_list.isEmpty()){
-                    var stream = detailBean!!.stream_list[0]
-                    LiveActivity.openVideo(context, stream.url, detailBean.live_title)
-                }else{
-                    Toast.makeText(activity, "暂无直播源", Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
     }
 
     override fun hideLoading() {

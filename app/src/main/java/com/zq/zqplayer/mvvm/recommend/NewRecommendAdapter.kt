@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import androidx.databinding.DataBindingUtil
 import com.zq.zqplayer.R
-import com.zq.zqplayer.bean.LiveListItemBean
+import com.zq.zqplayer.bean.RoomInfoBean
 import com.zq.zqplayer.databinding.ItemNewRecommendLiveItemBinding
 import androidx.annotation.NonNull
 
@@ -15,9 +15,9 @@ import androidx.annotation.NonNull
 
 class NewRecommendAdapter : RecyclerView.Adapter<NewRecommendAdapter.ViewHolder> {
 
-    var data: ArrayList<LiveListItemBean>? = null
+    var data: ArrayList<RoomInfoBean>? = null
 
-    constructor(data: ArrayList<LiveListItemBean>?) : super() {
+    constructor(data: ArrayList<RoomInfoBean>?) : super() {
         this.data = data
     }
 
@@ -44,7 +44,7 @@ class NewRecommendAdapter : RecyclerView.Adapter<NewRecommendAdapter.ViewHolder>
 
 
     interface OnActionListener{
-        fun onLiveItemClick(item: LiveListItemBean): Unit
+        fun onLiveItemClick(item: RoomInfoBean): Unit
     }
 
 
@@ -55,7 +55,7 @@ class NewRecommendAdapter : RecyclerView.Adapter<NewRecommendAdapter.ViewHolder>
             mBinding = DataBindingUtil.bind( itemView)
         }
 
-        fun bind(@NonNull itme: LiveListItemBean) {
+        fun bind(@NonNull itme: RoomInfoBean) {
             mBinding?.item = itme
         }
     }

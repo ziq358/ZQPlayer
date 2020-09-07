@@ -1,7 +1,6 @@
 package com.zq.zqplayer
 
 import android.graphics.Color
-import cn.jpush.android.api.JPushInterface
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
@@ -23,9 +22,6 @@ class ZQPlayerApplication : BaseApplication() {
         super.onCreate()
 
         sApplication = this
-
-        JPushInterface.setDebugMode(true);
-        JPushInterface.init(this);
 
         SmartRefreshLayout.setDefaultRefreshHeaderCreator { context, layout ->
             val header = ClassicsHeader(context)
