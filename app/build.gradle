@@ -104,25 +104,17 @@ dependencies {
 
     api project(":playerlib")
 
-    kapt(rootProject.ext.dependencies["butterknife-compiler"]) {
+    kapt("com.jakewharton:butterknife-compiler:10.2.1") {
         exclude module: 'support-annotations'
     }
-    kapt (rootProject.ext.dependencies["dagger2-compiler"]){
+    kapt ("com.google.dagger:dagger-compiler:2.24"){
         exclude module: 'support-annotations'
     }
 
-    api rootProject.ext.dependencies["constraintlayout"]
-    api rootProject.ext.dependencies["appcompat"]
-    api rootProject.ext.dependencies["recyclerview"]
-    api rootProject.ext.dependencies["design"]
+    api "androidx.constraintlayout:constraintlayout:2.0.1"
+    api "com.google.android.material:material:1.3.0-alpha02"
 
     api 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.5.1'
-
-    // Architecture Components
-    implementation rootProject.ext.dependencies["lifecycle-extensions"]
-    annotationProcessor rootProject.ext.dependencies["lifecycle-compiler"]
-
-
 
 }
 
@@ -130,7 +122,7 @@ ZQSDK {
     //依赖 库
     //添加了基础库依赖，默认是添加最新版 “+”
     BaseLib{
-       versionName '3.3.2'
+       versionName '3.3.3'
     }
     CustomViewLib{
         versionName '3.3.2'

@@ -2,9 +2,10 @@ package com.zq.zqplayer.mvvm.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import com.ziq.base.baserx.dagger.component.AppComponent
 import com.ziq.base.mvvm.MvvmBaseActivity
 import com.zq.zqplayer.MainActivity
@@ -38,7 +39,6 @@ class LoginActivity : MvvmBaseActivity() {
     override fun initData(savedInstanceState: Bundle?) {
         activityLoginBinding?.viewmodel = loginViewModel
         activityLoginBinding?.lifecycleOwner = this // 设置了这个， livedata 的变化才会应用到界面
-
         loginViewModel.toastMsg.observe(this, object : Observer<String> {
             override fun onChanged(t: String?) {
                 Toast.makeText(this@LoginActivity, t, Toast.LENGTH_LONG).show()
@@ -76,7 +76,6 @@ class LoginActivity : MvvmBaseActivity() {
             startActivity(Intent(this@LoginActivity, MainActivity::class.java))
             finish()
         }
-
     }
 
 }
