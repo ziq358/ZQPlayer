@@ -14,26 +14,12 @@ class UserInfoUtil {
         private var sUserInfoBean: UserInfoBean? = null
 
         fun getUserInfo(): UserInfoBean? {
-            if(sUserInfoBean == null){
-                synchronized(UserInfoUtil::class.java) {
-                    if (sUserInfoBean == null) {
-                        sUserInfoBean = getUserInfoFromSP()
-                    }
-                }
-            }
             return sUserInfoBean
         }
 
         fun saveToSP(bean: UserInfoBean) {
             sUserInfoBean = bean
             SharePreferenceUtil.save(ZQPlayerApplication.sApplication, Constants.SP_KEY_USER_INFO, Gson().toJson(bean))
-        }
-
-        private fun getUserInfoFromSP(): UserInfoBean? {
-            val value = SharePreferenceUtil.get(ZQPlayerApplication.sApplication, Constants.SP_KEY_USER_INFO, "") as String
-            return if (TextUtils.isEmpty(value)) {
-                null
-            } else Gson().fromJson(value, UserInfoBean::class.java)
         }
 
         fun cleanSP() {

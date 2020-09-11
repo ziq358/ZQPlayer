@@ -38,21 +38,13 @@ class MineFragment : MvpBaseFragment<IBasePresenter>() {
 
     override fun onResume() {
         super.onResume()
-        val userInfoBean: UserInfoBean? = UserInfoUtil.getUserInfo()
-        tv_login_or_logout.text = if (userInfoBean == null) "登录" else "退出登录"
+        tv_login_or_logout.text = "登录"
     }
 
     @OnClick(R.id.tv_login_or_logout, R.id.tv_push_the_flow)
     fun onclick(view: View): Unit {
         when(view.id){
             R.id.tv_login_or_logout -> {
-                val userInfoBean: UserInfoBean? = UserInfoUtil.getUserInfo()
-                if (userInfoBean == null) {
-                    startActivity(Intent(activity, LoginActivity::class.java))
-                } else {
-                    UserInfoUtil.cleanSP()
-                    tv_login_or_logout.text = "登录"
-                }
             }
             R.id.tv_push_the_flow -> {
                 Toast.makeText(activity, "检查相机权限", Toast.LENGTH_SHORT).show()

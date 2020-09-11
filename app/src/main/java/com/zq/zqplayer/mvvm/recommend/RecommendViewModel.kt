@@ -33,9 +33,6 @@ class RecommendViewModel : AndroidViewModel, IRecommendViewModel{
     constructor(application : Application) : super(application){
         headers = HashMap()
         var token  = ""
-        if(UserInfoUtil.getUserInfo()?.token != null){
-            token = UserInfoUtil.getUserInfo()?.token!!
-        }
         headers["token"] = token
     }
 

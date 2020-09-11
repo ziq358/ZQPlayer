@@ -28,9 +28,6 @@ class RecommendPresenter : BasePresenter {
     constructor() : super(){
         headers = HashMap()
         var token  = ""
-        if(UserInfoUtil.getUserInfo()?.token != null){
-            token = UserInfoUtil.getUserInfo()?.token!!
-        }
         headers["token"] = token
     }
 

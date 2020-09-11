@@ -116,6 +116,9 @@ dependencies {
 
     api 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.5.1'
 
+    //room 数据库
+    implementation "androidx.room:room-runtime:2.2.5"
+    kapt "androidx.room:room-compiler:2.2.5"
 }
 
 ZQSDK {

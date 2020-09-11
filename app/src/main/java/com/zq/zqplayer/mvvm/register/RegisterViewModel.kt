@@ -45,33 +45,37 @@ class RegisterViewModel : AndroidViewModel, IRegisterViewModel{
 
 
     override fun register(view: View) {
-        val loginRequest = LoginRequest(userName.value!!, userPassword.value!!)
-        iRepositoryManager.createService(UserService::class.java)
-                .register(loginRequest)
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe {
-                    isLoading.value = true
-                }
-                .subscribeOn(AndroidSchedulers.mainThread())//控制doOnSubscribe 所在线程
-                .observeOn(AndroidSchedulers.mainThread())
-                .doFinally {
-                    isLoading.value = false
-                }
-                .compose(LifecycleUtil.bindToDestroy(lifecycleProvider))
-                .subscribe(object : BaseObserver<BaseResponse<UserInfoBean>>() {
-                    override fun onSuccessful(t: BaseResponse<UserInfoBean>?) {
-                        if(t!!.isSuccess && t.data != null){
-                            userInfo.value = t.data
-                        }else{
-                            toastMsg.value = t.msg
-                        }
-                    }
-
-                    override fun onFailed(msg: String?) {
-                        toastMsg.value = msg
-                    }
-
-                })
+        val userInfoBean:UserInfoBean = UserInfoBean()
+        userInfoBean.userName = userName.value!!
+        userInfoBean.password = userPassword.value!!
+        userInfo.value = userInfoBean
+//        val loginRequest = LoginRequest(userName.value!!, userPassword.value!!)
+//        iRepositoryManager.createService(UserService::class.java)
+//                .register(loginRequest)
+//                .subscribeOn(Schedulers.io())
+//                .doOnSubscribe {
+//                    isLoading.value = true
+//                }
+//                .subscribeOn(AndroidSchedulers.mainThread())//控制doOnSubscribe 所在线程
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .doFinally {
+//                    isLoading.value = false
+//                }
+//                .compose(LifecycleUtil.bindToDestroy(lifecycleProvider))
+//                .subscribe(object : BaseObserver<BaseResponse<UserInfoBean>>() {
+//                    override fun onSuccessful(t: BaseResponse<UserInfoBean>?) {
+//                        if(t!!.isSuccess && t.data != null){
+//                            userInfo.value = t.data
+//                        }else{
+//                            toastMsg.value = t.msg
+//                        }
+//                    }
+//
+//                    override fun onFailed(msg: String?) {
+//                        toastMsg.value = msg
+//                    }
+//
+//                })
     }
 
 
