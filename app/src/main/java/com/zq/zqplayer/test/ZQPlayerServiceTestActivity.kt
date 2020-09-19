@@ -1,6 +1,5 @@
 package com.zq.zqplayer.test
 
-import android.content.Context
 import android.os.Bundle
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -15,7 +14,7 @@ import com.zq.playerlib.service.PlayerItemInfo
 import com.zq.playerlib.service.StatusListener
 import com.zq.playerlib.service.ZQPlayerServiceWrap
 import com.zq.zqplayer.R
-import java.io.*
+import com.zq.zqplayer.util.VideoDataUtil
 
 /**
  *@author wuyanqiang
@@ -24,7 +23,6 @@ import java.io.*
 class ZQPlayerServiceTestActivity : MvpBaseActivity<IBasePresenter>() {
 
     private var zqPlayerServiceWrap: ZQPlayerServiceWrap? = null
-    private var videoPath: String = ""
     var playeriteminfo = PlayerItemInfo()
 
     @BindView(R.id.btn_init)
@@ -53,9 +51,8 @@ class ZQPlayerServiceTestActivity : MvpBaseActivity<IBasePresenter>() {
     }
 
     override fun initData(savedInstanceState: Bundle?) {
-        initData()
         zqPlayerServiceWrap = ZQPlayerServiceWrap(this)
-        playeriteminfo.url = videoPath
+        playeriteminfo.url = VideoDataUtil.getTestVideoPath(this.application)
         mSurfaceView.holder.addCallback(object : SurfaceHolder.Callback {
 
             override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
@@ -135,34 +132,6 @@ class ZQPlayerServiceTestActivity : MvpBaseActivity<IBasePresenter>() {
 
 
 
-    private fun initData() {
-        videoPath = getDataDirPath(this, "meidacodec") + File.separator + "gao_bai_qi_qiu.mp4"
-        val `in` = BufferedInputStream(resources.openRawResource(R.raw.gao_bai_qi_qiu))
-        val out: BufferedOutputStream
-        try {
-            val outputStream = FileOutputStream(videoPath)
-            out = BufferedOutputStream(outputStream)
-            val buf = ByteArray(1024)
-            var size = `in`.read(buf)
-            while (size > 0) {
-                out.write(buf, 0, size)
-                size = `in`.read(buf)
-            }
-            `in`.close()
-            out.flush()
-            out.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
 
-    fun getDataDirPath(context: Context, dir: String): String {
-        val path = context.externalCacheDir!!.absolutePath + File.separator + dir
-        val file = File(path)
-        if (!file.exists()) {
-            file.mkdir()
-        }
-        return path
-    }
 
 }
