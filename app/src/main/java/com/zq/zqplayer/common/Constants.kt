@@ -7,7 +7,9 @@ class Constants {
 //        const val baseUrl = "http://192.168.2.1:6666"//本地
 //        const val baseUrl = "http://10.48.78.151:6666"
 //        const val baseUrl = "http://193.112.65.251:1234"//服务器
-        const val baseUrl = "http://192.168.112.64:8080"//服务器
+        const val baseUrl = "http://192.168.1.104:80"//服务器
+        const val pushUrl = "rtmp://192.168.1.104:1935/stream/ziq"//服务器
+
 
         const val SP_KEY_USER_INFO = "sp_key_user_info"
 

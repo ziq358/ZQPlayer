@@ -59,6 +59,7 @@
         <activity android:name=".mvp.live.ui.PushTheFlowActivity"/>
         <activity android:name=".test.ZQPlayerServiceTestActivity"/>
         <activity android:name=".test.OpenGL2Activity"/>
+        <activity android:name=".test.PushVideoActivity"/>
 
     </application>
 

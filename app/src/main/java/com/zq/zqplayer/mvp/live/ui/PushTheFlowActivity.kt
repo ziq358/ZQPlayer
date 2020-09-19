@@ -14,6 +14,7 @@ import com.ziq.base.mvp.MvpBaseActivity
 import com.ziq.base.utils.CameraUtils
 import com.zq.playerlib.ZQPusher
 import com.zq.zqplayer.R
+import com.zq.zqplayer.common.Constants
 
 class PushTheFlowActivity : MvpBaseActivity<IBasePresenter>(), SurfaceHolder.Callback, Camera.PreviewCallback {
 
@@ -60,7 +61,7 @@ class PushTheFlowActivity : MvpBaseActivity<IBasePresenter>(), SurfaceHolder.Cal
             CameraUtils.startPreviewDisplay(holder, this@PushTheFlowActivity)
 
 //            pusher.initVideo("rtmp://193.112.65.251:1935/stream/ziq", mSurfaceView.getWidth(), mSurfaceView.getHeight())
-            val result:Int = pusher.initVideo("rtmp://192.168.1.104:1935/stream/ziq",
+            val result:Int = pusher.initVideo(Constants.pushUrl,
                     CameraUtils.getCamera().getParameters().getPreviewSize().width,
                     CameraUtils.getCamera().getParameters().getPreviewSize().height)
             if(result == 0){
