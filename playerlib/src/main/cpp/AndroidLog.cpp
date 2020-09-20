@@ -32,3 +32,12 @@ void logd(const char *fmt, ...) {
         va_end(vl);
     }
 } ;
+
+void logi(const char *fmt, ...) {
+    if (showLog) {
+        va_list vl;
+        va_start(vl, fmt);
+        __android_log_vprint(ANDROID_LOG_INFO, TAG, fmt, vl);
+        va_end(vl);
+    }
+} ;

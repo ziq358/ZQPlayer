@@ -10,4 +10,6 @@ public class ZQPusher {
 
     public native int onFrameCallback(byte[] buffer);
 
+    public native int pushVideo(String videoFilePath, String pushUrl);
+
 }

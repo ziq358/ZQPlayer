@@ -8,6 +8,7 @@
 extern "C" {
 #import <libavformat/avformat.h>
 #import "libavutil/imgutils.h"
+#import "libavutil/time.h"
 #endif
 class Pusher {
 public:
@@ -50,6 +51,9 @@ JNIEXPORT jint JNICALL Java_com_zq_playerlib_ZQPusher_initVideo
  */
 JNIEXPORT jint JNICALL Java_com_zq_playerlib_ZQPusher_onFrameCallback
   (JNIEnv *, jobject, jbyteArray);
+
+JNIEXPORT jint JNICALL Java_com_zq_playerlib_ZQPusher_pushVideo
+        (JNIEnv *env, jobject instance, jstring videoFilePath, jstring pushUrl);
 
 #ifdef __cplusplus
 }

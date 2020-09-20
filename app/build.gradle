@@ -68,16 +68,16 @@ android {
     dataBinding {
         enabled = true
     }
-
-    applicationVariants.all { variant ->
-        variant.outputs.all { output ->
-            def outputFile = output.outputFile
-            if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                def fileName = outputFile.name.replace(outputFile.name, "zqplayer_${getGitBranch()}_${variant.buildType.name}_${releaseTime()}.apk")
-                outputFileName = fileName
-            }
-        }
-    }
+//    //改写输出文件名称
+//    applicationVariants.all { variant ->
+//        variant.outputs.all { output ->
+//            def outputFile = output.outputFile
+//            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                def fileName = outputFile.name.replace(outputFile.name, "zqplayer_${getGitBranch()}_${variant.buildType.name}_${releaseTime()}.apk")
+//                outputFileName = fileName
+//            }
+//        }
+//    }
 }
 
 // 打包时间
